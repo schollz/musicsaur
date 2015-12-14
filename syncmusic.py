@@ -80,6 +80,12 @@ def nextSong(delay):
     global is_initialized
     global song_name
     if time.time() - last_activated > 5 or not is_initialized: # songs can only be skipped every 5 seconds
+        if not is_initialized:
+            for root, dirnames, filenames in os.walk('/home/zack/Music'):
+                for filename in fnmatch.filter(filenames, '*.mp3'):
+                    if 'Allen' in root or 'Allen' in filename:
+                        playlist.append((root, filename))
+            print(playlist)
         is_playing = False
         current_song += 1
         if current_song >= len(playlist):
@@ -87,8 +93,10 @@ def nextSong(delay):
         print(current_song)
         last_activated = time.time()
         cwd = os.getcwd()
+        print(playlist[current_song][0])
         os.chdir(playlist[current_song][0])
         cmd = 'scp ' + playlist[current_song][1].replace(' ','\ ') + ' phi@server8.duckdns.org:/www/data/sound.mp3'
+        cmd = 'cp ' + playlist[current_song][1].replace(' ','\ ') + ' ' + cwd + '/static/sound.mp3'
         print(cmd)
         os.system(cmd)
         audiofile = eyed3.load(playlist[current_song][1])
@@ -101,12 +109,7 @@ def nextSong(delay):
 
 if __name__ == "__main__":
     # Load playlist
-    for root, dirnames, filenames in os.walk('/home/zack/Music'):
-        for filename in fnmatch.filter(filenames, '*.mp3'):
-            if 'Allen' in root or 'Allen' in filename:
-                playlist.append((root, filename))
-    print(playlist)
-    #app.run(host='10.190.76.50')
+    app.run(host='10.190.76.50')
 
     from tornado.wsgi import WSGIContainer
     from tornado.httpserver import HTTPServer
