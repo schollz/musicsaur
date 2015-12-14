@@ -5,10 +5,13 @@
     <title>Music Sync</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-control" content="no-cache">
+  <meta http-equiv="Expires" content="-1">
+
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
   {% if data['is_index'] %}
       <script src="/static/howler.js" type="text/javascript"></script>
-       <audio preload="auto" src="http://server8.duckdns.org/sound.mp3" id="sound">
+       <audio preload="auto" src="http://server8.duckdns.org/sound.mp3?{{ data['random_integer'] }}" id="sound">
   Your browser does not support the audio tag.
 </audio> 
   {% endif %}
@@ -45,7 +48,7 @@ var secondTimeout0 = setTimeout(function() {
 
 
 var sound = new Howl({
-    urls: ['http://server8.duckdns.org/sound.mp3'],
+    urls: ['http://server8.duckdns.org/sound.mp3?{{ data['random_integer'] }}'],
     onend: function() {
 
         var posting = $.post('/nextsong', {
@@ -54,6 +57,7 @@ var sound = new Howl({
 
         // Put the results in a div
         posting.done(function(data) {
+            sound.unload()
             location.reload(true);
         });
 
@@ -139,6 +143,7 @@ function checkIfSkipped() {
         posting.done(function(data) {
           console.log(data)
           if (data['is_playing']==false) {
+            sound.unload()
             location.reload(true);
           }
         });
@@ -160,6 +165,7 @@ $(function () {
 
         // Put the results in a div
         posting.done(function(data) {
+            sound.unload()
             location.reload(true);
         });
     });

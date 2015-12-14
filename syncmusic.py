@@ -3,6 +3,7 @@ import sys
 import shutil
 import os
 import fnmatch
+import random
 
 import eyed3
 from flask import *
@@ -26,7 +27,7 @@ def getTime():
 @app.route("/")
 def index_html():
     data = {}
-
+    data['random_integer'] = random.randint(1000,30000)
     if not is_initialized:
         nextSong(10)
     if is_playing or next_song_time - getTime() > 7000:
@@ -59,7 +60,8 @@ def sync():
 def finished():
     response = {'message':'loading!'}
     if request.method == 'POST':
-        nextSong(6)
+        if is_playing:
+            nextSong(6)
     return jsonify(response)
 
 @app.route("/playing", methods=['GET', 'POST'])
@@ -83,28 +85,31 @@ def nextSong(delay):
         if current_song >= len(playlist):
             current_song = 0
         print(current_song)
-        print(playlist)
         last_activated = time.time()
-        cmd = 'scp ' + playlist[current_song].replace(' ','\ ') + ' phi@server8.duckdns.org:/www/data/sound.mp3'
+        cwd = os.getcwd()
+        os.chdir(playlist[current_song][0])
+        cmd = 'scp ' + playlist[current_song][1].replace(' ','\ ') + ' phi@server8.duckdns.org:/www/data/sound.mp3'
         print(cmd)
         os.system(cmd)
-        audiofile = eyed3.load(playlist[current_song])
+        audiofile = eyed3.load(playlist[current_song][1])
+        os.chdir(cwd)
         song_name = audiofile.tag.album + ' - ' + audiofile.tag.title + ' by ' + audiofile.tag.artist 
         next_song_time = getTime() + delay*1000
-        print ('next up: ' + playlist[current_song])
+        print ('next up: ' + song_name)
         is_initialized = True
 
 if __name__ == "__main__":
     # Load playlist
     for root, dirnames, filenames in os.walk('/home/zack/Music'):
         for filename in fnmatch.filter(filenames, '*.mp3'):
-            playlist.append(os.path.join(root, filename))
+            if 'Allen' in root or 'Allen' in filename:
+                playlist.append((root, filename))
     print(playlist)
     #app.run(host='10.190.76.50')
+
     from tornado.wsgi import WSGIContainer
     from tornado.httpserver import HTTPServer
     from tornado.ioloop import IOLoop
-
     http_server = HTTPServer(WSGIContainer(app))
     http_server.listen(5000)
     IOLoop.instance().start()
