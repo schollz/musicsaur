@@ -3,22 +3,136 @@
   <head>
     <meta charset="UTF-8">
     <title>title</title>
-    <script src="howler.js" type="text/javascript"></script>
-    <audio controls>
-      <source src="sound.mp3" type="audio/mpeg">
-    Your browser does not support the audio tag.
-    </audio>
+    <script src="/static/howler.js" type="text/javascript"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script>
-    var sound = new Howl({
-  urls: ['sound.mp3']
-});
+   
+    var time = Date.now || function() {
+  return +new Date.getTime();
+}
+
+  function makeRequests(callback) {
+
+    for (var i=0; i<5; i++) {
+      // Send the data using post
+      var posting = $.post( '/sync', { 'client_timestamp': time() } );
+     
+      // Put the results in a div
+      posting.done(function( data ) {
+            console.log(data);
+            latency = time() - data['client_timestamp']
+            half_latency = latency / 2.0
+            time_delta = time() - data['server_timestamp']
+            next_trigger = data['next_song']
+            if (data['is_playing']) {
+              location.reload();
+            }
+            callback(time_delta + half_latency);
+      });
+    }
+  }
+
+  function getMean(time_delta) {
+    correct_time_delta.push(time_delta);
+    var sum = 0.0;
+    for( var j = 0; j < correct_time_delta.length; j++ ){
+        sum = sum + correct_time_delta[j]; 
+    }
+
+    true_time_delta = sum/correct_time_delta.length;
+  }
+makeRequests(getMean);
 </script>
   </head>
   <body>
   <script>
-    sound.play()
+    var correct_time_delta = []
+    var next_trigger = time() + 1000000;
+    var true_time_delta = 0;
+    var sound_activated = false;
+    var seconds_left = 0;
+
+
+
+ var sound = new Howl({
+  urls: ['http://server8.duckdns.org/sound.mp3'],
+    onend: function() {
+
+            var posting = $.post( '/nextsong', { 'message': 'next song please' } );
+     
+      // Put the results in a div
+      posting.done(function( data ) {
+            location.reload(true);
+      });
+    
+  },
+  onplay:function() {
+
+            var posting = $.post( '/playing', { 'message': 'next song please' } );
+     
+      // Put the results in a div
+      posting.done(function( data ) {
+           
+      });
+    
+  },
+  buffer: true
+
+});
+
+
+
+
+  function activateSound() {
+    if (time() - true_time_delta > next_trigger) {
+      if (sound_activated == false) {
+        sound_activated = true;
+       console.log('playing sound');
+        sound.play();
+      }
+    } else {
+      next_seconds_left = parseInt((next_trigger - (time() - true_time_delta))/1000);
+      if (next_seconds_left != seconds_left) {
+        seconds_left = next_seconds_left;
+        console.log(seconds_left);
+      }
+    }
+  }
+
+  
+  setInterval(function() {
+      activateSound();
+   }, 1);
+
+
   </script>
   
+
+
   
   </body>
 </html>
+
+
+
+<!--
+https://stackoverflow.com/questions/11001318/waiting-for-api-call-to-finish-in-javascript-before-continuing
+
+var res = makeCall();
+if(res)
+{
+   // do stuff
+}
+Do this:
+
+function makeCall(){
+    FB.api('/me/feed', 'post', { message: body }, function(response) {
+        if (response && !response.error) {
+            // do stuff
+        }
+    });
+}
+
+makeCall();
+-->
