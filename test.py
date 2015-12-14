@@ -27,7 +27,7 @@ def index_html():
     data = {}
 
     if not is_initialized:
-        nextSong(20)
+        nextSong(10)
     if is_playing or next_song_time - getTime() > 7000:
         data = {}
         if is_playing:
