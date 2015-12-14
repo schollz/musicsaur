@@ -7,64 +7,77 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 
+  <link rel="stylesheet" href="/static/normalize.css">
+  <link rel="stylesheet" href="/static/skeleton.css">
   </head>
   <body>
   <script>
-
-    var time = Date.now || function() {
-  return +new Date.getTime();
+var time = Date.now || function() {
+    return +new Date.getTime();
 }
 
 
- var sound = new Howl({
-  urls: ['http://server8.duckdns.org/sound.mp3'],
+// GLOBALS
+var correct_time_delta = []
+var next_trigger = time() + 1000000;
+var true_time_delta = 0;
+var sound_activated = false;
+var seconds_left = 0;
+var secondTimeout3 = setTimeout(function() {
+    console.log('3 seconds left')
+}, 100000);
+var secondTimeout2 = setTimeout(function() {
+    console.log('2 seconds left')
+}, 100000);
+var secondTimeout1 = setTimeout(function() {
+    console.log('1 seconds left')
+}, 100000);
+var secondTimeout0 = setTimeout(function() {
+    console.log('0 seconds left')
+}, 100000);
+
+
+var sound = new Howl({
+    urls: ['http://server8.duckdns.org/sound.mp3'],
     onend: function() {
 
-            var posting = $.post( '/nextsong', { 'message': 'next song please' } );
-     
-      // Put the results in a div
-      posting.done(function( data ) {
-            location.reload(true);
-      });
-    
-  },
-  onplay:function() {
+        var posting = $.post('/nextsong', {
+            'message': 'next song please'
+        });
 
-            var posting = $.post( '/playing', { 'message': 'im playing a song' } );
-     
-      // Put the results in a div
-      posting.done(function( data ) {
-           
-      });
-    
-  },
-  buffer: true
+        // Put the results in a div
+        posting.done(function(data) {
+            location.reload(true);
+        });
+
+    },
+    onplay: function() {
+
+        var posting = $.post('/playing', {
+            'message': 'im playing a song'
+        });
+
+        // Put the results in a div
+        posting.done(function(data) {
+
+        });
+
+    },
+    buffer: true
 
 });
 
 
+function makeRequests(callback) {
 
-   var correct_time_delta = []
-    var next_trigger = time() + 1000000;
-    var true_time_delta = 0;
-    var sound_activated = false;
-    var seconds_left = 0;
-    var secondTimeout3 = setTimeout(function(){ console.log('3 seconds left') }, 100000);
-    var secondTimeout2 = setTimeout(function(){ console.log('2 seconds left') }, 100000);
-    var secondTimeout1 = setTimeout(function(){ console.log('1 seconds left') }, 100000);
-    var secondTimeout0 = setTimeout(function(){ console.log('0 seconds left') }, 100000);
+    for (var i = 0; i < 5; i++) {
+        // Send the data using post
+        var posting = $.post('/sync', {
+            'client_timestamp': time()
+        });
 
-   
-
-
-  function makeRequests(callback) {
-
-    for (var i=0; i<5; i++) {
-      // Send the data using post
-      var posting = $.post( '/sync', { 'client_timestamp': time() } );
-     
-      // Put the results in a div
-      posting.done(function( data ) {
+        // Put the results in a div
+        posting.done(function(data) {
             console.log(data);
             latency = time() - data['client_timestamp']
             half_latency = latency / 2.0
@@ -73,50 +86,93 @@
 
             correct_time_delta.push(time_delta);
             var sum = 0.0;
-            for( var j = 0; j < correct_time_delta.length; j++ ){
-                sum = sum + correct_time_delta[j]; 
+            for (var j = 0; j < correct_time_delta.length; j++) {
+                sum = sum + correct_time_delta[j];
             }
 
-            true_time_delta = sum/correct_time_delta.length;
+            true_time_delta = sum / correct_time_delta.length;
             console.log(true_time_delta);
             clearTimeout(secondTimeout3);
-            secondTimeout3 =  setTimeout(function(){ console.log('3 seconds left') }, next_trigger - (time() - true_time_delta)-3000);
+            secondTimeout3 = setTimeout(function() {
+                console.log('3 seconds left');
+                $("div.info1").text('3 seconds left');
+            }, next_trigger - (time() - true_time_delta) - 3000);
             clearTimeout(secondTimeout2);
-            secondTimeout2 =  setTimeout(function(){ console.log('2 seconds left') }, next_trigger - (time() - true_time_delta)-2000);
+            secondTimeout2 = setTimeout(function() {
+                console.log('2 seconds left');
+                $("div.info1").text('2 seconds left');
+            }, next_trigger - (time() - true_time_delta) - 2000);
             clearTimeout(secondTimeout1);
-            secondTimeout1 =  setTimeout(function(){ console.log('1 seconds left') }, next_trigger - (time() - true_time_delta)-1000);
+            secondTimeout1 = setTimeout(function() {
+                console.log('1 seconds left');
+                $("div.info1").text('1 second left');
+            }, next_trigger - (time() - true_time_delta) - 1000);
             clearTimeout(secondTimeout0);
-            secondTimeout0 =  setTimeout(function(){ console.log('playing song') }, next_trigger - (time() - true_time_delta));
-      });
+            secondTimeout0 = setTimeout(function() {
+                console.log('playing song');
+                window.setInterval(function(){
+                  checkIfSkipped();
+                }, 3000);
+                sound.play();
+            }, next_trigger - (time() - true_time_delta));
+        });
     }
-  }
+}
 
 makeRequests();
 
+$(function () {
+    $('#nextsong').on('click', function () {
+        var posting = $.post('/nextsong', {
+            'message': 'next song please'
+        });
+
+        // Put the results in a div
+        posting.done(function(data) {
+            location.reload(true);
+        });
+    });
+});
 
 
 
-  function activateSound() {
-    if (time() - true_time_delta > next_trigger) {
-      if (sound_activated == false) {
-        sound_activated = true;
-       console.log('playing sound');
-        sound.play();
-      }
-    } else {
-      next_seconds_left = parseInt((next_trigger - (time() - true_time_delta))/1000);
-      if (next_seconds_left != seconds_left) {
-        seconds_left = next_seconds_left;
-        //console.log(seconds_left);
-      }
-    }
-  }
+
+function checkIfSkipped() {
+
+        // Send the data using post
+        var posting = $.post('/sync', {
+            'client_timestamp': time()
+        });
+
+        // Put the results in a div
+        posting.done(function(data) {
+          if (data['is_playing']==false) {
+            location.reload(true);
+          }
+        });
+
+}
+
+
 
 
 
   </script>
   
+<div class="container">
 
+  <!-- columns should be the immediate child of a .row -->
+  <div class="row">
+  <div class="two columns">
+    <button class="button" id="nextsong">Next</button>
+  </div>
+  <div class="ten columns">
+    <div class="info1">Please wait.</div>
+  </div>
+
+  </div>
+
+</div>
 
   
   </body>

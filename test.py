@@ -59,7 +59,7 @@ def nextSong(delay):
     global current_song
     global next_song_time
     global is_playing
-    if time.time() - last_activated > 10:
+    if time.time() - last_activated > 5: # songs can only be skipped every 5 seconds
         is_playing = False
         current_song += 1
         last_activated = time.time()
