@@ -12,6 +12,7 @@ app.debug = True
 playlist = ['short1.mp3','short2.mp3','long2.mp3','long3.mp3','short3.mp3']
 current_song = -1
 last_activated = 0
+next_song_time = 0
 is_playing = False
 
 def getTime():
@@ -20,7 +21,10 @@ def getTime():
 
 @app.route("/")
 def index_html():
-    return render_template('index.html')
+    if is_playing or next_song_time - getTime() > 5000:
+        return render_template('waiting_page.html')
+    else:
+        return render_template('index.html')
 
 @app.route("/sync", methods=['GET', 'POST'])
 def sync():
@@ -59,13 +63,13 @@ def nextSong(delay):
         is_playing = False
         current_song += 1
         last_activated = time.time()
-        shutil.copy('./' + playlist[current_song],'./static/')
-        os.rename('./static/' + playlist[current_song],'./static/sound.mp3')
-        os.system('scp ' + playlist[current_song] + ' phi@192.168.1.11:/www/data/sound.mp3')
+        # shutil.copy('./' + playlist[current_song],'./static/')
+        # os.rename('./static/' + playlist[current_song],'./static/sound.mp3')
+        # os.system('scp ' + playlist[current_song] + ' phi@192.168.1.11:/www/data/sound.mp3')
         next_song_time = getTime() + delay*1000
         print ('next up: ' + playlist[current_song])
 
 if __name__ == "__main__":
-    nextSong(20)
-    app.run(host='192.168.1.2')
+    nextSong(10)
+    app.run(host='10.190.76.50')
 
