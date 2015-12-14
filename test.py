@@ -14,6 +14,7 @@ current_song = -1
 last_activated = 0
 next_song_time = 0
 is_playing = False
+is_initialized = False
 
 def getTime():
     return int(time.time()*1000)
@@ -21,8 +22,15 @@ def getTime():
 
 @app.route("/")
 def index_html():
+    if not is_initialized:
+        nextSong(20)
     if is_playing or next_song_time - getTime() > 7000:
-        return render_template('waiting_page.html')
+        data = {}
+        if is_playing:
+            data['message'] = 'A song is currently playing. You will join on the next song.'
+        else:
+            data['message'] = 'Waiting for other participants, please hold.'
+        return render_template('waiting_page.html',data = data)
     else:
         return render_template('index.html')
 
@@ -60,17 +68,20 @@ def nextSong(delay):
     global current_song
     global next_song_time
     global is_playing
-    if time.time() - last_activated > 5: # songs can only be skipped every 5 seconds
+    global is_initialized
+    if time.time() - last_activated > 5 or not is_initialized: # songs can only be skipped every 5 seconds
         is_playing = False
         current_song += 1
+        if current_song >= len(playlist):
+            current_song = 0
         last_activated = time.time()
         # shutil.copy('./' + playlist[current_song],'./static/')
         # os.rename('./static/' + playlist[current_song],'./static/sound.mp3')
         # os.system('scp ' + playlist[current_song] + ' phi@192.168.1.11:/www/data/sound.mp3')
         next_song_time = getTime() + delay*1000
         print ('next up: ' + playlist[current_song])
+        is_initialized = True
 
 if __name__ == "__main__":
-    nextSong(10)
     app.run(host='10.190.76.50')
 
