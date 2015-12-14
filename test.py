@@ -22,6 +22,8 @@ def getTime():
 
 @app.route("/")
 def index_html():
+    data = {}
+
     if not is_initialized:
         nextSong(20)
     if is_playing or next_song_time - getTime() > 7000:
@@ -30,9 +32,11 @@ def index_html():
             data['message'] = 'A song is currently playing. You will join on the next song.'
         else:
             data['message'] = 'Waiting for other participants, please hold.'
-        return render_template('waiting_page.html',data = data)
+        data['is_index'] = False
     else:
-        return render_template('index.html')
+        data['message'] = 'Starting soon.'
+        data['is_index'] = True    
+    return render_template('index.html',data = data)
 
 @app.route("/sync", methods=['GET', 'POST'])
 def sync():

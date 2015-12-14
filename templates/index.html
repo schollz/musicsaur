@@ -11,7 +11,9 @@
   <link rel="stylesheet" href="/static/skeleton.css">
   </head>
   <body>
+
   <script>
+{% if data['is_index'] %}
 var time = Date.now || function() {
     return +new Date.getTime();
 }
@@ -122,20 +124,6 @@ function makeRequests(callback) {
 
 makeRequests();
 
-$(function () {
-    $('#nextsong').on('click', function () {
-        var posting = $.post('/nextsong', {
-            'message': 'next song please'
-        });
-
-        // Put the results in a div
-        posting.done(function(data) {
-            location.reload(true);
-        });
-    });
-});
-
-
 
 
 function checkIfSkipped() {
@@ -154,7 +142,23 @@ function checkIfSkipped() {
 
 }
 
+{% else %}
+setInterval(function() 
+{ window.location=window.location;},3000);
+{% endif %}
 
+$(function () {
+    $('#nextsong').on('click', function () {
+        var posting = $.post('/nextsong', {
+            'message': 'next song please'
+        });
+
+        // Put the results in a div
+        posting.done(function(data) {
+            location.reload(true);
+        });
+    });
+});
 
 
 
@@ -168,7 +172,7 @@ function checkIfSkipped() {
     <button class="button" id="nextsong">Next</button>
   </div>
   <div class="ten columns">
-    <div class="info1">Starting soon.</div>
+    <div class="info1">{{ data['message'] }}</div>
   </div>
   </div>
   <div class="row">
