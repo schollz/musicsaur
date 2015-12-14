@@ -2,6 +2,7 @@ import time
 import sys
 import shutil
 import os
+import fnmatch
 
 import eyed3
 from flask import *
@@ -10,7 +11,7 @@ app = Flask(__name__)
 app.debug = True
 
 
-playlist = ['short1.mp3','short2.mp3','long2.mp3','long3.mp3','short3.mp3']
+playlist = []
 current_song = -1
 last_activated = 0
 next_song_time = 0
@@ -81,16 +82,30 @@ def nextSong(delay):
         current_song += 1
         if current_song >= len(playlist):
             current_song = 0
+        print(current_song)
+        print(playlist)
         last_activated = time.time()
-        # shutil.copy('./' + playlist[current_song],'./static/')
-        # os.rename('./static/' + playlist[current_song],'./static/sound.mp3')
-        # os.system('scp ' + playlist[current_song] + ' phi@192.168.1.11:/www/data/sound.mp3')
-        audiofile = eyed3.load('sound.mp3')
+        cmd = 'scp ' + playlist[current_song].replace(' ','\ ') + ' phi@server8.duckdns.org:/www/data/sound.mp3'
+        print(cmd)
+        os.system(cmd)
+        audiofile = eyed3.load(playlist[current_song])
         song_name = audiofile.tag.album + ' - ' + audiofile.tag.title + ' by ' + audiofile.tag.artist 
         next_song_time = getTime() + delay*1000
         print ('next up: ' + playlist[current_song])
         is_initialized = True
 
 if __name__ == "__main__":
-    app.run(host='10.190.76.50')
+    # Load playlist
+    for root, dirnames, filenames in os.walk('/home/zack/Music'):
+        for filename in fnmatch.filter(filenames, '*.mp3'):
+            playlist.append(os.path.join(root, filename))
+    print(playlist)
+    #app.run(host='10.190.76.50')
+    from tornado.wsgi import WSGIContainer
+    from tornado.httpserver import HTTPServer
+    from tornado.ioloop import IOLoop
+
+    http_server = HTTPServer(WSGIContainer(app))
+    http_server.listen(5000)
+    IOLoop.instance().start()
 

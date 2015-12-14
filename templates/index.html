@@ -152,6 +152,8 @@ setInterval(function()
 
 $(function () {
     $('#nextsong').on('click', function () {
+        $("div.info1").text('Skipping to next song');
+        $("div.info2").text('');
         var posting = $.post('/nextsong', {
             'message': 'next song please'
         });
