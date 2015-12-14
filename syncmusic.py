@@ -61,7 +61,7 @@ def finished():
     response = {'message':'loading!'}
     if request.method == 'POST':
         if is_playing:
-            nextSong(6)
+            nextSong(10)
     return jsonify(response)
 
 @app.route("/playing", methods=['GET', 'POST'])
@@ -96,6 +96,7 @@ def nextSong(delay):
         song_name = audiofile.tag.album + ' - ' + audiofile.tag.title + ' by ' + audiofile.tag.artist 
         next_song_time = getTime() + delay*1000
         print ('next up: ' + song_name)
+        print ('time: ' + str(getTime()) + ' and next: ' + str(next_song_time))
         is_initialized = True
 
 if __name__ == "__main__":
