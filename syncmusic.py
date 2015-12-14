@@ -29,8 +29,8 @@ def index_html():
     data = {}
     data['random_integer'] = random.randint(1000,30000)
     if not is_initialized:
-        nextSong(10)
-    if is_playing or next_song_time - getTime() > 7000:
+        nextSong(20)
+    if is_playing or next_song_time - getTime() > 17000:
         data = {}
         if is_playing:
             data['message'] = 'A song is currently playing. You will join on the next song.'
@@ -48,7 +48,7 @@ def sync():
     if request.method == 'POST':
         print(getTime())
         data = {}
-        data['client_timestamp'] = request.form['client_timestamp']
+        data['client_timestamp'] = int(request.form['client_timestamp'])
         data['server_timestamp'] = getTime()
         data['next_song'] = next_song_time
         data['is_playing'] = is_playing
@@ -61,7 +61,7 @@ def finished():
     response = {'message':'loading!'}
     if request.method == 'POST':
         if is_playing:
-            nextSong(10)
+            nextSong(20)
     return jsonify(response)
 
 @app.route("/playing", methods=['GET', 'POST'])
