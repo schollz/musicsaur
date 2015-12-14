@@ -3,6 +3,7 @@ import sys
 import shutil
 import os
 
+import eyed3
 from flask import *
 
 app = Flask(__name__)
@@ -15,6 +16,7 @@ last_activated = 0
 next_song_time = 0
 is_playing = False
 is_initialized = False
+song_name = ""
 
 def getTime():
     return int(time.time()*1000)
@@ -48,7 +50,7 @@ def sync():
         data['server_timestamp'] = getTime()
         data['next_song'] = next_song_time
         data['is_playing'] = is_playing
-        data['current_song'] = playlist[current_song]
+        data['current_song'] = song_name
         return jsonify(data)
 
 
@@ -73,6 +75,7 @@ def nextSong(delay):
     global next_song_time
     global is_playing
     global is_initialized
+    global song_name
     if time.time() - last_activated > 5 or not is_initialized: # songs can only be skipped every 5 seconds
         is_playing = False
         current_song += 1
@@ -82,6 +85,8 @@ def nextSong(delay):
         # shutil.copy('./' + playlist[current_song],'./static/')
         # os.rename('./static/' + playlist[current_song],'./static/sound.mp3')
         # os.system('scp ' + playlist[current_song] + ' phi@192.168.1.11:/www/data/sound.mp3')
+        audiofile = eyed3.load('sound.mp3')
+        song_name = audiofile.tag.album + ' - ' + audiofile.tag.title + ' by ' + audiofile.tag.artist 
         next_song_time = getTime() + delay*1000
         print ('next up: ' + playlist[current_song])
         is_initialized = True
