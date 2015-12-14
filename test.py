@@ -21,7 +21,7 @@ def getTime():
 
 @app.route("/")
 def index_html():
-    if is_playing or next_song_time - getTime() > 5000:
+    if is_playing or next_song_time - getTime() > 7000:
         return render_template('waiting_page.html')
     else:
         return render_template('index.html')
@@ -36,6 +36,7 @@ def sync():
         data['server_timestamp'] = getTime()
         data['next_song'] = next_song_time
         data['is_playing'] = is_playing
+        data['current_song'] = playlist[current_song]
         return jsonify(data)
 
 
