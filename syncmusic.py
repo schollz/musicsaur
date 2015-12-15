@@ -4,6 +4,18 @@ import shutil
 import os
 import fnmatch
 import random
+import logging
+import sys
+
+root = logging.getLogger()
+root.setLevel(logging.DEBUG)
+
+ch = logging.StreamHandler(sys.stdout)
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+root.addHandler(ch)
+
 
 import eyed3
 from flask import *
@@ -95,8 +107,8 @@ def nextSong(delay):
         cwd = os.getcwd()
         print(playlist[current_song][0])
         os.chdir(playlist[current_song][0])
-        cmd = 'cp ' + playlist[current_song][1].replace(' ','\ ') + ' ' + cwd + '/static/sound.mp3'
         cmd = 'scp ' + playlist[current_song][1].replace(' ','\ ') + ' phi@server8.duckdns.org:/www/data/sound.mp3'
+        cmd = 'cp ' + playlist[current_song][1].replace(' ','\ ') + ' ' + cwd + '/static/sound.mp3'
         print(cmd)
         os.system(cmd)
         audiofile = eyed3.load(playlist[current_song][1])
@@ -109,7 +121,7 @@ def nextSong(delay):
 
 if __name__ == "__main__":
     # Load playlist
-    app.run(host='10.190.76.50')
+    #app.run(host='10.190.76.50')
 
     from tornado.wsgi import WSGIContainer
     from tornado.httpserver import HTTPServer
