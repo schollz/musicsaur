@@ -41,5 +41,5 @@ The main limitation is the upload of the music file, which may be a bottleneck i
 
 ## Todo
 
-- Add Next, Previous buttons
-- Show playlist on every screen?
+- ~~Add Next, Previous buttons~~
+- ~~Show playlist on every screen~~

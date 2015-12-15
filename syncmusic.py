@@ -42,23 +42,26 @@ songStopTimer = None
 def getTime():
     return int(time.time()*1000)
 
+def getPlaylistHtml():
+    playlist_html = ""
+    for i in range(len(playlist_info)):
+        html = """<a type="controls" data-skip="%(i)s">%(song)s</a><br>"""
+        if playlist_info[i]==song_name:
+            song =  "<b>" + playlist_info[i] + "</b>"
+        else:
+            song = playlist_info[i]
+        playlist_html += html % {'i':str(i),'song':song}
+    return playlist_html
 
 @app.route("/")
 def index_html():
     data = {}
     data['random_integer'] = random.randint(1000,30000)
-    playlist_html = ""
-    for song in playlist_info:
-        if song==song_name:
-            playlist_html += "<b>" + song + "</b>"
-        else:
-            playlist_html += song
-        playlist_html += "<br>"
-    data['playlist_html'] = playlist_html
+
+    data['playlist_html'] = getPlaylistHtml()
     if not is_initialized:
-        nextSong(20)
+        nextSong(20,0)
     if is_playing or next_song_time - getTime() > 17000:
-        data = {}
         if is_playing:
             data['message'] = 'A song is currently playing. You will join on the next song.'
         else:
@@ -79,14 +82,6 @@ def sync():
         data['next_song'] = next_song_time
         data['is_playing'] = is_playing
         data['current_song'] = song_name
-        playlist_html = ""
-        for song in playlist_info:
-            if song==song_name:
-                playlist_html += "<b>" + song + "</b>"
-            else:
-                playlist_html += song
-            playlist_html += "<br>"
-        data['playlist_html'] = playlist_html
         return jsonify(data)
 
 
@@ -94,8 +89,8 @@ def sync():
 def finished():
     response = {'message':'loading!'}
     if request.method == 'POST':
-        if is_playing:
-            nextSong(20)
+        skip = int(request.form['skip'])
+        nextSong(20,skip)
     return jsonify(response)
 
 @app.route("/playing", methods=['GET', 'POST'])
@@ -116,9 +111,9 @@ def songOver():
     logger = logging.getLogger('syncmusic:songOver')
     logger.info('song over')
     is_playing = False
-    nextSong(20)
+    nextSong(20,-1)
 
-def nextSong(delay):
+def nextSong(delay,skip):
     global last_activated
     global current_song
     global next_song_time
@@ -142,9 +137,15 @@ def nextSong(delay):
                         os.chdir(cwd)
 
         is_playing = False
-        current_song += 1
+        if skip < 0:
+            current_song += skip + 2
+        else:
+            current_song = skip
         if current_song >= len(playlist):
             current_song = 0
+        if current_song < 0:
+            current_song = len(playlist)-1
+
         logger.info(current_song)
         last_activated = time.time()
         cwd = os.getcwd()

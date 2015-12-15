@@ -17,6 +17,9 @@
   {% endif %}
   <link rel="stylesheet" href="/static/normalize.css">
   <link rel="stylesheet" href="/static/skeleton.css">
+  <style>
+a { cursor: pointer; }
+  </style>
   </head>
   <body>
 
@@ -80,7 +83,6 @@ function makeRequests(callback) {
         // Put the results in a div
         posting.done(function(data) {
             console.log(data);
-            $("div.info2").html(data['playlist_html']);
             latency = time() - data['client_timestamp']
             half_latency = latency / 2.0
             time_delta = time() - data['server_timestamp']
@@ -111,7 +113,6 @@ function makeRequests(callback) {
             }, next_trigger - (time() - true_time_delta) - 1000);
             clearTimeout(secondTimeout0);
             secondTimeout0 = setTimeout(function() {
-                $("div.info2").html(data['playlist_html']);
                 console.log('playing song');
                 $("div.info1").text('Playing');
                 window.setInterval(function(){
@@ -165,11 +166,14 @@ setInterval(function()
 { window.location=window.location;},1000);
 {% endif %}
 
-$(function () {
-    $('#nextsong').on('click', function () {
-        $("div.info1").text('Skipping to next song');
+$(document).ready(function(){
+    $('a[type=controls]').click(function() {
+       var skip = $(this).data('skip');
+       console.log(skip);
+        $("div.info1").text('Changing song');
         var posting = $.post('/nextsong', {
-            'message': 'next song please'
+            'message': 'next song please',
+            'skip': parseInt(skip)
         });
 
         // Put the results in a div
@@ -177,10 +181,9 @@ $(function () {
             sound.unload()
             location.reload(true);
         });
+
     });
 });
-
-
 
   </script>
   
@@ -195,9 +198,9 @@ $(function () {
 
   <div class="row">
   <div class="six columns">
-    <button class="button" id="previoussong">Previous</button>
-    <button class="button" id="reloadsong">Replay</button>
-    <button class="button" id="nextsong">Next</button>
+    <a class="button" type="controls" data-skip="-3">Previous</a>
+    <a class="button" type="controls" data-skip="-2">Replay</a>
+    <a class="button" type="controls" data-ksip="-1">Next</a>
   </div>
   <div class="six columns">
     <div class="info1">{{ data['message'] }}</div>
@@ -207,7 +210,7 @@ $(function () {
   <div class="two columns">
   </div>
   <div class="ten columns">
-    <div class="info2">{{ data['playlist_html'] }}</div>
+    <div class="info2">{{ data['playlist_html'] | safe }}</div>
   </div>
   </div>
 
