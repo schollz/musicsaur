@@ -42,8 +42,6 @@ import numpy
 
 url = ""
 
-mean_time_delta = 0
-
 def getTime():
     return int(time.time()*1000)
 
@@ -63,7 +61,6 @@ def checkIfSkipped():
 
 
 def syncClocks():
-	global mean_time_delta
 	correct_time_delta = []
 	request_url = url + '/'
 	request_url = 'http://' + request_url.replace('//','/')
@@ -96,9 +93,12 @@ def syncClocks():
 		print('1')
 		time.sleep(1)
 		print('playing')
-		
+
 if __name__ == "__main__":
-	url=sys.argv[1]
-	syncClocks()
+	try:
+		url=sys.argv[1]
+	except:
+		print('python client.py URL')
+		sys.exit(-1)
 	t = perpetualTimer(1,checkIfSkipped)
 	t.start()
