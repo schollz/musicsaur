@@ -1,0 +1,104 @@
+import time
+import sys
+import os
+import random
+import logging
+import json
+from threading import Timer,Thread,Event
+
+
+class perpetualTimer():
+
+	def __init__(self,t,hFunction):
+		self.t=t
+		self.hFunction = hFunction
+		self.thread = Timer(self.t,self.handle_function)
+
+	def handle_function(self):
+		self.hFunction()
+		self.thread = Timer(self.t,self.handle_function)
+		self.thread.start()
+
+	def start(self):
+		self.thread.start()
+
+	def cancel(self):
+		self.thread.cancel()
+
+
+
+
+root = logging.getLogger()
+root.setLevel(logging.DEBUG)
+
+ch = logging.StreamHandler(sys.stdout)
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+root.addHandler(ch)
+
+import requests
+import numpy
+
+url = ""
+
+mean_time_delta = 0
+
+def getTime():
+    return int(time.time()*1000)
+
+
+def checkIfSkipped():
+	print "Checking if skipped"
+	request_url = url + '/sync'
+	request_url = 'http://' + request_url.replace('//','/')
+
+	data = {'client_timestamp':getTime()}
+	r = requests.post(request_url,data=data)
+	data = r.json()
+	if not data['is_playing']:
+		os.system('rm sound.mp3')
+		os.system('wget http://' + url + '/static/sound.mp3')
+		syncClocks()
+
+
+def syncClocks():
+	global mean_time_delta
+	correct_time_delta = []
+	request_url = url + '/'
+	request_url = 'http://' + request_url.replace('//','/')
+	r = requests.get(request_url)
+
+	for i in range(5):
+		request_url = url + '/sync'
+		request_url = 'http://' + request_url.replace('//','/')
+
+		data = {'client_timestamp':getTime()}
+		r = requests.post(request_url,data=data)
+		data = r.json()
+		latency = getTime() - data['client_timestamp']
+		half_latency = latency / 2.0
+		time_delta = getTime() - data['server_timestamp']
+		next_trigger = data['next_song']
+
+		correct_time_delta.append(time_delta)
+		time.sleep(0.15)
+
+	mean_time_delta = numpy.mean(correct_time_delta)
+	print(mean_time_delta)
+	sleep_time = (next_trigger - (getTime() - mean_time_delta))/1000.0
+	if sleep_time > 0:
+		time.sleep(sleep_time-3)
+		print('3')
+		time.sleep(1)
+		print('2')
+		time.sleep(1)
+		print('1')
+		time.sleep(1)
+		print('playing')
+		
+if __name__ == "__main__":
+	url=sys.argv[1]
+	syncClocks()
+	t = perpetualTimer(1,checkIfSkipped)
+	t.start()
