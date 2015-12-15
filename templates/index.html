@@ -11,7 +11,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
   {% if data['is_index'] %}
       <script src="/static/howler.js" type="text/javascript"></script>
-       <audio preload="auto" src="/static/sound.mp3?{{ data['random_integer'] }}" id="sound">
+       <audio preload="auto" src="http://server8.duckdns.org/sound.mp3?{{ data['random_integer'] }}" id="sound">
   Your browser does not support the audio tag.
 </audio> 
   {% endif %}
@@ -48,7 +48,7 @@ var secondTimeout0 = setTimeout(function() {
 
 
 var sound = new Howl({
-    urls: ['/static/sound.mp3?{{ data['random_integer'] }}'],
+    urls: ['http://server8.duckdns.org/sound.mp3?{{ data['random_integer'] }}'],
     onend: function() {
 
         var posting = $.post('/nextsong', {

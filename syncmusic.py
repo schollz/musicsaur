@@ -95,8 +95,8 @@ def nextSong(delay):
         cwd = os.getcwd()
         print(playlist[current_song][0])
         os.chdir(playlist[current_song][0])
-        cmd = 'scp ' + playlist[current_song][1].replace(' ','\ ') + ' phi@server8.duckdns.org:/www/data/sound.mp3'
         cmd = 'cp ' + playlist[current_song][1].replace(' ','\ ') + ' ' + cwd + '/static/sound.mp3'
+        cmd = 'scp ' + playlist[current_song][1].replace(' ','\ ') + ' phi@server8.duckdns.org:/www/data/sound.mp3'
         print(cmd)
         os.system(cmd)
         audiofile = eyed3.load(playlist[current_song][1])
