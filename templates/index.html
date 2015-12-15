@@ -80,7 +80,7 @@ function makeRequests(callback) {
         // Put the results in a div
         posting.done(function(data) {
             console.log(data);
-            $("div.info2").text('Now playing: ' + data['current_song']);
+            $("div.info2").html(data['playlist_html']);
             latency = time() - data['client_timestamp']
             half_latency = latency / 2.0
             time_delta = time() - data['server_timestamp']
@@ -111,7 +111,7 @@ function makeRequests(callback) {
             }, next_trigger - (time() - true_time_delta) - 1000);
             clearTimeout(secondTimeout0);
             secondTimeout0 = setTimeout(function() {
-                $("div.info2").text('Now playing: ' + data['current_song']);
+                $("div.info2").html(data['playlist_html']);
                 console.log('playing song');
                 $("div.info1").text('Playing');
                 window.setInterval(function(){

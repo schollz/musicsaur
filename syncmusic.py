@@ -6,6 +6,7 @@ import fnmatch
 import random
 import logging
 import sys
+from threading import Timer
 
 root = logging.getLogger()
 root.setLevel(logging.DEBUG)
@@ -19,18 +20,24 @@ root.addHandler(ch)
 
 import eyed3
 from flask import *
+from mutagen.mp3 import MP3
+
 
 app = Flask(__name__)
 app.debug = True
 
 
 playlist = []
+playlist_info = []
 current_song = -1
 last_activated = 0
 next_song_time = 0
 is_playing = False
 is_initialized = False
 song_name = ""
+songStartTimer = None
+songStopTimer = None
+
 
 def getTime():
     return int(time.time()*1000)
@@ -58,13 +65,20 @@ def index_html():
 def sync():
     #searchword = request.args.get('key', '')
     if request.method == 'POST':
-        print(getTime())
         data = {}
         data['client_timestamp'] = int(request.form['client_timestamp'])
         data['server_timestamp'] = getTime()
         data['next_song'] = next_song_time
         data['is_playing'] = is_playing
         data['current_song'] = song_name
+        playlist_html = ""
+        for song in playlist_info:
+            if song==song_name:
+                playlist_html += "<b>" + song + "</b>"
+            else:
+                playlist_html += song
+            playlist_html += "<br>"
+        data['playlist_html'] = playlist_html
         return jsonify(data)
 
 
@@ -84,6 +98,18 @@ def playing():
         is_playing = True
     return jsonify(response)
 
+
+def songStarts():
+    logger = logging.getLogger('syncmusic:songStarts')
+    logger.info('PLAYING SONG!')
+
+def songOver():
+    global is_playing
+    logger = logging.getLogger('syncmusic:songOver')
+    logger.info('song over')
+    is_playing = False
+    nextSong(20)
+
 def nextSong(delay):
     global last_activated
     global current_song
@@ -91,33 +117,49 @@ def nextSong(delay):
     global is_playing
     global is_initialized
     global song_name
+    global songStartTimer
+    global songStopTimer
+    logger = logging.getLogger('syncmusic:nextSong')
     if time.time() - last_activated > 5 or not is_initialized: # songs can only be skipped every 5 seconds
         if not is_initialized:
             for root, dirnames, filenames in os.walk('/home/zack/Music'):
                 for filename in fnmatch.filter(filenames, '*.mp3'):
                     if 'Allen' in root or 'Allen' in filename:
                         playlist.append((root, filename))
-            print(playlist)
+                        cwd = os.getcwd()
+                        os.chdir(root)
+                        audiofile = eyed3.load(filename)
+                        song_name = audiofile.tag.album + ' - ' + audiofile.tag.title + ' by ' + audiofile.tag.artist 
+                        playlist_info.append(song_name)
+                        os.chdir(cwd)
+
         is_playing = False
         current_song += 1
         if current_song >= len(playlist):
             current_song = 0
-        print(current_song)
+        logger.info(current_song)
         last_activated = time.time()
         cwd = os.getcwd()
-        print(playlist[current_song][0])
         os.chdir(playlist[current_song][0])
         cmd = 'scp ' + playlist[current_song][1].replace(' ','\ ') + ' phi@server8.duckdns.org:/www/data/sound.mp3'
         cmd = 'cp ' + playlist[current_song][1].replace(' ','\ ') + ' ' + cwd + '/static/sound.mp3'
-        print(cmd)
+        logger.debug(cmd)
         os.system(cmd)
-        audiofile = eyed3.load(playlist[current_song][1])
         os.chdir(cwd)
-        song_name = audiofile.tag.album + ' - ' + audiofile.tag.title + ' by ' + audiofile.tag.artist 
+        song_name = playlist_info[current_song]
         next_song_time = getTime() + delay*1000
-        print ('next up: ' + song_name)
-        print ('time: ' + str(getTime()) + ' and next: ' + str(next_song_time))
+        logger.info ('next up: ' + song_name)
+        logger.debug ('time: ' + str(getTime()) + ' and next: ' + str(next_song_time))
         is_initialized = True
+        if songStartTimer is not None:
+            songStartTimer.cancel()
+            songStopTimer.cancel()
+        songStopTimer = Timer(float(next_song_time-getTime())/1000.0, songStarts, ())
+        songStopTimer.start()
+        audio = MP3('./static/sound.mp3')
+        logger.debug(audio.info.length)
+        songStartTimer = Timer(2+float(audio.info.length) + float(next_song_time-getTime())/1000.0, songOver, ())
+        songStartTimer.start()
 
 if __name__ == "__main__":
     # Load playlist

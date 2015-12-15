@@ -5,7 +5,7 @@ import random
 import logging
 import json
 from threading import Timer,Thread,Event
-
+import subprocess
 
 class perpetualTimer():
 
@@ -52,13 +52,16 @@ def checkIfSkipped():
 	request_url = 'http://' + request_url.replace('//','/')
 
 	data = {'client_timestamp':getTime()}
-	r = requests.post(request_url,data=data)
-	data = r.json()
-	if not data['is_playing']:
-		os.system('rm sound.mp3')
-		os.system('wget http://' + url + '/static/sound.mp3')
-		syncClocks()
-
+	try:
+		r = requests.post(request_url,data=data)
+		data = r.json()
+		if not data['is_playing']:
+			os.system('pkill play')
+			os.system('rm sound.mp3')
+			os.system('wget http://' + url + '/static/sound.mp3')
+			syncClocks()
+	except:
+		pass
 
 def syncClocks():
 	correct_time_delta = []
@@ -93,6 +96,11 @@ def syncClocks():
 		print('1')
 		time.sleep(1)
 		print('playing')
+		subprocess.Popen(["play","sound.mp3"])
+		request_url = url + '/playing'
+		request_url = 'http://' + request_url.replace('//','/')
+		data = {'client_timestamp':getTime()}
+		r = requests.post(request_url,data=data)
 
 if __name__ == "__main__":
 	try:
@@ -100,5 +108,5 @@ if __name__ == "__main__":
 	except:
 		print('python client.py URL')
 		sys.exit(-1)
-	t = perpetualTimer(1,checkIfSkipped)
+	t = perpetualTimer(3,checkIfSkipped)
 	t.start()

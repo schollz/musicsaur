@@ -33,3 +33,8 @@ Then goto a browser and type in your ```yourip:5000``` to see the syncing.
 ## Limitations
 
 The main limitation is the upload of the music file, which may be a bottleneck if you are using it over the internet.
+
+## Audio on Raspberry Pi
+
+- [Maybe useful article about reducing crackle](https://dbader.org/blog/crackle-free-audio-on-the-raspberry-pi-with-mpd-and-pulseaudio#update1)
+- [How to play MP3s with SOX](http://superuser.com/questions/421153/how-to-add-a-mp3-handler-to-sox/421168)
