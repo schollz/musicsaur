@@ -168,7 +168,6 @@ setInterval(function()
 $(function () {
     $('#nextsong').on('click', function () {
         $("div.info1").text('Skipping to next song');
-        $("div.info2").text('');
         var posting = $.post('/nextsong', {
             'message': 'next song please'
         });
@@ -189,10 +188,18 @@ $(function () {
 
   <!-- columns should be the immediate child of a .row -->
   <div class="row">
-  <div class="two columns">
+  </div>
+  <div class="row">
+  <h1>Sync Music</h1>
+  </div>
+
+  <div class="row">
+  <div class="six columns">
+    <button class="button" id="previoussong">Previous</button>
+    <button class="button" id="reloadsong">Replay</button>
     <button class="button" id="nextsong">Next</button>
   </div>
-  <div class="ten columns">
+  <div class="six columns">
     <div class="info1">{{ data['message'] }}</div>
   </div>
   </div>
@@ -200,7 +207,7 @@ $(function () {
   <div class="two columns">
   </div>
   <div class="ten columns">
-    <div class="info2"></div>
+    <div class="info2">{{ data['playlist_html'] }}</div>
   </div>
   </div>
 

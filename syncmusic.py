@@ -47,6 +47,14 @@ def getTime():
 def index_html():
     data = {}
     data['random_integer'] = random.randint(1000,30000)
+    playlist_html = ""
+    for song in playlist_info:
+        if song==song_name:
+            playlist_html += "<b>" + song + "</b>"
+        else:
+            playlist_html += song
+        playlist_html += "<br>"
+    data['playlist_html'] = playlist_html
     if not is_initialized:
         nextSong(20)
     if is_playing or next_song_time - getTime() > 17000:
@@ -120,7 +128,7 @@ def nextSong(delay):
     global songStartTimer
     global songStopTimer
     logger = logging.getLogger('syncmusic:nextSong')
-    if time.time() - last_activated > 5 or not is_initialized: # songs can only be skipped every 5 seconds
+    if time.time() - last_activated > 10 or not is_initialized: # songs can only be skipped every 5 seconds
         if not is_initialized:
             for root, dirnames, filenames in os.walk('/home/zack/Music'):
                 for filename in fnmatch.filter(filenames, '*.mp3'):
