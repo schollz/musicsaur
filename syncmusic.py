@@ -37,6 +37,7 @@ is_initialized = False
 song_name = ""
 songStartTimer = None
 songStopTimer = None
+folder_with_music = ""
 
 
 def getTime():
@@ -173,7 +174,11 @@ def nextSong(delay,skip):
 if __name__ == "__main__":
     # Load playlist
     #app.run(host='10.190.76.50')
-
+    if len(sys.argv) > 1:
+        folder_with_music = sys.argv[1:]
+    else:
+        print("Need to specify folder with music.\npython syncmusic.py '/folder/with/music'")
+        sys.exit(-1)
     from tornado.wsgi import WSGIContainer
     from tornado.httpserver import HTTPServer
     from tornado.ioloop import IOLoop
