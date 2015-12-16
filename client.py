@@ -47,6 +47,7 @@ def getTime():
 
 
 def checkIfSkipped():
+	logger = logging.getLogger('client:checkIfSkipped')
 	print "Checking if skipped"
 	request_url = url + '/sync'
 	request_url = 'http://' + request_url.replace('//','/')
@@ -55,6 +56,7 @@ def checkIfSkipped():
 	try:
 		r = requests.post(request_url,data=data)
 		data = r.json()
+		logger.info(json.dumps(data))
 		if not data['is_playing']:
 			os.system('pkill play')
 			os.system('rm sound.mp3')
