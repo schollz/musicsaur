@@ -5,6 +5,7 @@ import os
 import fnmatch
 import random
 import sys
+import socket
 from threading import Timer
 
 # Setup logging
@@ -262,9 +263,19 @@ if __name__ == "__main__":
             "Need to specify folder with music.\npython syncmusic.py '/folder/with/music'")
         sys.exit(-1)
 
-    print("*" * 60)
-    print("* Starting server with " + str(len(playlist)) + " songs")
-    print("*" * 60)
+
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("gmail.com",80))
+        ip_address = s.getsockname()[0]
+        s.close()
+    except:
+        ip_address = "127.0.0.1"
+
+    print("\n\n" +"#" * 60)
+    print("# Starting server with " + str(len(playlist)) + " songs")
+    print("# To use, open a browser to http://" + ip_address + ":5000")
+    print("#" * 60 +"\n\n")
 
     from tornado.wsgi import WSGIContainer
     from tornado.httpserver import HTTPServer

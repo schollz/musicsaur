@@ -4,14 +4,16 @@ Want to sync up your music on multiple computers? This accomplishes exactly that
 
 This program is powered by [the excellent howler.js library from goldfire](https://github.com/goldfire/howler.js/). Essentially all the client computers [sync their clocks](http://www.mine-control.com/zack/timesync/timesync.html) and then try to start a song at the same time. Any dissimilarities between playback are also fixed, because the clients will automatically seek to the position of the server.
 
-## Install
+# Installation
+
+To install simply use
 
 ```bash
 git clone https://github.com/schollz/sync-music-player.git
 python setup.py install
 ```
 
-## Run
+## Usage
 
 Start the server using
 
@@ -30,8 +32,21 @@ and enable it. Also note, if you are using a Raspberry Pi, you can run the brows
 xinit /usr/bin/midori -a http://LOCALSERVERIP:5000/
 ```
 
-## Todo
+## Contributing
 
-- ~~Add Next, Previous buttons~~
-- ~~Show playlist on every screen~~
-- ~~Mute the audio if it loses sync~~
+1. Fork it!
+2. Create your feature branch: `git checkout -b my-new-feature`
+3. Commit your changes: `git commit -am 'Add some feature'`
+4. Push to the branch: `git push origin my-new-feature`
+5. Submit a pull request :D
+
+## History
+
+TODO: Write history
+
+## Credits
+
+* [Goldfire studios](http://goldfirestudios.com/blog/104/howler.js-Modern-Web-Audio-Javascript-Library) for their amazing [howler.js library](https://github.com/goldfire/howler.js/)
+* Zach Simpson for [his paper on simple clock synchronization](http://www.mine-control.com/zack/timesync/timesync.html)
+
+
