@@ -83,6 +83,7 @@ def sync():
         data['next_song'] = next_song_time
         data['is_playing'] = is_playing
         data['current_song'] = song_name
+        data['song_time'] = float(getTime()-next_song_time)/1000.0
         return jsonify(data)
 
 
@@ -126,7 +127,7 @@ def nextSong(delay,skip):
     logger = logging.getLogger('syncmusic:nextSong')
     if time.time() - last_activated > 10 or not is_initialized: # songs can only be skipped every 5 seconds
         if not is_initialized:
-            for root, dirnames, filenames in os.walk('/home/zack/Music'):
+            for root, dirnames, filenames in os.walk(folder_with_music):
                 for filename in fnmatch.filter(filenames, '*.mp3'):
                     if 'Allen' in root or 'Allen' in filename:
                         playlist.append((root, filename))
@@ -175,10 +176,12 @@ if __name__ == "__main__":
     # Load playlist
     #app.run(host='10.190.76.50')
     if len(sys.argv) > 1:
-        folder_with_music = sys.argv[1:]
+        folder_with_music = sys.argv[1]
     else:
         print("Need to specify folder with music.\npython syncmusic.py '/folder/with/music'")
         sys.exit(-1)
+
+
     from tornado.wsgi import WSGIContainer
     from tornado.httpserver import HTTPServer
     from tornado.ioloop import IOLoop

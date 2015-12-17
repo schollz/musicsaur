@@ -51,7 +51,7 @@ var secondTimeout0 = setTimeout(function() {
 
 
 var sound = new Howl({
-    urls: ['/static/sound.mp3?{{ data['random_integer'] }}'],
+    src: ['/static/sound.mp3?{{ data['random_integer'] }}'],
     onend: function() {
 
         var posting = $.post('/nextsong', {
@@ -117,7 +117,7 @@ function makeRequests(callback) {
                 $("div.info1").text('Playing');
                 window.setInterval(function(){
                   checkIfSkipped();
-                }, 3000);
+                }, 10000);
                 sound.play();
                 var posting = $.post('/playing', {
                 'message': 'im playing a song'
@@ -156,6 +156,8 @@ function checkIfSkipped() {
           if (data['is_playing']==false) {
             sound.unload()
             location.reload(true);
+          } else {
+            sound.seek(data['song_time'])
           }
         });
 
@@ -163,7 +165,7 @@ function checkIfSkipped() {
 
 {% else %}
 setInterval(function() 
-{ window.location=window.location;},1000);
+{ window.location=window.location;},3000);
 {% endif %}
 
 $(document).ready(function(){
