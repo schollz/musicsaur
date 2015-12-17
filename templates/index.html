@@ -1,227 +1,241 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="UTF-8">
-    <title>Music Sync</title>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Cache-control" content="no-cache">
-  <meta http-equiv="Expires" content="-1">
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/2.5.0/math.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-      <script src="/static/howler.js" type="text/javascript"></script>
-      <!-- <audio preload="auto" src="/static/sound.mp3?{{ data['random_integer'] }}" id="sound">
+    <title>Music Sync</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="no-cache" http-equiv="Cache-control">
+    <meta content="-1" http-equiv="Expires">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/2.5.0/math.min.js" type="text/javascript">
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js">
+    </script>
+    <script src="/static/howler.js" type="text/javascript">
+    </script>
+    <!-- <audio preload="auto" src="/static/sound.mp3?{{ data['random_integer'] }}" id="sound">
   Your browser does not support the audio tag.
 </audio> -->
+    <link href="/static/normalize.css" rel="stylesheet">
+    <link href="/static/skeleton.css" rel="stylesheet">
+    <style>
+    a { cursor: pointer; }
+    </style>
+</head>
 
-  <link rel="stylesheet" href="/static/normalize.css">
-  <link rel="stylesheet" href="/static/skeleton.css">
-  <style>
-a { cursor: pointer; }
-  </style>
-  </head>
-  <body>
-
-  <script>
+<body>
+<script>
 
 var time = Date.now || function() {
-    return +new Date.getTime();
+return +new Date.getTime();
 }
 
+// CONSTANTS
+var CHECK_UP_TIME_FAST = 1200;
+var CHECK_UP_TIME_SLOW = 12000;
+var MAX_SYNC_LAG = 30;
 
 // GLOBALS
-var lagTimes = []
-var computeTimes = []
-var correct_time_delta = []
-var correct_latency = []
+var lagTimes = [];
+var computeTimes = [];
+var correct_time_delta = [];
+var correct_latency = [];
 var next_trigger = time() + 1000000;
 var true_time_delta = 0;
 var true_server_time_delta = 0;
 var sound_activated = false;
 var seconds_left = 0;
+var current_song = "None"
 var secondTimeout3 = setTimeout(function() {
-    console.log('3 seconds left')
+console.log('3 seconds left')
 }, 100000);
 var secondTimeout2 = setTimeout(function() {
-    console.log('2 seconds left')
+console.log('2 seconds left')
 }, 100000);
 var secondTimeout1 = setTimeout(function() {
-    console.log('1 seconds left')
+console.log('1 seconds left')
 }, 100000);
 var secondTimeout0 = setTimeout(function() {
-    console.log('0 seconds left')
+console.log('0 seconds left')
 }, 100000);
 var mainInterval = 0;
 
 
 var sound = new Howl({
-    src: ['/static/sound.mp3?{{ data['random_integer'] }}'],
-    onend: function() {
+src: ['/static/sound.mp3?{{ data['random_integer'] }}'],
+onend: function() {
 
-        var posting = $.post('/nextsong', {
-            'message': 'next song please'
-        });
+    var posting = $.post('/nextsong', {
+        'message': 'next song please'
+    });
 
-        // Put the results in a div
-        posting.done(function(data) {
-            sound.unload()
-            location.reload(true);
-        });
+    // Put the results in a div
+    posting.done(function(data) {
+        sound.unload()
+        location.reload(true);
+    });
 
-    },
-    html5: false,
-    preload: true
+},
+html5: false,
+preload: true
 });
 
 
 function makeRequests(callback) {
 
-    for (var i = 0; i < 15; i++) {
+for (var i = 0; i < 15; i++) {
 
-      setTimeout(function postRequest() {
+  setTimeout(function postRequest() {
 
 // Send the data using post
-        var posting = $.post('/sync', {
-            'client_timestamp': time()
-        });
+    var posting = $.post('/sync', {
+        'client_timestamp': time(),
+        'current_song': current_song
+    });
 
-        // Put the results in a div
-        posting.done(function(data) {
-            latency = time() - data['client_timestamp']
-            half_latency = latency / 2.0
-            time_delta = time() - data['server_timestamp']
-            next_trigger = data['next_song']
+    // Put the results in a div
+    posting.done(function(data) {
+        current_song = data['current_song']
+        latency = time() - data['client_timestamp']
+        half_latency = latency / 2.0
+        time_delta = time() - data['server_timestamp']
+        next_trigger = data['next_song']
 
-            correct_time_delta.push(time_delta + half_latency);
-            correct_latency.push(half_latency);
-            if (correct_time_delta.length==7) {
-              var mean = math.mean(correct_time_delta);
-              var median = math.median(correct_time_delta);
-              var std = math.std(correct_time_delta);
-              var sum = 0
-              var num = 0
-              for (var j = 0; j < correct_time_delta.length; j++) {
-                  if (correct_time_delta[j]<median+std) {
-                      sum = sum + correct_time_delta[j];
-                      num = num + 1;
-                  }
+        correct_time_delta.push(time_delta + half_latency);
+        correct_latency.push(half_latency);
+        if (correct_time_delta.length==7) {
+          var mean = math.mean(correct_time_delta);
+          var median = math.median(correct_time_delta);
+          var std = math.std(correct_time_delta);
+          var sum = 0
+          var num = 0
+          for (var j = 0; j < correct_time_delta.length; j++) {
+              if (correct_time_delta[j]<median+std) {
+                  sum = sum + correct_time_delta[j];
+                  num = num + 1;
               }
-              true_time_delta = sum / num;
+          }
+          true_time_delta = sum / num;
 
-              var mean = math.mean(correct_latency);
-              var median = math.median(correct_latency);
-              var std = math.std(correct_latency);
-              var sum = 0
-              var num = 0
-              for (var j = 0; j < correct_latency.length; j++) {
-                  if (correct_latency[j]<median+std) {
-                      sum = sum + correct_latency[j];
-                      num = num + 1;
-                  }
+          var mean = math.mean(correct_latency);
+          var median = math.median(correct_latency);
+          var std = math.std(correct_latency);
+          var sum = 0
+          var num = 0
+          for (var j = 0; j < correct_latency.length; j++) {
+              if (correct_latency[j]<median+std) {
+                  sum = sum + correct_latency[j];
+                  num = num + 1;
               }
-              true_server_time_delta = sum / num;
+          }
+          true_server_time_delta = sum / num;
 
-              clearTimeout(secondTimeout3);
-              secondTimeout3 = setTimeout(function() {
-                  console.log('3 seconds left');
-                  $("div.info1").text('3 seconds left');
-              }, next_trigger - (time() - true_time_delta) - 3000);
-              clearTimeout(secondTimeout2);
-              secondTimeout2 = setTimeout(function() {
-                  console.log('2 seconds left');
-                  $("div.info1").text('2 seconds left');
-              }, next_trigger - (time() - true_time_delta) - 2000);
-              clearTimeout(secondTimeout1);
-              secondTimeout1 = setTimeout(function() {
-                  console.log('1 seconds left');
-                  $("div.info1").text('1 second left');
-              }, next_trigger - (time() - true_time_delta) - 1000);
-              clearTimeout(secondTimeout0);
-              secondTimeout0 = setTimeout(function() {
-                  console.log('playing song');
-                  $("div.info1").text('Playing');
-                  mainInterval = setInterval(function(){
-                    checkIfSkipped();
-                  }, 1200);
-                  sound.play();
-                  if (data['is_playing']==true) {
-                      sound.seek(data['song_time'])
-                  }
-                  var posting = $.post('/playing', {
-                  'message': 'im playing a song'
-                  });
+          clearTimeout(secondTimeout3);
+          secondTimeout3 = setTimeout(function() {
+              console.log('3 seconds left');
+              $("div.info1").text('3 seconds left');
+          }, next_trigger - (time() - true_time_delta) - 3000);
+          clearTimeout(secondTimeout2);
+          secondTimeout2 = setTimeout(function() {
+              console.log('2 seconds left');
+              $("div.info1").text('2 seconds left');
+          }, next_trigger - (time() - true_time_delta) - 2000);
+          clearTimeout(secondTimeout1);
+          secondTimeout1 = setTimeout(function() {
+              console.log('1 seconds left');
+              $("div.info1").text('1 second left');
+          }, next_trigger - (time() - true_time_delta) - 1000);
+          clearTimeout(secondTimeout0);
+          secondTimeout0 = setTimeout(function() {
+              console.log('playing song');
+              $("div.info1").text('Playing');
+              mainInterval = setInterval(function(){
+                checkIfSkipped();
+              }, CHECK_UP_TIME_FAST);
+              sound.play();
+              if (data['is_playing']==true) {
+                  sound.seek(data['song_time'])
+              }
+              var posting = $.post('/playing', {
+              'message': 'im playing a song'
+              });
 
-                  // Put the results in a div
-                  posting.done(function(data) {
+              // Put the results in a div
+              posting.done(function(data) {
 
-                  });
-              }, next_trigger - (time() - true_time_delta));
+              });
+          }, next_trigger - (time() - true_time_delta));
 
-            }
-
-
-
-
-        });
+        }
 
 
 
-      }, i*200 );
-        
-    }
+
+    });
+
+
+
+  }, i*150 );
+    
+}
 }
 
 
 function checkIfSkipped() {
 
-        var start = new Date().getTime();
-        // Send the data using post
-        var posting = $.post('/sync', {
-            'client_timestamp': time()
-        });
+    var start = new Date().getTime();
+    // Send the data using post
+    var posting = $.post('/sync', {
+        'client_timestamp': time(),
+        'current_song': current_song
+    });
 
-        // Put the results in a div
-        posting.done(function(data) {
-          if (data['is_playing']==false) {
-            sound.unload()
-            location.reload(true);
-          } else {
-              var mySongTime = sound.seek();
-            var serverSongTime = data['song_time'];
-              var end = new Date().getTime();
-              var time = end - start;
-              console.log('Execution time1: (ms) ' + time);
-            var diff = serverSongTime*1000+time - mySongTime*1000;
-            var seekTo = data['song_time']+time/1000.0;
-            console.log('Browser: ' + mySongTime.toString() + '\nServer: ' + serverSongTime.toString() + '\nHalf-Latency: ' + true_server_time_delta.toString() + '\nCorrected diff: ' + diff.toString());
-            if (Math.abs(diff) > 25) {
-              if (lagTimes.length>4) {
-                var meanLag = math.median(lagTimes)/1000.0;
-                var meanCompute = math.median(computeTimes)/1000.0;
-                console.log('\npreviously seeking to ' + seekTo.toString() + ' now adjusting with ' + meanLag.toString() + ' s lag and ' + meanCompute.toString() + ' s compute time');
-                seekTo = seekTo + meanLag + meanCompute;
-              }
-              console.log('now seeking to ' + seekTo.toString());
-              sound.seek(seekTo);
-              var end = new Date().getTime();
-              var time = end - start;
-              console.log('Execution time: (ms) ' + time);
-              if (diff>0) {
-                lagTimes.push(diff);
-              }
-               computeTimes.push(time);
-              sound.volume(0.0);
-              clearInterval(mainInterval);
-              mainInterval = setInterval(function(){checkIfSkipped();}, 1200);
-            } else {
-              lagTimes = [];
-              computeTimes = [];
-              sound.volume(1.0);
-              clearInterval(mainInterval);
-              mainInterval = setInterval(function(){checkIfSkipped();}, 12000);
-            } 
+    // Put the results in a div
+    posting.done(function(data) {
+      if (data['is_playing']==false) {
+        sound.unload()
+        location.reload(true);
+      } else {
+          var mySongTime = sound.seek();
+          if (typeof(mySongTime)=="object") {
+            mySongTime = 0;
           }
-        });
+        var serverSongTime = data['song_time'];
+        current_song = data['current_song']
+        var end = new Date().getTime();
+        var time = end - start;
+        console.log('Execution time1: (ms) ' + time);
+        var diff = serverSongTime*1000+time - mySongTime*1000;
+        var seekTo = data['song_time']+time/1000.0;
+        console.log('Browser: ' + mySongTime.toString() + '\nServer: ' + serverSongTime.toString() + '\nHalf-Latency: ' + true_server_time_delta.toString() + '\nCorrected diff: ' + diff.toString());
+        if (Math.abs(diff) > MAX_SYNC_LAG) {
+          if (lagTimes.length>4) {
+            var meanLag = math.median(lagTimes)/1000.0;
+            var meanCompute = math.median(computeTimes)/1000.0;
+            console.log('\npreviously seeking to ' + seekTo.toString() + ' now adjusting with ' + meanLag.toString() + ' s lag and ' + meanCompute.toString() + ' s compute time');
+            seekTo = seekTo + meanLag + meanCompute;
+          }
+          console.log('now seeking to ' + seekTo.toString());
+          sound.seek(seekTo);
+          var end = new Date().getTime();
+          var time = end - start;
+          console.log('Execution time: (ms) ' + time);
+          if (diff>0) {
+            lagTimes.push(diff);
+          }
+           computeTimes.push(time);
+          sound.volume(0.0);
+          clearInterval(mainInterval);
+          mainInterval = setInterval(function(){checkIfSkipped();}, CHECK_UP_TIME_FAST);
+        } else {
+          lagTimes = [];
+          computeTimes = [];
+          sound.volume(1.0);
+          clearInterval(mainInterval);
+          mainInterval = setInterval(function(){checkIfSkipped();}, CHECK_UP_TIME_SLOW);
+        } 
+      }
+    });
 
 }
 
@@ -229,85 +243,71 @@ function checkIfSkipped() {
 
 
 $(document).ready(function(){
-    $('a[type=controls]').click(function() {
-       var skip = $(this).data('skip');
-       console.log(skip);
-        $("div.info1").text('Changing song');
-        var posting = $.post('/nextsong', {
-            'message': 'next song please',
-            'skip': parseInt(skip)
-        });
-
-        // Put the results in a div
-        posting.done(function(data) {
-            sound.unload()
-            location.reload(true);
-        });
-
+$('a[type=controls]').click(function() {
+   var skip = $(this).data('skip');
+   console.log(skip);
+    $("div.info1").text('Changing song');
+    var posting = $.post('/nextsong', {
+        'message': 'next song please',
+        'skip': parseInt(skip)
     });
 
+    // Put the results in a div
+    posting.done(function(data) {
+        sound.unload()
+        location.reload(true);
+    });
 
-    makeRequests();
+});
+
+
+makeRequests();
 
 });
 
 
 
 
-  </script>
-  
-<div class="container">
+</script>
 
-  <!-- columns should be the immediate child of a .row -->
-  <div class="row">
-  </div>
-  <div class="row">
-  <h1>Sync Music</h1>
-  </div>
+    <div class="container">
+        <!-- columns should be the immediate child of a .row -->
 
-  <div class="row">
-  <div class="six columns">
-    <a class="button" type="controls" data-skip="-3">Previous</a>
-    <a class="button" type="controls" data-skip="-2">Replay</a>
-    <a class="button" type="controls" data-ksip="-1">Next</a>
-  </div>
-  <div class="six columns">
-    <div class="info1">{{ data['message'] }}</div>
-  </div>
-  </div>
-  <div class="row">
-  <div class="two columns">
-  </div>
-  <div class="ten columns">
-    <div class="info2">{{ data['playlist_html'] | safe }}</div>
-  </div>
-  </div>
 
-</div>
+        <div class="row">
+        </div>
 
-  
-  </body>
+
+        <div class="row">
+            <h1>Sync Music</h1>
+        </div>
+
+
+        <div class="row">
+            <div class="six columns">
+                <a class="button" data-skip="-3" type="controls">Previous</a> <a class="button" data-skip="-2" type="controls">Replay</a> <a class="button" data-skip="-1" type="controls">Next</a>
+            </div>
+
+
+            <div class="six columns">
+                <div class="info1">
+                    {{ data['message'] }}
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="two columns">
+            </div>
+
+
+            <div class="ten columns">
+                <div class="info2">
+                    {{ data['playlist_html'] | safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
 </html>
-
-
-
-<!--
-https://stackoverflow.com/questions/11001318/waiting-for-api-call-to-finish-in-javascript-before-continuing
-
-var res = makeCall();
-if(res)
-{
-   // do stuff
-}
-Do this:
-
-function makeCall(){
-    FB.api('/me/feed', 'post', { message: body }, function(response) {
-        if (response && !response.error) {
-            // do stuff
-        }
-    });
-}
-
-makeCall();
--->

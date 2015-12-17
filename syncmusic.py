@@ -57,7 +57,7 @@ def getPlaylistHtml():
 @app.route("/")
 def index_html():
     if not is_initialized:
-        nextSong(20,0)
+        nextSong(6,0)
     data = {}
     data['random_integer'] = random.randint(1000,30000)
     data['playlist_html'] = getPlaylistHtml()
@@ -74,7 +74,10 @@ def sync():
         data['client_timestamp'] = int(request.form['client_timestamp'])
         data['server_timestamp'] = getTime()
         data['next_song'] = next_song_time
-        data['is_playing'] = is_playing
+        if is_playing:
+            data['is_playing'] = (song_name==request.form['current_song'])
+        else:
+            data['is_playing'] = is_playing
         data['current_song'] = song_name
         data['song_time'] = float(getTime()-next_song_time)/1000.0
         return jsonify(data)
@@ -85,7 +88,7 @@ def finished():
     response = {'message':'loading!'}
     if request.method == 'POST':
         skip = int(request.form['skip'])
-        nextSong(20,skip)
+        nextSong(6,skip)
     return jsonify(response)
 
 @app.route("/playing", methods=['GET', 'POST'])
@@ -106,7 +109,7 @@ def songOver():
     logger = logging.getLogger('syncmusic:songOver')
     logger.info('song over')
     is_playing = False
-    nextSong(20,-1)
+    nextSong(6,-1)
 
 def nextSong(delay,skip):
     global last_activated
@@ -166,9 +169,23 @@ if __name__ == "__main__":
                 cwd = os.getcwd()
                 os.chdir(root)
                 audiofile = eyed3.load(filename)
-                song_name = audiofile.tag.album + ' - ' + audiofile.tag.title + ' by ' + audiofile.tag.artist 
+                if audiofile.tag == None:
+                    continue
+                title = audiofile.tag.title
+                if title == None:
+                    title = 'unknown'
+                artist = audiofile.tag.artist
+                if artist == None:
+                    artist = filename
+                album = audiofile.tag.album
+                if album == None:
+                    album = ''
+                song_name = album + ' - ' +title + ' by ' + artist 
                 playlist_info.append(song_name)
                 os.chdir(cwd)
+        if len(playlist)==0:
+            print('No music in ' + folder_with_music)
+            sys.exit(-1)
     else:
         print("Need to specify folder with music.\npython syncmusic.py '/folder/with/music'")
         sys.exit(-1)
