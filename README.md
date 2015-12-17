@@ -20,7 +20,6 @@ Start the server using
 ```bash
 python syncmusic.py "C:/Your/folder/of/music"
 ```
-
 Now, figure out your local server IP using ```ifconfig``` or similar. Then goto a browser and type in your ```http://LOCALSERVERIP:5000``` to see the playlist and hear the synced up music! Note: If you are using Android, you won't be able to hear the music [unless you change one of the flags in chrome to allow audio without gestures](http://android.stackexchange.com/questions/59134/enable-autoplay-html5-video-in-chrome). To do this, copy and paste this into your Chrome browser
 
 ```bash
@@ -39,10 +38,6 @@ xinit /usr/bin/midori -a http://LOCALSERVERIP:5000/
 3. Commit your changes: `git commit -am 'Add some feature'`
 4. Push to the branch: `git push origin my-new-feature`
 5. Submit a pull request :D
-
-## History
-
-TODO: Write history
 
 ## Credits
 
