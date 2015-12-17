@@ -20,15 +20,31 @@ Start the server using
 ```bash
 python syncmusic.py "C:/Your/folder/of/music"
 ```
-Now, figure out your local server IP using ```ifconfig``` or similar. Then goto a browser and type in your ```http://LOCALSERVERIP:5000``` to see the playlist and hear the synced up music! Note: If you are using Android, you won't be able to hear the music [unless you change one of the flags in chrome to allow audio without gestures](http://android.stackexchange.com/questions/59134/enable-autoplay-html5-video-in-chrome). To do this, copy and paste this into your Chrome browser
+
+which should print out something like
+
+```bash
+############################################################
+# Starting server with 18 songs
+# To use, open a browser to http://W.X.Y.Z:5000
+############################################################
+```
+
+Your server is up and running! Now, for each computer that you want to play music from, just go and load up a browser to the url ```http://W.X.Y.Z:5000```. You will see the playlist and the music will automatically synchronize and start playing! 
+
+### Some notes
+
+- If not on LAN you might have to wait 10-20 seconds to load the song
+- If you're using Chrome browser on Android, you won't be able to hear the music [unless you change one of the flags in chrome to allow audio without gestures](http://android.stackexchange.com/questions/59134/enable-autoplay-html5-video-in-chrome). To do this, copy and paste this into your Chrome browser:
 
 ```bash
 chrome://flags/#disable-gesture-requirement-for-media-playback
 ```
-and enable it. Also note, if you are using a Raspberry Pi, you can run the browser headless using the following command:
+
+- If you want to play music from a Raspberry Pi, just type this command (works on headless):
 
 ```bash
-xinit /usr/bin/midori -a http://LOCALSERVERIP:5000/
+xinit /usr/bin/midori -a http://W.X.Y.Z:5000
 ```
 
 ## Contributing
