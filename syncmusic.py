@@ -6,6 +6,7 @@ import fnmatch
 import random
 import sys
 import socket
+import shutil
 from threading import Timer
 
 # Setup logging
@@ -112,13 +113,7 @@ def nextSong(delay, skip):
             current_song = len(playlist) - 1
 
         last_activated = time.time()
-        cwd = os.getcwd()
-        os.chdir(playlist[current_song][0])
-        cmd = 'cp ' + \
-            playlist[current_song][1].replace(' ', '\ ') + ' ' + cwd + '/static/sound.mp3'
-        logger.debug(cmd)
-        os.system(cmd)
-        os.chdir(cwd)
+        shutil.copy(playlist[current_song],os.path.join(os.getcwd(),'static/sound.mp3'))
         song_name = playlist_info[current_song]
         next_song_time = getTime() + delay * 1000
         logger.debug('next up: ' + song_name)
@@ -232,27 +227,27 @@ if __name__ == "__main__":
     """Load the playlist, or let user know that one needs to be loaded"""
     # app.run(host='0.0.0.0')
     logger = logging.getLogger('syncmusic:nextSong')
+    cwd = os.getcwd()
     if len(sys.argv) > 1:
         folder_with_music = sys.argv[1]
         # Load playlist
         for root, dirnames, filenames in os.walk(folder_with_music):
             for filename in fnmatch.filter(filenames, '*.mp3'):
-                playlist.append((root, filename))
-                cwd = os.getcwd()
-                os.chdir(root)
-                audiofile = eyed3.load(filename)
-                if audiofile.tag is None:
-                    continue
-                title = audiofile.tag.title
-                if title is None:
-                    title = 'unknown'
-                artist = audiofile.tag.artist
-                if artist is None:
-                    artist = filename
-                album = audiofile.tag.album
-                if album is None:
-                    album = ''
-                song_name = album + ' - ' + title + ' by ' + artist
+                playlist.append(os.path.join(root, filename))
+                audiofile = eyed3.load(playlist[-1])
+                try:
+                    title = audiofile.tag.title
+                    if title is None:
+                        title = 'unknown'
+                    artist = audiofile.tag.artist
+                    if artist is None:
+                        artist = filename
+                    album = audiofile.tag.album
+                    if album is None:
+                        album = ''
+                    song_name = album + ' - ' + title + ' by ' + artist
+                except:
+                    song_name = filename
                 playlist_info.append(song_name)
                 os.chdir(cwd)
         if len(playlist) == 0:
@@ -263,7 +258,7 @@ if __name__ == "__main__":
             "Need to specify folder with music.\npython syncmusic.py '/folder/with/music'")
         sys.exit(-1)
 
-
+    os.chdir(cwd)
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("gmail.com",80))

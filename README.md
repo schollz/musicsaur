@@ -6,7 +6,7 @@ This program is powered by [the excellent howler.js library from goldfire](https
 
 # Installation
 
-To install simply use
+Tested on Python2.7 and Python3.4. To install simply use
 
 ```bash
 git clone https://github.com/schollz/sync-music-player.git
