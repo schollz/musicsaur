@@ -28,17 +28,10 @@ chrome://flags/#disable-gesture-requirement-for-media-playback
 ```
 and enable it.
 
-The second client is for headless computers - e.g. Raspberry Pi's. You need to install ```sox``` with
+To run on Raspberry Pi headless, use
 
 ```bash
-sudo apt-get install sox libsox-fmt-mp3
-```
-
-and then you can run the client using
-
-```bash
-git clone https://github.com/schollz/sync-music-player.git
-python client.py 192.168.1.X:5000
+xinit /usr/bin/midori -a http://ADDRESS:5000/
 ```
 
 ## Limitations
@@ -56,3 +49,4 @@ The main limitation is the upload of the music file, which may be a bottleneck i
 
 - ~~Add Next, Previous buttons~~
 - ~~Show playlist on every screen~~
+- Mute the audio if it loses sync
