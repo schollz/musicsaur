@@ -1,6 +1,8 @@
-# sync-music-player
+# μsic
 
-Allows you to play music from your library, in sync, with various other computers. This is the simplest form of syncing. Multiple clients request songs from the server, to which the server provides, along with a specified time to play the song. All the clients use the server to [sync their clocks](http://www.mine-control.com/zack/timesync/timesync.html) and then they all try to play the songs at the same time (works pretty well).
+Want to sync up your music on multiple computers? This accomplishes exactly that - using only a simple Python server and a browser. Simply run the Python server, and open up a browser on each computer you want to sync up - that's it!
+
+This program is powered by [the excellent howler.js library from goldfire](https://github.com/goldfire/howler.js/). Essentially all the client computers [sync their clocks](http://www.mine-control.com/zack/timesync/timesync.html) and then try to start a song at the same time. Any dissimilarities between playback are also fixed, because the clients will automatically seek to the position of the server.
 
 ## Install
 
@@ -17,36 +19,19 @@ Start the server using
 python syncmusic.py "C:/Your/folder/of/music"
 ```
 
-Then goto a browser and type in your ```localhost:5000``` to see the playlist.
-
-## Client
-
-There are two clients. The simple one is just to open a web browser and goto [localhsot:5000](http://localhost:5000/), or use whatever your host address is (probabaly 192.168.X.Y).  Note: If you are using Android, you won't be able to "autoplay" the music [unless you change one of the flags in chrome](http://android.stackexchange.com/questions/59134/enable-autoplay-html5-video-in-chrome). To do this, copy and paste this into your Chrome browser
+Now, figure out your local server IP using ```ifconfig``` or similar. Then goto a browser and type in your ```http://LOCALSERVERIP:5000``` to see the playlist and hear the synced up music! Note: If you are using Android, you won't be able to hear the music [unless you change one of the flags in chrome to allow audio without gestures](http://android.stackexchange.com/questions/59134/enable-autoplay-html5-video-in-chrome). To do this, copy and paste this into your Chrome browser
 
 ```bash
 chrome://flags/#disable-gesture-requirement-for-media-playback
 ```
-and enable it.
-
-To run on Raspberry Pi headless, use
+and enable it. Also note, if you are using a Raspberry Pi, you can run the browser headless using the following command:
 
 ```bash
-xinit /usr/bin/midori -a http://ADDRESS:5000/
+xinit /usr/bin/midori -a http://LOCALSERVERIP:5000/
 ```
-
-## Limitations
-
-The main limitation is the upload of the music file, which may be a bottleneck if you are using it over the internet.
-
-## Audio on Raspberry Pi
-
-
-
-- [Maybe useful article about reducing crackle](https://dbader.org/blog/crackle-free-audio-on-the-raspberry-pi-with-mpd-and-pulseaudio#update1)
-- [How to play MP3s with SOX](http://superuser.com/questions/421153/how-to-add-a-mp3-handler-to-sox/421168)
 
 ## Todo
 
 - ~~Add Next, Previous buttons~~
 - ~~Show playlist on every screen~~
-- Mute the audio if it loses sync
+- ~~Mute the audio if it loses sync~~

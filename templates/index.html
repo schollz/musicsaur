@@ -133,22 +133,24 @@ for (var i = 0; i < 15; i++) {
           clearTimeout(secondTimeout3);
           secondTimeout3 = setTimeout(function() {
               console.log('3 seconds left');
-              $("div.info1").text('3 seconds left');
+              $("div.info1").text('Playing in 3...');
           }, next_trigger - (time() - true_time_delta) - 3000);
           clearTimeout(secondTimeout2);
           secondTimeout2 = setTimeout(function() {
               console.log('2 seconds left');
-              $("div.info1").text('2 seconds left');
+              $("div.info1").text('Playing in 2...');
           }, next_trigger - (time() - true_time_delta) - 2000);
           clearTimeout(secondTimeout1);
           secondTimeout1 = setTimeout(function() {
               console.log('1 seconds left');
-              $("div.info1").text('1 second left');
+              $("div.info1").text('Playing in 1...');
           }, next_trigger - (time() - true_time_delta) - 1000);
           clearTimeout(secondTimeout0);
           secondTimeout0 = setTimeout(function() {
               console.log('playing song');
-              $("div.info1").text('Playing');
+              current_song_name = current_song.split(":");
+              current_song_name = current_song_name[current_song_name.length-1];
+              $("div.info1").html('Playing <b>' + current_song_name + '</b>');
               mainInterval = setInterval(function(){
                 checkIfSkipped();
               }, CHECK_UP_TIME_FAST);
@@ -279,17 +281,17 @@ makeRequests();
 
 
         <div class="row">
-            <h1>Sync Music</h1>
+            <h1><i>μsic</i></h1>
         </div>
 
 
         <div class="row">
-            <div class="six columns">
+            <div class="seven columns">
                 <a class="button" data-skip="-3" type="controls">Previous</a> <a class="button" data-skip="-2" type="controls">Replay</a> <a class="button" data-skip="-1" type="controls">Next</a>
             </div>
 
 
-            <div class="six columns">
+            <div class="five columns">
                 <div class="info1">
                     {{ data['message'] }}
                 </div>

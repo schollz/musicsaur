@@ -62,7 +62,7 @@ def index_html():
     data['random_integer'] = random.randint(1000,30000)
     data['playlist_html'] = getPlaylistHtml()
     data['is_playing']  = is_playing
-    data['message'] = 'Starting soon.'
+    data['message'] = 'Syncing...'
     data['is_index'] = True    
     return render_template('index.html',data = data)
 
