@@ -11,7 +11,7 @@ git clone https://github.com/schollz/sync-music-player.git
 python setup.py install
 ```
 
-## Server
+## Run
 
 Start the server using
 
