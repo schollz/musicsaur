@@ -229,6 +229,9 @@ function checkIfSkipped() {
             lagTimes.push(diff);
           }
            computeTimes.push(time);
+          if (meanLag > 1) {
+            lagTimes = [];
+          }
           sound.volume(0.0);
           CHECK_UP_ITERATION = 1;
         } else {
