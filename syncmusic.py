@@ -56,21 +56,14 @@ def getPlaylistHtml():
 
 @app.route("/")
 def index_html():
-    data = {}
-    data['random_integer'] = random.randint(1000,30000)
-
-    data['playlist_html'] = getPlaylistHtml()
     if not is_initialized:
         nextSong(20,0)
-    if is_playing or next_song_time - getTime() > 17000:
-        if is_playing:
-            data['message'] = 'A song is currently playing. You will join on the next song.'
-        else:
-            data['message'] = 'Waiting for other participants, please hold.'
-        data['is_index'] = False
-    else:
-        data['message'] = 'Starting soon.'
-        data['is_index'] = True    
+    data = {}
+    data['random_integer'] = random.randint(1000,30000)
+    data['playlist_html'] = getPlaylistHtml()
+    data['is_playing']  = is_playing
+    data['message'] = 'Starting soon.'
+    data['is_index'] = True    
     return render_template('index.html',data = data)
 
 @app.route("/sync", methods=['GET', 'POST'])
@@ -125,19 +118,7 @@ def nextSong(delay,skip):
     global songStartTimer
     global songStopTimer
     logger = logging.getLogger('syncmusic:nextSong')
-    if time.time() - last_activated > 10 or not is_initialized: # songs can only be skipped every 5 seconds
-        if not is_initialized:
-            for root, dirnames, filenames in os.walk(folder_with_music):
-                for filename in fnmatch.filter(filenames, '*.mp3'):
-                    if 'Allen' in root or 'Allen' in filename:
-                        playlist.append((root, filename))
-                        cwd = os.getcwd()
-                        os.chdir(root)
-                        audiofile = eyed3.load(filename)
-                        song_name = audiofile.tag.album + ' - ' + audiofile.tag.title + ' by ' + audiofile.tag.artist 
-                        playlist_info.append(song_name)
-                        os.chdir(cwd)
-
+    if time.time() - last_activated > 3 or not is_initialized: # songs can only be skipped every 5 seconds
         is_playing = False
         if skip < 0:
             current_song += skip + 2
@@ -151,6 +132,7 @@ def nextSong(delay,skip):
         logger.info(current_song)
         last_activated = time.time()
         cwd = os.getcwd()
+        logger.debug(playlist)
         os.chdir(playlist[current_song][0])
         cmd = 'scp ' + playlist[current_song][1].replace(' ','\ ') + ' phi@server8.duckdns.org:/www/data/sound.mp3'
         cmd = 'cp ' + playlist[current_song][1].replace(' ','\ ') + ' ' + cwd + '/static/sound.mp3'
@@ -177,6 +159,16 @@ if __name__ == "__main__":
     #app.run(host='10.190.76.50')
     if len(sys.argv) > 1:
         folder_with_music = sys.argv[1]
+        for root, dirnames, filenames in os.walk(folder_with_music):
+            for filename in fnmatch.filter(filenames, '*.mp3'):
+                print(filename)
+                playlist.append((root, filename))
+                cwd = os.getcwd()
+                os.chdir(root)
+                audiofile = eyed3.load(filename)
+                song_name = audiofile.tag.album + ' - ' + audiofile.tag.title + ' by ' + audiofile.tag.artist 
+                playlist_info.append(song_name)
+                os.chdir(cwd)
     else:
         print("Need to specify folder with music.\npython syncmusic.py '/folder/with/music'")
         sys.exit(-1)
