@@ -31,8 +31,9 @@ return +new Date.getTime();
 }
 
 // CONSTANTS
-var CHECK_UP_TIME_FAST = 1200;
-var CHECK_UP_TIME_SLOW = 12000;
+var CHECK_UP_WAIT_TIME = 1200;
+var CHECK_UP_ITERATION = 1;
+var check_up_counter = 0;
 var MAX_SYNC_LAG = 30;
 
 // GLOBALS
@@ -153,7 +154,7 @@ for (var i = 0; i < 15; i++) {
               $("div.info1").html('Playing <b>' + current_song_name + '</b>');
               mainInterval = setInterval(function(){
                 checkIfSkipped();
-              }, CHECK_UP_TIME_FAST);
+              }, CHECK_UP_WAIT_TIME);
               sound.play();
               if (data['is_playing']==true) {
                   sound.seek(data['song_time'])
@@ -194,10 +195,12 @@ function checkIfSkipped() {
 
     // Put the results in a div
     posting.done(function(data) {
+      check_up_counter = check_up_counter + 1;
       if (data['is_playing']==false) {
         sound.unload()
         location.reload(true);
-      } else {
+      } else if (check_up_counter % CHECK_UP_ITERATION==0) {
+        check_up_counter = 0;
           var mySongTime = sound.seek();
           if (typeof(mySongTime)=="object") {
             mySongTime = 0;
@@ -227,14 +230,12 @@ function checkIfSkipped() {
           }
            computeTimes.push(time);
           sound.volume(0.0);
-          clearInterval(mainInterval);
-          mainInterval = setInterval(function(){checkIfSkipped();}, CHECK_UP_TIME_FAST);
+          CHECK_UP_ITERATION = 1;
         } else {
           lagTimes = [];
           computeTimes = [];
           sound.volume(1.0);
-          clearInterval(mainInterval);
-          mainInterval = setInterval(function(){checkIfSkipped();}, CHECK_UP_TIME_SLOW);
+          CHECK_UP_ITERATION = 10;
         } 
       }
     });
