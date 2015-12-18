@@ -34,7 +34,7 @@ Your server is up and running! Now, for each computer that you want to play musi
 
 ### Some notes
 
-- If you don't hear anything, the client is probably trying to synchronize. Its set to mute when it goes out of sync to avoid the headache caused by mis-aligned audio.
+- If you don't hear anything, the client is probably trying to synchronize. The browser automatically mutes when it goes out of sync to avoid the headache caused by mis-aligned audio. You can see synchronization progress in [your browser console](https://webmasters.stackexchange.com/questions/8525/how-to-open-the-javascript-console-in-different-browsers). 
 - If you still dont' hear anything, and you're using Chrome browser on Android [you need change one of the flags in chrome to allow audio without gestures](http://android.stackexchange.com/questions/59134/enable-autoplay-html5-video-in-chrome). To do this, copy and paste this into your Chrome browser:
 
 ```bash
