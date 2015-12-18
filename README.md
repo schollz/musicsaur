@@ -1,3 +1,5 @@
+[![Join the chat at https://gitter.im/schollz/music](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/schollz/music?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 # μsic
 
 Want to sync up your music on multiple computers? This accomplishes exactly that - using only a simple Python server and a browser. Simply run the Python server, and open up a browser on each computer you want to sync up - that's it!
