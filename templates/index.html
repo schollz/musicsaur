@@ -214,7 +214,7 @@ function checkIfSkipped() {
         var seekTo = data['song_time']+time/1000.0;
         console.log('Browser: ' + mySongTime.toString() + '\nServer: ' + serverSongTime.toString() + '\nHalf-Latency: ' + true_server_time_delta.toString() + '\nCorrected diff: ' + diff.toString());
         if (Math.abs(diff) > MAX_SYNC_LAG) {
-          if (lagTimes.length>4) {
+          if (lagTimes.length>1) {
             var meanLag = math.median(lagTimes)/1000.0;
             var meanCompute = math.median(computeTimes)/1000.0;
             console.log('\npreviously seeking to ' + seekTo.toString() + ' now adjusting with ' + meanLag.toString() + ' s lag and ' + meanCompute.toString() + ' s compute time');
