@@ -234,8 +234,8 @@ if __name__ == "__main__":
         for root, dirnames, filenames in os.walk(folder_with_music):
             for filename in fnmatch.filter(filenames, '*.mp3'):
                 playlist.append(os.path.join(root, filename))
-                audiofile = eyed3.load(playlist[-1])
                 try:
+                    audiofile = eyed3.load(playlist[-1])
                     title = audiofile.tag.title
                     if title is None:
                         title = 'unknown'
