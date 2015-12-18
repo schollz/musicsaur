@@ -31,7 +31,7 @@ return +new Date.getTime();
 }
 
 // CONSTANTS
-var CHECK_UP_WAIT_TIME = 1200;
+var CHECK_UP_WAIT_TIME = 3000;
 var CHECK_UP_ITERATION = 1;
 var check_up_counter = 0;
 var MAX_SYNC_LAG = 30;
@@ -229,7 +229,8 @@ function checkIfSkipped() {
             lagTimes.push(diff);
           }
            computeTimes.push(time);
-          if (meanLag > 5) {
+          // Don't need to save stuff while the song is loading
+          if (mySongTime == 0 || lagTimes.length > 10) {
             lagTimes = [];
           }
           sound.volume(0.0);
