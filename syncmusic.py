@@ -82,7 +82,7 @@ def songOver():
     logger = logging.getLogger('syncmusic:songOver')
     logger.debug('Done playing: ' + song_name)
     is_playing = False
-    nextSong(6, -1)
+    nextSong(9, -1)
 
 
 def nextSong(delay, skip):
@@ -159,7 +159,7 @@ def index_html():
     """
 
     if not is_initialized:
-        nextSong(6, 0)
+        nextSong(9, 0)
     data = {}
     data['random_integer'] = random.randint(1000, 30000)
     data['playlist_html'] = getPlaylistHtml()
@@ -201,7 +201,7 @@ def finished():
     response = {'message': 'loading!'}
     if request.method == 'POST':
         skip = int(request.form['skip'])
-        nextSong(6, skip)
+        nextSong(9, skip)
     return jsonify(response)
 
 
