@@ -217,8 +217,8 @@ function checkIfSkipped() {
           if (lagTimes.length>2) {
             var meanLag = math.median(lagTimes)/1000.0;
             var meanCompute = math.median(computeTimes)/1000.0;
-            	console.log('\npreviously seeking to ' + seekTo.toString() + ' now adjusting with ' + meanLag.toString() + ' s lag'); // + meanCompute.toString() + ' s compute time');
-		seekTo = seekTo + meanLag; // + meanCompute;
+            	console.log('\npreviously seeking to ' + seekTo.toString() + ' now adjusting with ' + meanLag.toString() + ' s lag + Half-Latency'); // + meanCompute.toString() + ' s compute time');
+		seekTo = seekTo + meanLag + true_server_time_delta/1000.0; // + meanCompute;
           }
           console.log('now seeking to ' + seekTo.toString());
           sound.seek(seekTo);
