@@ -2,6 +2,8 @@
 
 # μsic
 
+[![Join the chat at https://gitter.im/schollz/music](https://badges.gitter.im/schollz/music.svg)](https://gitter.im/schollz/music?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Want to sync up your music on multiple computers? This accomplishes exactly that - using only a simple Python server and a browser. Simply run the Python server, and open up a browser on each computer you want to sync up - that's it!
 
 This program is powered by [the excellent howler.js library from goldfire](https://github.com/goldfire/howler.js/). Essentially all the client computers [sync their clocks](http://www.mine-control.com/zack/timesync/timesync.html) and then try to start a song at the same time. Any dissimilarities between playback are also fixed, because the clients will automatically seek to the position of the server.
