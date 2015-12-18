@@ -1,3 +1,5 @@
+**Update 12/18/2015 4:50pm: Today I have recieved [lots of great feedback](https://github.com/schollz/music/issues) for new features. I will be implementing all of them, PLUS a better optimized syncing system in the next few hours, so please [subscribe](https://github.com/schollz/music/subscription) to be alerted when it arrives! (Also please keep [submitting requests for features](https://github.com/schollz/music/issues/new)!)**
+
 # μsic
 
 [![Join the chat at https://gitter.im/schollz/music](https://badges.gitter.im/schollz/music.svg)](https://gitter.im/schollz/music?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -56,6 +58,10 @@ xinit /usr/bin/midori -a http://W.X.Y.Z:5000
 3. Commit your changes: `git commit -am 'Add some feature'`
 4. Push to the branch: `git push origin my-new-feature`
 5. Submit a pull request :D
+
+# History
+
+- 12/17/2015: Version 1.0 Released!
 
 ## Credits
 
