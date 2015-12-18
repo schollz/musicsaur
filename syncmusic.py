@@ -270,6 +270,7 @@ if __name__ == "__main__":
     print("\n\n" +"#" * 60)
     print("# Starting server with " + str(len(playlist)) + " songs")
     print("# To use, open a browser to http://" + ip_address + ":5000")
+    print("# To stop server, use Ctl + C")
     print("#" * 60 +"\n\n")
 
     from tornado.wsgi import WSGIContainer
@@ -277,4 +278,17 @@ if __name__ == "__main__":
     from tornado.ioloop import IOLoop
     http_server = HTTPServer(WSGIContainer(app))
     http_server.listen(5000)
-    IOLoop.instance().start()
+    try:
+        IOLoop.instance().start()
+    except (KeyboardInterrupt, SystemExit):
+        print('\nProgram shutting down...')
+        try:
+            songStopTimer.cancel()
+        except:
+            pass
+        try:
+            songStartTimer.cancel()
+        except:
+            pass
+        sys.exit(-1)
+        raise
