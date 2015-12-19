@@ -280,7 +280,7 @@ if __name__ == "__main__":
                         album = audiofile['TALB'].text[0]
                     except:
                         pass
-                except Exception, e:
+                except BaseException as e:
                     logger.error('Failed to get audio information for ' + path + ': '+ str(e))
                 state['playlist'][path]['title'] = title
                 state['playlist'][path]['artist'] = artist
