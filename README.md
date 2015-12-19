@@ -39,8 +39,9 @@ which should print out something like
 
 ```bash
 ############################################################
-# Starting server with 18 songs
+# Starting server with 346 songs
 # To use, open a browser to http://W.X.Y.Z:5000
+# To stop server, use Ctl + C
 ############################################################
 ```
 
