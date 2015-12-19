@@ -1,8 +1,5 @@
-**Update 12/18/2015 7:40pm: Version 1.1 released - note the slight change in usage (configuration file to list your music files)**
-
-**Update 12/18/2015 4:50pm: Today I have recieved [lots of great feedback](https://github.com/schollz/music/issues) for new features. I will be implementing all of them, PLUS a better optimized syncing system in the next few hours, so please [subscribe](https://github.com/schollz/music/subscription) to be alerted when it arrives! (Also please keep [submitting requests for features](https://github.com/schollz/music/issues/new)!)**
-
-# μsic
+# MusicSAUR (formally the un-googleable "μsic")
+## Music Synchronization And Uniform Relaying
 
 [![Version 1.1](https://img.shields.io/badge/version-1.1-brightgreen.svg)]()
 [![Join the chat at https://gitter.im/schollz/music](https://badges.gitter.im/schollz/music.svg)](https://gitter.im/schollz/music?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
