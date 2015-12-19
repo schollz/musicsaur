@@ -1,4 +1,5 @@
 **Update 12/18/2015 7:40pm: Version 1.1 released**
+
 **Update 12/18/2015 4:50pm: Today I have recieved [lots of great feedback](https://github.com/schollz/music/issues) for new features. I will be implementing all of them, PLUS a better optimized syncing system in the next few hours, so please [subscribe](https://github.com/schollz/music/subscription) to be alerted when it arrives! (Also please keep [submitting requests for features](https://github.com/schollz/music/issues/new)!)**
 
 # μsic
