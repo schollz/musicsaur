@@ -103,5 +103,6 @@ xinit /usr/bin/midori -a http://W.X.Y.Z:5000
 * James Simpson and [Goldfire studios](http://goldfirestudios.com/blog/104/howler.js-Modern-Web-Audio-Javascript-Library) for their amazing [howler.js library](https://github.com/goldfire/howler.js/)
 * Zach Simpson for [his paper on simple clock synchronization](http://www.mine-control.com/zack/timesync/timesync.html)
 * Everyone on the [/r/raspberry_pi](https://www.reddit.com/r/raspberry_pi/comments/3xc8kq/simple_python_script_to_allow_multiple_raspberry/) and [/r/python](https://www.reddit.com/r/Python/comments/3xc8mj/simple_python_script_to_allow_multiple_computers/) threads for great feature requests and bug reports!
+* [ClkerFreeVectorImages](https://pixabay.com/en/users/ClkerFreeVectorImages-3736/) and [OpenClipartVectors](https://pixabay.com/en/users/OpenClipartVectors-30363/) for the Public Domain vectors
 
 
