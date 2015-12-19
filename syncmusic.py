@@ -34,25 +34,15 @@ from mutagen.id3 import ID3
 #####################
 
 state = {}
-state['playlist'] = {}
-state['ordering'] = []
-state['current_song'] = -1
-current_song = -1
-last_activated = 0
-next_song_time = 0
-is_playing = False
-is_initialized = False
-song_name = ""
 songStartTimer = None
 songStopTimer = None
-folder_with_music = ""
 
 parser = SafeConfigParser()
 try:
     parser.read('config.cfg')
 except:
     print("Problem parsing config.cfg - did you change something?")
-    sys.exit(-1)
+    sys.exit(-1)    
 
 #####################
 # UTILITY FUNCTIONS
@@ -72,7 +62,7 @@ def getPlaylistHtml():
     for i,path in enumerate(state['ordering']):
         cur_song = state['playlist'][path]['song_name']
         html = """<a type="controls" data-skip="%(i)s">%(song)s</a><br>"""
-        if song_name == cur_song:
+        if state['currently_playing_songname'] == cur_song:
             song = "<b>" + cur_song + "</b>"
         else:
             song = cur_song
@@ -82,19 +72,17 @@ def getPlaylistHtml():
 
 def songStarts():
     """Runs when server decides a song starts"""
-    global is_playing
     logger = logging.getLogger('syncmusic:songStarts')
-    logger.debug('Playing: ' + song_name)
-    is_playing = True
+    logger.debug('Playing: ' + state['currently_playing_songname'])
+    state['is_playing'] = True
 
 
 
 def songOver():
     """Runs when server decides a song stops"""
-    global is_playing
     logger = logging.getLogger('syncmusic:songOver')
-    logger.debug('Done playing: ' + song_name)
-    is_playing = False
+    logger.debug('Done playing: ' + state['currently_playing_songname'])
+    state['is_playing'] = False
     nextSong(int(parser.get('server_parameters','time_to_next_song')), -1)
 
 
@@ -105,19 +93,13 @@ def nextSong(delay, skip):
     loads the new song, and sets the timers for when
     the songs should start and end.
     """
-    global last_activated
-    global current_song
-    global next_song_time
-    global is_playing
-    global is_initialized
-    global song_name
     global songStartTimer
     global songStopTimer
     logger = logging.getLogger('syncmusic:nextSong')
-    if (time.time() - last_activated > int(parser.get('server_parameters','time_to_disallow_skips')) 
-            or not is_initialized): 
+    if (time.time() - state['last_activated'] > int(parser.get('server_parameters','time_to_disallow_skips')) 
+            or not state['is_initialized']): 
 
-        last_activated = time.time()
+        state['last_activated'] = time.time()
 
         if skip < 0:
             state['current_song'] += skip + 2
@@ -130,18 +112,18 @@ def nextSong(delay, skip):
         current_song_path = state['ordering'][state['current_song']]
 
         shutil.copy(current_song_path,os.path.join(os.getcwd(),'static/sound.mp3'))
-        song_name = state['playlist'][current_song_path]['song_name']
-        next_song_time = getTime() + delay * 1000
-        logger.debug('next up: ' + song_name)
+        state['currently_playing_songname'] = state['playlist'][current_song_path]['song_name']
+        state['next_song_time'] = getTime() + delay * 1000
+        logger.debug('next up: ' + state['currently_playing_songname'])
         logger.debug('time: ' + str(getTime()) +
-                     ' and next: ' + str(next_song_time))
-        is_initialized = True
+                     ' and next: ' + str(state['next_song_time']))
+        state['is_initialized'] = True
         if songStartTimer is not None:
             songStartTimer.cancel()
             songStopTimer.cancel()
         songStopTimer = Timer(
             float(
-                next_song_time -
+                state['next_song_time'] -
                 getTime()) /
             1000.0,
             songStarts,
@@ -154,7 +136,7 @@ def nextSong(delay, skip):
             float(
                 audio.info.length) +
             float(
-                next_song_time -
+                state['next_song_time'] -
                 getTime()) /
             1000.0,
             songOver,
@@ -175,19 +157,19 @@ class IndexPage(tornado.web.RequestHandler):
     """
 
     def get(self):
-        if not is_initialized:
-            nextSong(int(parser.get('server_parameters','time_to_next_song')), 0)
+        if not state['is_initialized']:
+            nextSong(int(parser.get('server_parameters','time_to_next_song')), state['current_song'])
         data = {}
         data['random_integer'] = random.randint(1000, 30000)
         data['playlist_html'] = getPlaylistHtml()
-        data['is_playing'] = is_playing
+        data['is_playing'] = state['is_playing']
         data['message'] = 'Syncing...'
         data['is_index'] = True
         data['max_sync_lag'] = parser.get('client_parameters','max_sync_lag')
         data['check_up_wait_time'] = parser.get('client_parameters','check_up_wait_time')
         self.write(index_page.render(data=data))
 
-class Sync(tornado.web.RequestHandler):
+class SyncHandler(tornado.web.RequestHandler):
     """Syncing route - /sync
 
     POST request from main page with the client client_timestamp
@@ -199,17 +181,17 @@ class Sync(tornado.web.RequestHandler):
         data = {}
         data['client_timestamp'] = int(self.get_argument('client_timestamp'))
         data['server_timestamp'] = getTime()
-        data['next_song'] = next_song_time
-        if is_playing:
-            data['is_playing'] = (song_name == self.get_argument('current_song'))
+        data['next_song'] = state['next_song_time']
+        if state['is_playing']:
+            data['is_playing'] = (state['currently_playing_songname'] == self.get_argument('current_song'))
         else:
-            data['is_playing'] = is_playing
-        data['current_song'] = song_name
-        data['song_time'] = float(getTime() - next_song_time) / 1000.0
+            data['is_playing'] = state['is_playing']
+        data['current_song'] = state['currently_playing_songname']
+        data['song_time'] = float(getTime() - state['next_song_time']) / 1000.0
         self.write(data)
 
 
-class NextSong(tornado.web.RequestHandler):
+class NextSongHandler(tornado.web.RequestHandler):
     """Syncing route - /sync
 
     POST request from main page with the client client_timestamp
@@ -239,8 +221,8 @@ class NextSong(tornado.web.RequestHandler):
 
 application = tornado.web.Application([
     (r"/", IndexPage),
-    (r"/sync", Sync),
-    (r"/nextsong", NextSong),
+    (r"/sync", SyncHandler),
+    (r"/nextsong", NextSongHandler),
     (r'/static/(.*)', tornado.web.StaticFileHandler, {'path': './static'}),
 ])
 
@@ -256,6 +238,18 @@ if __name__ == "__main__":
     logger = logging.getLogger('syncmusic:nextSong')
     cwd = os.getcwd()
 
+    state['playlist'] = {}
+    state['ordering'] = []
+    state['current_song'] = 0
+    state['currently_playing_songname'] = ""
+    if os.path.isfile('state.json'):
+        state = json.load(open('state.json','r'))
+    state['last_activated'] = 0
+    state['next_song_time'] = 0
+    state['is_playing'] = False
+    state['is_initialized'] = False
+    state['last_activated'] = 0
+
     folders_with_music = parser.get('server_parameters','music_folder').split(',')
     for folder_with_music in folders_with_music:
         # Load playlist
@@ -263,27 +257,29 @@ if __name__ == "__main__":
         for root, dirnames, filenames in os.walk(folder_with_music):
             for filename in fnmatch.filter(filenames, '*.mp3'):
                 path = os.path.join(root, filename)
+                if path in state['ordering']:
+                    continue
                 state['ordering'].append(path)
                 state['playlist'][path] = {}
                 title = filename
-                artist = 'unknwon'
+                artist = 'unknown'
                 album = 'unknown'
                 try:
-                    audiofile = ID3(state['playlist'][song_num]['path'])
+                    audiofile = ID3(path)
                     try:
-                        title = audio['TIT2'].text[0]
+                        title = audiofile['TIT2'].text[0]
                     except:
                         pass
                     try:
-                        artist = audio['TPE1'].text[0]
+                        artist = audiofile['TPE1'].text[0]
                     except:
                         pass
                     try:
-                        album = audio['TALB'].text[0]
+                        album = audiofile['TALB'].text[0]
                     except:
                         pass
-                except:
-                    song_name = filename
+                except Exception, e:
+                    logger.error('Failed to get audio information for ' + path + ': '+ str(e))
                 state['playlist'][path]['title'] = title
                 state['playlist'][path]['artist'] = artist
                 state['playlist'][path]['album'] = album
@@ -327,11 +323,18 @@ if __name__ == "__main__":
         tornado.ioloop.IOLoop.instance().start()
     except (KeyboardInterrupt, SystemExit):
         print('\nProgram shutting down...')
+        print('Saving state...')
+        with open('state.json','w') as f:
+            f.write(json.dumps(state,indent=2))
+
         for pi_client in pi_clients:
+            pi_client = pi_client.strip()
+            print('Shutting down ' + pi_client + '...')
             try:
                 os.system("ssh " + pi_client + " 'pkill -9 midori </dev/null > log 2>&1 &'")
             except:
                 pass
+        print('Stopping timers...')
         try:
             songStopTimer.cancel()
         except:
@@ -340,5 +343,6 @@ if __name__ == "__main__":
             songStartTimer.cancel()
         except:
             pass
+        print('Exiting...')
         sys.exit(-1)
         raise
