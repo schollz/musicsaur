@@ -8,7 +8,7 @@ import sys
 import socket
 import shutil
 from threading import Timer
-from ConfigParser import SafeConfigParser
+from configparser import SafeConfigParser
 
 # Setup logging
 import logging
@@ -279,7 +279,6 @@ if __name__ == "__main__":
     print("# Starting server with " + str(len(playlist)) + " songs")
     print("# To use, open a browser to http://" + ip_address + ":5000")
     print("# To stop server, use Ctl + C")
-    print(parser.get('client_parameters','check_up_wait_time'))
     print("#" * 60 +"\n\n")
 
     pi_clients = []
