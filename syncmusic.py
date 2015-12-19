@@ -23,16 +23,15 @@ root.addHandler(ch)
 
 # Import 3rd-part packages
 import eyed3
-from flask import *
+import tornado.ioloop
+import tornado.web
+from jinja2 import Template
 from mutagen.mp3 import MP3
 
 
 #####################
 # GLOBAL VARIABLES
 #####################
-
-app = Flask(__name__)
-app.debug = True
 
 playlist = []
 playlist_info = []
@@ -80,8 +79,11 @@ def getPlaylistHtml():
 
 def songStarts():
     """Runs when server decides a song starts"""
+    global is_playing
     logger = logging.getLogger('syncmusic:songStarts')
     logger.debug('Playing: ' + song_name)
+    is_playing = True
+
 
 
 def songOver():
@@ -157,76 +159,85 @@ def nextSong(delay, skip):
 # WEB ROUTES
 #################
 
+index_page = Template(open('templates/index.html','r').read())
 
-@app.route("/")
-def index_html():
+class IndexPage(tornado.web.RequestHandler):
     """Main sign-in - /
 
     Server loads new song if not initialized, and
     then returns the rendered music control page
     """
 
-    if not is_initialized:
-        nextSong(int(parser.get('server_parameters','time_to_next_song')), 0)
-    data = {}
-    data['random_integer'] = random.randint(1000, 30000)
-    data['playlist_html'] = getPlaylistHtml()
-    data['is_playing'] = is_playing
-    data['message'] = 'Syncing...'
-    data['is_index'] = True
-    data['max_sync_lag'] = parser.get('client_parameters','max_sync_lag')
-    data['check_up_wait_time'] = parser.get('client_parameters','check_up_wait_time')
-    return render_template('index.html', data=data)
+    def get(self):
+        if not is_initialized:
+            nextSong(int(parser.get('server_parameters','time_to_next_song')), 0)
+        data = {}
+        data['random_integer'] = random.randint(1000, 30000)
+        data['playlist_html'] = getPlaylistHtml()
+        data['is_playing'] = is_playing
+        data['message'] = 'Syncing...'
+        data['is_index'] = True
+        data['max_sync_lag'] = parser.get('client_parameters','max_sync_lag')
+        data['check_up_wait_time'] = parser.get('client_parameters','check_up_wait_time')
+        self.write(index_page.render(data=data))
 
-
-@app.route("/sync", methods=['GET', 'POST'])
-def sync():
+class Sync(tornado.web.RequestHandler):
     """Syncing route - /sync
 
     POST request from main page with the client client_timestamp
     and current_song. Returns JSON containing the server client_timestamp
     and whether or not to load a new song.
     """
-    #searchword = request.args.get('key', '')
-    if request.method == 'POST':
+
+    def post(self):
         data = {}
-        data['client_timestamp'] = int(request.form['client_timestamp'])
+        data['client_timestamp'] = int(self.get_argument('client_timestamp'))
         data['server_timestamp'] = getTime()
         data['next_song'] = next_song_time
         if is_playing:
-            data['is_playing'] = (song_name == request.form['current_song'])
+            data['is_playing'] = (song_name == self.get_argument('current_song'))
         else:
             data['is_playing'] = is_playing
         data['current_song'] = song_name
         data['song_time'] = float(getTime() - next_song_time) / 1000.0
-        return jsonify(data)
+        self.write(data)
 
 
-@app.route("/nextsong", methods=['GET', 'POST'])
-def finished():
-    """ Next song route - /nextSong
+class NextSong(tornado.web.RequestHandler):
+    """Syncing route - /sync
 
-    POST request to start a new song
+    POST request from main page with the client client_timestamp
+    and current_song. Returns JSON containing the server client_timestamp
+    and whether or not to load a new song.
     """
-    response = {'message': 'loading!'}
-    if request.method == 'POST':
-        skip = int(request.form['skip'])
+
+    def post(self):
+        response = {'message': 'loading!'}
+        skip = int(self.get_argument('skip'))
         nextSong(int(parser.get('server_parameters','time_to_next_song')), skip)
-    return jsonify(response)
+        self.write(response)
 
+# Depreciated
+# @app.route("/playing", methods=['GET', 'POST'])
+# def playing():
+#     """ Is playing route - /nextSong
 
-@app.route("/playing", methods=['GET', 'POST'])
-def playing():
-    """ Is playing route - /nextSong
+#     POST request to tell server that client has started
+#     playing a song. DEPRECATED.
+#     """
+#     global is_playing
+#     response = {'message': 'loading!'}
+#     if request.method == 'POST':
+#         is_playing = True
+#     return jsonify(response)
 
-    POST request to tell server that client has started
-    playing a song. DEPRECATED.
-    """
-    global is_playing
-    response = {'message': 'loading!'}
-    if request.method == 'POST':
-        is_playing = True
-    return jsonify(response)
+application = tornado.web.Application([
+    (r"/", IndexPage),
+    (r"/sync", Sync),
+    (r"/nextsong", NextSong),
+    (r'/static/(.*)', tornado.web.StaticFileHandler, {'path': './static'}),
+])
+
 
 
 ##########
@@ -242,6 +253,7 @@ if __name__ == "__main__":
     folders_with_music = parser.get('server_parameters','music_folder').split(',')
     for folder_with_music in folders_with_music:
         # Load playlist
+        folder_with_music = folder_with_music.strip()
         for root, dirnames, filenames in os.walk(folder_with_music):
             for filename in fnmatch.filter(filenames, '*.mp3'):
                 playlist.append(os.path.join(root, filename))
@@ -285,19 +297,16 @@ if __name__ == "__main__":
     if len(parser.get('raspberry_pis','clients')) > 2 and ip_address != '127.0.0.1':
         pi_clients = parser.get('raspberry_pis','clients').split(',')
         for pi_client in pi_clients:
+            pi_client = pi_client.strip()
             try:
                 os.system("ssh " + pi_client + " 'pkill -9 midori </dev/null > log 2>&1 &'")
                 os.system("ssh " + pi_client + " 'xinit /usr/bin/midori -a " + ip_address + ":" + parser.get('server_parameters','port') + "/ </dev/null > log 2>&1 &'")
             except:
                 print("Problem starting pi!")
 
-    from tornado.wsgi import WSGIContainer
-    from tornado.httpserver import HTTPServer
-    from tornado.ioloop import IOLoop
-    http_server = HTTPServer(WSGIContainer(app))
-    http_server.listen(int(parser.get('server_parameters','port')))
+    application.listen(int(parser.get('server_parameters','port')))
     try:
-        IOLoop.instance().start()
+        tornado.ioloop.IOLoop.instance().start()
     except (KeyboardInterrupt, SystemExit):
         print('\nProgram shutting down...')
         for pi_client in pi_clients:
