@@ -242,6 +242,7 @@ if __name__ == "__main__":
     folders_with_music = parser.get('server_parameters','music_folder').split(',')
     for folder_with_music in folders_with_music:
         # Load playlist
+        folder_with_music = folder_with_music.strip()
         for root, dirnames, filenames in os.walk(folder_with_music):
             for filename in fnmatch.filter(filenames, '*.mp3'):
                 playlist.append(os.path.join(root, filename))
@@ -285,6 +286,7 @@ if __name__ == "__main__":
     if len(parser.get('raspberry_pis','clients')) > 2 and ip_address != '127.0.0.1':
         pi_clients = parser.get('raspberry_pis','clients').split(',')
         for pi_client in pi_clients:
+            pi_client = pi_client.strip()
             try:
                 os.system("ssh " + pi_client + " 'pkill -9 midori </dev/null > log 2>&1 &'")
                 os.system("ssh " + pi_client + " 'xinit /usr/bin/midori -a " + ip_address + ":" + parser.get('server_parameters','port') + "/ </dev/null > log 2>&1 &'")
