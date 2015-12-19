@@ -3,8 +3,14 @@
 # MusicSAUR (formally the un-googleable "μsic")
 ## Music Synchronization And Uniform Relaying
 
-[![Version 1.2](https://img.shields.io/badge/version-1.1-brightgreen.svg)]()
+[![Version 1.2](https://img.shields.io/badge/version-1.2-brightgreen.svg)]()
 [![Join the chat at https://gitter.im/schollz/musicsaur](https://badges.gitter.im/schollz/music.svg)](https://gitter.im/schollz/musicsaur?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+**Update 12/19/2015: Version 1.2 released! Major features include:**
+- Improved server performance
+- State variables for reloading position in playlist and faster boot-up
+- Bug fixes
+- Fewer dependencies
 
 Want to sync up your music on multiple computers? This accomplishes exactly that - using only a simple Python server and a browser. Simply run the Python server, and open up a browser on each computer you want to sync up - that's it!
 
@@ -94,6 +100,7 @@ xinit /usr/bin/midori -a http://W.X.Y.Z:5000
 
 # History
 
+- 12/19/2015 (morning): Version 1.2 Release
 - 12/18/2015 (evening): Version 1.1 Release
 - 12/18/2015 (morning): Version 1.0 Release
 
