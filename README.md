@@ -1,3 +1,6 @@
+**Update 12/18/2015 7:40pm: Version 1.1 released**
+**Update 12/18/2015 4:50pm: Today I have recieved [lots of great feedback](https://github.com/schollz/music/issues) for new features. I will be implementing all of them, PLUS a better optimized syncing system in the next few hours, so please [subscribe](https://github.com/schollz/music/subscription) to be alerted when it arrives! (Also please keep [submitting requests for features](https://github.com/schollz/music/issues/new)!)**
+
 # μsic
 
 [![Version 1.1](https://img.shields.io/badge/version-1.1-brightgreen.svg)]()
@@ -90,8 +93,12 @@ xinit /usr/bin/midori -a http://W.X.Y.Z:5000
 
 # History
 
+<<<<<<< HEAD
 - 12/18/2015 (evening): Version 1.1 Release
 - 12/18/2015 (morning): Version 1.0 Release
+=======
+- 12/17/2015: Version 1.0 Released!
+>>>>>>> 1582f131820e52ef2da61f2deb8701e62aa0e888
 
 ## Credits
 
