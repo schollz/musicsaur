@@ -5,6 +5,6 @@ setup(name='syncmusic',
       description='Syncs music from web browser',
       author='Zack',
       author_email='zack@hypercubeplatforms.com',
-      url='https://github.com/schollz/music',
-      install_requires=['eyed3', 'tornado', 'flask', 'mutagen','configparser'],
+      url='https://github.com/schollz/musicsaur',
+      install_requires=['tornado', 'mutagen','configparser'],
      )
