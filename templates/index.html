@@ -106,7 +106,9 @@ for (var i = 0; i < 15; i++) {
 
         correct_time_delta.push(time_delta + half_latency);
         correct_latency.push(half_latency);
-        if (correct_time_delta.length==7) {
+        if (correct_time_delta.length==15) {
+          console.log('correct_time_delta');
+          console.log(correct_time_delta);
           var mean = math.mean(correct_time_delta);
           var median = math.median(correct_time_delta);
           var std = math.std(correct_time_delta);
@@ -174,7 +176,7 @@ for (var i = 0; i < 15; i++) {
         }
     });
 
-  }, i*150 );
+  }, i*200 );
     
 }
 }
@@ -214,11 +216,11 @@ function checkIfSkipped() {
             sound.volume(0.0);
             runningDiff = runningDiff + diff;
             var serverSongTime = data['song_time']+true_server_time_delta/1000.0;
-            sound.seek(serverSongTime+runningDiff);
             console.log('[' + Date.now() + '] ' + ': NOT in sync (>' + MAX_SYNC_LAG.toString() + ' ms)')
-            console.log('Browser:  ' + mySongTime.toString() + '\nServer: ' + serverSongTime.toString() + '\nDiff: ' + (diff*1000).toString() + '\nrunningDiff: ' + (runningDiff*1000).toString());
+            console.log('Browser:  ' + mySongTime.toString() + '\nServer: ' + serverSongTime.toString() + '\nDiff: ' + (diff*1000).toString() + '\nrunningDiff: ' + (runningDiff*1000).toString() + '\nSeeking to: ' + (serverSongTime+runningDiff).toString());
             $("div.info1").html('Muted <b>' + current_song_name + '</b> (out of sync)');
-            if (Math.abs(runningDiff)>3) {
+            sound.seek(serverSongTime+runningDiff);
+            if (runningDiff<-10000) {
               runningDiff = 0;
             }
           } else {
