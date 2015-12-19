@@ -36,6 +36,7 @@ from mutagen.id3 import ID3
 state = {}
 songStartTimer = None
 songStopTimer = None
+audio_data = None
 parser = SafeConfigParser()
 try:
     parser.read('config.cfg')
@@ -94,10 +95,11 @@ def nextSong(delay, skip):
     """
     global songStartTimer
     global songStopTimer
+    global audio_data
     logger = logging.getLogger('syncmusic:nextSong')
     if (time.time() - state['last_activated'] > int(parser.get('server_parameters','time_to_disallow_skips')) 
             or not state['is_initialized']): 
-
+        state['is_initialized'] = True
         state['last_activated'] = time.time()
 
         if skip < 0:
@@ -111,12 +113,24 @@ def nextSong(delay, skip):
         current_song_path = state['ordering'][state['current_song']]
 
         shutil.copy(current_song_path,os.path.join(os.getcwd(),'static/sound.mp3'))
+        os.chdir('static')
+        #shutil.copy(current_song_path,os.path.join(os.getcwd(),'static/start.mp3'))
+        # try:
+        #     os.remove('sound.ogg')
+        # except:
+        #     pass
+        # try:
+        #     os.remove('sound.mp3')
+        # except:
+        #     pass
+        # os.system('ffmpeg -i start.mp3 -codec:a libmp3lame -qscale:a 1 sound.mp3')
+        audio_data = open('sound.mp3','rb').read()
+        os.chdir('../')
         state['currently_playing_songname'] = state['playlist'][current_song_path]['song_name']
         state['next_song_time'] = getTime() + delay * 1000
         logger.debug('next up: ' + state['currently_playing_songname'])
         logger.debug('time: ' + str(getTime()) +
                      ' and next: ' + str(state['next_song_time']))
-        state['is_initialized'] = True
         if songStartTimer is not None:
             songStartTimer.cancel()
             songStopTimer.cancel()
@@ -147,6 +161,13 @@ def nextSong(delay, skip):
 #################
 
 index_page = Template(open('templates/index.html','r').read())
+
+class SoundMp3(tornado.web.RequestHandler):
+
+    def get(self):
+        self.write(audio_data)
+        self.finish()
+
 
 class IndexPage(tornado.web.RequestHandler):
     """Main sign-in - /
@@ -225,6 +246,7 @@ application = tornado.web.Application([
     (r"/sync", SyncHandler),
     (r"/nextsong", NextSongHandler),
     (r'/static/(.*)', tornado.web.StaticFileHandler, {'path': './static'}),
+    (r"/sound.mp3", SoundMp3),
 ])
 
 
