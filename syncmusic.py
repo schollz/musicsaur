@@ -34,7 +34,6 @@ from mutagen.id3 import ID3
 #####################
 
 state = {}
-state['debug'] = False
 songStartTimer = None
 songStopTimer = None
 parser = SafeConfigParser()
@@ -251,6 +250,7 @@ if __name__ == "__main__":
     state['is_playing'] = False
     state['is_initialized'] = False
     state['last_activated'] = 0
+    state['debug'] = True
 
     folders_with_music = parser.get('server_parameters','music_folder').split(',')
     for folder_with_music in folders_with_music:
