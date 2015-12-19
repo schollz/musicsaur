@@ -36,6 +36,7 @@ from mutagen.id3 import ID3
 state = {}
 state['playlist'] = {}
 state['ordering'] = []
+state['current_song'] = -1
 current_song = -1
 last_activated = 0
 next_song_time = 0
@@ -119,14 +120,14 @@ def nextSong(delay, skip):
         last_activated = time.time()
 
         if skip < 0:
-            current_song += skip + 2
+            state['current_song'] += skip + 2
         else:
-            current_song = skip
-        if current_song >= len(state['ordering']):
-            current_song = 0
-        if current_song < 0:
-            current_song = len(state['orering']) - 1
-        current_song_path = state['ordering'][current_song]
+            state['current_song'] = skip
+        if state['current_song'] >= len(state['ordering']):
+            state['current_song'] = 0
+        if state['current_song'] < 0:
+            state['current_song'] = len(state['orering']) - 1
+        current_song_path = state['ordering'][state['current_song']]
 
         shutil.copy(current_song_path,os.path.join(os.getcwd(),'static/sound.mp3'))
         song_name = state['playlist'][current_song_path]['song_name']
