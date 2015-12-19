@@ -8,19 +8,28 @@ This program is powered by [the excellent howler.js library from goldfire](https
 
 # Installation
 
-Tested on Python2.7 and Python3.4. To install simply use
+Tested on Python2.7 and Python3.4. Requests ```setuptools```. To install simply use
 
 ```bash
+pip install setuptools
 git clone https://github.com/schollz/sync-music-player.git
 python setup.py install
 ```
 
 ## Usage
 
-Start the server using
+### Just get me started!
+
+Open up the configuration file, ```config.cfg```, and edit line 42 by inputting your music folder, e.g.:
 
 ```bash
-python syncmusic.py "C:/Your/folder/of/music"
+music_folder = /my/music/folder
+```
+
+Now start the server using
+
+```bash
+python syncmusic.py
 ```
 
 which should print out something like
@@ -33,6 +42,29 @@ which should print out something like
 ```
 
 Your server is up and running! Now, for each computer that you want to play music from, just go and load up a browser to the url ```http://W.X.Y.Z:5000```. You will see the playlist and the music will automatically synchronize and start playing! 
+
+### Auto-start Raspberry Pis!
+
+If you'd like the server to automatically start up the Raspberry Pis, its easy to do. First, from your server computer (which can also be a Raspberry Pi) copy your ssh-key using the following command:
+
+```bash
+ssh-copy-id pi@YOUR_PIS_IP
+```
+
+Now sign-in to your Pi (you shouldn't have to use a password now) and install ```midori```:
+
+```bash
+ssh pi@YOUR_PIS_IP
+sudo apt-get install midori
+```
+
+Finally, open up the ```config.cfg``` and change line 16 to include the address of the computer:
+
+```bash
+clients = pi@YOUR_PIS_IP
+```
+
+If you have more then one, just seperate them by commas.
 
 ### Some notes
 
@@ -56,6 +88,11 @@ xinit /usr/bin/midori -a http://W.X.Y.Z:5000
 3. Commit your changes: `git commit -am 'Add some feature'`
 4. Push to the branch: `git push origin my-new-feature`
 5. Submit a pull request :D
+
+# History
+
+- 12/18/2015 (evening): Version 1.1 Release
+- 12/18/2015 (morning): Version 1.0 Release
 
 ## Credits
 
