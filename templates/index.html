@@ -218,6 +218,9 @@ function checkIfSkipped() {
             console.log('[' + Date.now() + '] ' + ': NOT in sync (>' + MAX_SYNC_LAG.toString() + ' ms)')
             console.log('Browser:  ' + mySongTime.toString() + '\nServer: ' + serverSongTime.toString() + '\nDiff: ' + (diff*1000).toString() + '\nrunningDiff: ' + (runningDiff*1000).toString());
             $("div.info1").html('Muted <b>' + current_song_name + '</b> (out of sync)');
+            if (Math.abs(runningDiff)>3) {
+              runningDiff = 0;
+            }
           } else {
             console.log('[' + Date.now() + '] ' + ': in sync (<' + MAX_SYNC_LAG.toString() + ' ms)')
             $("div.info1").html('Playing <b>' + current_song_name + '</b>');
