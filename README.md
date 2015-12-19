@@ -1,5 +1,6 @@
 # μsic
 
+[![Version 1.1](https://img.shields.io/badge/version-1.1-brightgreen.svg)]()
 [![Join the chat at https://gitter.im/schollz/music](https://badges.gitter.im/schollz/music.svg)](https://gitter.im/schollz/music?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Want to sync up your music on multiple computers? This accomplishes exactly that - using only a simple Python server and a browser. Simply run the Python server, and open up a browser on each computer you want to sync up - that's it!
@@ -17,8 +18,6 @@ python setup.py install
 ```
 
 ## Usage
-
-### Just get me started!
 
 Open up the configuration file, ```config.cfg```, and edit line 42 by inputting your music folder, e.g.:
 
