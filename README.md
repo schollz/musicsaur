@@ -96,6 +96,10 @@ chrome://flags/#disable-gesture-requirement-for-media-playback
 xinit /usr/bin/midori -a http://W.X.Y.Z:5000
 ```
 
+## Screenshot
+
+![Screenshot](http://rpiai.com/musicsaur/screenshot2.png)
+
 ## Contributing
 
 1. Fork it!
