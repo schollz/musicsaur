@@ -9,6 +9,7 @@ import socket
 import shutil
 from threading import Timer
 from configparser import SafeConfigParser
+import json
 
 # Setup logging
 import logging
@@ -22,19 +23,19 @@ ch.setFormatter(formatter)
 root.addHandler(ch)
 
 # Import 3rd-part packages
-import eyed3
 import tornado.ioloop
 import tornado.web
 from jinja2 import Template
 from mutagen.mp3 import MP3
-
+from mutagen.id3 import ID3
 
 #####################
 # GLOBAL VARIABLES
 #####################
 
-playlist = []
-playlist_info = []
+state = {}
+state['playlist'] = {}
+state['ordering'] = []
 current_song = -1
 last_activated = 0
 next_song_time = 0
@@ -67,12 +68,13 @@ def getPlaylistHtml():
     """Returns HTML for the playlist"""
 
     playlist_html = ""
-    for i in range(len(playlist_info)):
+    for i,path in enumerate(state['ordering']):
+        cur_song = state['playlist'][path]['song_name']
         html = """<a type="controls" data-skip="%(i)s">%(song)s</a><br>"""
-        if playlist_info[i] == song_name:
-            song = "<b>" + playlist_info[i] + "</b>"
+        if song_name == cur_song:
+            song = "<b>" + cur_song + "</b>"
         else:
-            song = playlist_info[i]
+            song = cur_song
         playlist_html += html % {'i': str(i), 'song': song}
     return playlist_html
 
@@ -113,18 +115,21 @@ def nextSong(delay, skip):
     logger = logging.getLogger('syncmusic:nextSong')
     if (time.time() - last_activated > int(parser.get('server_parameters','time_to_disallow_skips')) 
             or not is_initialized): 
+
+        last_activated = time.time()
+
         if skip < 0:
             current_song += skip + 2
         else:
             current_song = skip
-        if current_song >= len(playlist):
+        if current_song >= len(state['ordering']):
             current_song = 0
         if current_song < 0:
-            current_song = len(playlist) - 1
+            current_song = len(state['orering']) - 1
+        current_song_path = state['ordering'][current_song]
 
-        last_activated = time.time()
-        shutil.copy(playlist[current_song],os.path.join(os.getcwd(),'static/sound.mp3'))
-        song_name = playlist_info[current_song]
+        shutil.copy(current_song_path,os.path.join(os.getcwd(),'static/sound.mp3'))
+        song_name = state['playlist'][current_song_path]['song_name']
         next_song_time = getTime() + delay * 1000
         logger.debug('next up: ' + song_name)
         logger.debug('time: ' + str(getTime()) +
@@ -256,28 +261,40 @@ if __name__ == "__main__":
         folder_with_music = folder_with_music.strip()
         for root, dirnames, filenames in os.walk(folder_with_music):
             for filename in fnmatch.filter(filenames, '*.mp3'):
-                playlist.append(os.path.join(root, filename))
+                path = os.path.join(root, filename)
+                state['ordering'].append(path)
+                state['playlist'][path] = {}
+                title = filename
+                artist = 'unknwon'
+                album = 'unknown'
                 try:
-                    audiofile = eyed3.load(playlist[-1])
-                    title = audiofile.tag.title
-                    if title is None:
-                        title = 'unknown'
-                    artist = audiofile.tag.artist
-                    if artist is None:
-                        artist = filename
-                    album = audiofile.tag.album
-                    if album is None:
-                        album = ''
-                    song_name = album + ' - ' + title + ' by ' + artist
+                    audiofile = ID3(state['playlist'][song_num]['path'])
+                    try:
+                        title = audio['TIT2'].text[0]
+                    except:
+                        pass
+                    try:
+                        artist = audio['TPE1'].text[0]
+                    except:
+                        pass
+                    try:
+                        album = audio['TALB'].text[0]
+                    except:
+                        pass
                 except:
                     song_name = filename
-                playlist_info.append(song_name)
+                state['playlist'][path]['title'] = title
+                state['playlist'][path]['artist'] = artist
+                state['playlist'][path]['album'] = album
+                state['playlist'][path]['song_name'] = album + ' - ' + title + ' by ' + artist
                 os.chdir(cwd)
-    if len(playlist) == 0:
+
+    if len(state['ordering']) == 0:
         print(
             "\n\nNo mp3s found.\nDid you specify a music folder in line 40 of config.cfg?\n\n")
         sys.exit(-1)
 
+    print(json.dumps(state,indent=2))
     os.chdir(cwd)
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -288,7 +305,7 @@ if __name__ == "__main__":
         ip_address = "127.0.0.1"
 
     print("\n\n" +"#" * 60)
-    print("# Starting server with " + str(len(playlist)) + " songs")
+    print("# Starting server with " + str(len(state['ordering'])) + " songs")
     print("# To use, open a browser to http://" + ip_address + ":"+ parser.get('server_parameters','port') + "")
     print("# To stop server, use Ctl + C")
     print("#" * 60 +"\n\n")
