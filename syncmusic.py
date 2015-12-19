@@ -8,6 +8,7 @@ import sys
 import socket
 import shutil
 from threading import Timer
+from ConfigParser import SafeConfigParser
 
 # Setup logging
 import logging
@@ -44,6 +45,13 @@ song_name = ""
 songStartTimer = None
 songStopTimer = None
 folder_with_music = ""
+
+parser = SafeConfigParser()
+try:
+    parser.read('config.cfg')
+except:
+    print("Problem parsing config.cfg - did you change something?")
+    sys.exit(-1)
 
 #####################
 # UTILITY FUNCTIONS
@@ -82,7 +90,7 @@ def songOver():
     logger = logging.getLogger('syncmusic:songOver')
     logger.debug('Done playing: ' + song_name)
     is_playing = False
-    nextSong(9, -1)
+    nextSong(int(parser.get('server_parameters','time_to_next_song')), -1)
 
 
 def nextSong(delay, skip):
@@ -101,8 +109,8 @@ def nextSong(delay, skip):
     global songStartTimer
     global songStopTimer
     logger = logging.getLogger('syncmusic:nextSong')
-    if time.time() - last_activated > 3 or not is_initialized:  # songs can only be skipped every 5 seconds
-        is_playing = False
+    if (time.time() - last_activated > int(parser.get('server_parameters','time_to_disallow_skips')) 
+            or not is_initialized): 
         if skip < 0:
             current_song += skip + 2
         else:
@@ -159,13 +167,15 @@ def index_html():
     """
 
     if not is_initialized:
-        nextSong(9, 0)
+        nextSong(int(parser.get('server_parameters','time_to_next_song')), 0)
     data = {}
     data['random_integer'] = random.randint(1000, 30000)
     data['playlist_html'] = getPlaylistHtml()
     data['is_playing'] = is_playing
     data['message'] = 'Syncing...'
     data['is_index'] = True
+    data['max_sync_lag'] = parser.get('client_parameters','max_sync_lag')
+    data['check_up_wait_time'] = parser.get('client_parameters','check_up_wait_time')
     return render_template('index.html', data=data)
 
 
@@ -201,7 +211,7 @@ def finished():
     response = {'message': 'loading!'}
     if request.method == 'POST':
         skip = int(request.form['skip'])
-        nextSong(9, skip)
+        nextSong(int(parser.get('server_parameters','time_to_next_song')), skip)
     return jsonify(response)
 
 
@@ -228,8 +238,9 @@ if __name__ == "__main__":
     # app.run(host='0.0.0.0')
     logger = logging.getLogger('syncmusic:nextSong')
     cwd = os.getcwd()
-    if len(sys.argv) > 1:
-        folder_with_music = sys.argv[1]
+
+    folders_with_music = parser.get('server_parameters','music_folder').split(',')
+    for folder_with_music in folders_with_music:
         # Load playlist
         for root, dirnames, filenames in os.walk(folder_with_music):
             for filename in fnmatch.filter(filenames, '*.mp3'):
@@ -250,12 +261,9 @@ if __name__ == "__main__":
                     song_name = filename
                 playlist_info.append(song_name)
                 os.chdir(cwd)
-        if len(playlist) == 0:
-            print('No music in ' + folder_with_music)
-            sys.exit(-1)
-    else:
+    if len(playlist) == 0:
         print(
-            "Need to specify folder with music.\npython syncmusic.py '/folder/with/music'")
+            "\n\nNo mp3s found.\nDid you specify a music folder in line 40 of config.cfg?\n\n")
         sys.exit(-1)
 
     os.chdir(cwd)
@@ -271,17 +279,33 @@ if __name__ == "__main__":
     print("# Starting server with " + str(len(playlist)) + " songs")
     print("# To use, open a browser to http://" + ip_address + ":5000")
     print("# To stop server, use Ctl + C")
+    print(parser.get('client_parameters','check_up_wait_time'))
     print("#" * 60 +"\n\n")
+
+    pi_clients = []
+    if len(parser.get('raspberry_pis','clients')) > 2:
+        pi_clients = parser.get('raspberry_pis','clients').split(',')
+        for pi_client in pi_clients:
+            try:
+                os.system("ssh " + pi_client + " 'pkill -9 midori </dev/null > log 2>&1 &'")
+                os.system("ssh " + pi_client + " 'xinit /usr/bin/midori -a 192.168.1.2:5000/ </dev/null > log 2>&1 &'")
+            except:
+                print("Problem starting pi!")
 
     from tornado.wsgi import WSGIContainer
     from tornado.httpserver import HTTPServer
     from tornado.ioloop import IOLoop
     http_server = HTTPServer(WSGIContainer(app))
-    http_server.listen(5000)
+    http_server.listen(int(parser.get('server_parameters','port')))
     try:
         IOLoop.instance().start()
     except (KeyboardInterrupt, SystemExit):
         print('\nProgram shutting down...')
+        for pi_client in pi_clients:
+            try:
+                os.system("ssh " + pi_client + " 'pkill -9 midori </dev/null > log 2>&1 &'")
+            except:
+                pass
         try:
             songStopTimer.cancel()
         except:

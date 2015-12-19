@@ -31,10 +31,10 @@ return +new Date.getTime();
 }
 
 // CONSTANTS
-var CHECK_UP_WAIT_TIME = 1700;
+var CHECK_UP_WAIT_TIME = {{ data['check_up_wait_time'] }};
 var CHECK_UP_ITERATION = 1;
 var check_up_counter = 0;
-var MAX_SYNC_LAG = 30;
+var MAX_SYNC_LAG = {{ data['max_sync_lag'] }};
 
 // GLOBALS
 var lagTimes = [];
