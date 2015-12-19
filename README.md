@@ -1,3 +1,5 @@
+![Logo](http://rpiai.com/music/musicsaur1.png)
+
 # MusicSAUR (formally the un-googleable "μsic")
 ## Music Synchronization And Uniform Relaying
 
