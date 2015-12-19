@@ -95,16 +95,14 @@ xinit /usr/bin/midori -a http://W.X.Y.Z:5000
 
 # History
 
-<<<<<<< HEAD
 - 12/18/2015 (evening): Version 1.1 Release
 - 12/18/2015 (morning): Version 1.0 Release
-=======
-- 12/17/2015: Version 1.0 Released!
->>>>>>> 1582f131820e52ef2da61f2deb8701e62aa0e888
+
 
 ## Credits
 
 * James Simpson and [Goldfire studios](http://goldfirestudios.com/blog/104/howler.js-Modern-Web-Audio-Javascript-Library) for their amazing [howler.js library](https://github.com/goldfire/howler.js/)
 * Zach Simpson for [his paper on simple clock synchronization](http://www.mine-control.com/zack/timesync/timesync.html)
+* Everyone on the [/r//raspberry_pi](https://www.reddit.com/r/raspberry_pi/comments/3xc8kq/simple_python_script_to_allow_multiple_raspberry/) and [/r/python](https://www.reddit.com/r/Python/comments/3xc8mj/simple_python_script_to_allow_multiple_computers/) threads for great feature requests and bug reports!
 
 
