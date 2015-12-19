@@ -163,14 +163,14 @@ for (var i = 0; i < 15; i++) {
               if (data['is_playing']==true) {
                   sound.seek(data['song_time'])
               }
-              var posting = $.post('/playing', {
-              'message': 'im playing a song'
-              });
+              // var posting = $.post('/playing', {
+              // 'message': 'im playing a song'
+              // });
 
-              // Put the results in a div
-              posting.done(function(data) {
+              // // Put the results in a div
+              // posting.done(function(data) {
 
-              });
+              // });
           }, next_trigger - (time() - true_time_delta));
 
         }
@@ -276,7 +276,7 @@ makeRequests();
 
 
         <div class="row">
-            <h1><i>μsic</i></h1>
+            <h1><i>musicsaur</i></h1>
         </div>
 
 
