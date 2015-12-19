@@ -9,6 +9,7 @@ import socket
 import shutil
 from threading import Timer
 from configparser import SafeConfigParser
+import json
 
 # Setup logging
 import logging
@@ -22,36 +23,25 @@ ch.setFormatter(formatter)
 root.addHandler(ch)
 
 # Import 3rd-part packages
-import eyed3
-from flask import *
+import tornado.ioloop
+import tornado.web
+from jinja2 import Template
 from mutagen.mp3 import MP3
-
+from mutagen.id3 import ID3
 
 #####################
 # GLOBAL VARIABLES
 #####################
 
-app = Flask(__name__)
-app.debug = True
-
-playlist = []
-playlist_info = []
-current_song = -1
-last_activated = 0
-next_song_time = 0
-is_playing = False
-is_initialized = False
-song_name = ""
+state = {}
 songStartTimer = None
 songStopTimer = None
-folder_with_music = ""
-
 parser = SafeConfigParser()
 try:
     parser.read('config.cfg')
 except:
     print("Problem parsing config.cfg - did you change something?")
-    sys.exit(-1)
+    sys.exit(-1)    
 
 #####################
 # UTILITY FUNCTIONS
@@ -68,12 +58,13 @@ def getPlaylistHtml():
     """Returns HTML for the playlist"""
 
     playlist_html = ""
-    for i in range(len(playlist_info)):
+    for i,path in enumerate(state['ordering']):
+        cur_song = state['playlist'][path]['song_name']
         html = """<a type="controls" data-skip="%(i)s">%(song)s</a><br>"""
-        if playlist_info[i] == song_name:
-            song = "<b>" + playlist_info[i] + "</b>"
+        if state['currently_playing_songname'] == cur_song:
+            song = "<b>" + cur_song + "</b>"
         else:
-            song = playlist_info[i]
+            song = cur_song
         playlist_html += html % {'i': str(i), 'song': song}
     return playlist_html
 
@@ -81,15 +72,16 @@ def getPlaylistHtml():
 def songStarts():
     """Runs when server decides a song starts"""
     logger = logging.getLogger('syncmusic:songStarts')
-    logger.debug('Playing: ' + song_name)
+    logger.debug('Playing: ' + state['currently_playing_songname'])
+    state['is_playing'] = True
+
 
 
 def songOver():
     """Runs when server decides a song stops"""
-    global is_playing
     logger = logging.getLogger('syncmusic:songOver')
-    logger.debug('Done playing: ' + song_name)
-    is_playing = False
+    logger.debug('Done playing: ' + state['currently_playing_songname'])
+    state['is_playing'] = False
     nextSong(int(parser.get('server_parameters','time_to_next_song')), -1)
 
 
@@ -100,40 +92,37 @@ def nextSong(delay, skip):
     loads the new song, and sets the timers for when
     the songs should start and end.
     """
-    global last_activated
-    global current_song
-    global next_song_time
-    global is_playing
-    global is_initialized
-    global song_name
     global songStartTimer
     global songStopTimer
     logger = logging.getLogger('syncmusic:nextSong')
-    if (time.time() - last_activated > int(parser.get('server_parameters','time_to_disallow_skips')) 
-            or not is_initialized): 
-        if skip < 0:
-            current_song += skip + 2
-        else:
-            current_song = skip
-        if current_song >= len(playlist):
-            current_song = 0
-        if current_song < 0:
-            current_song = len(playlist) - 1
+    if (time.time() - state['last_activated'] > int(parser.get('server_parameters','time_to_disallow_skips')) 
+            or not state['is_initialized']): 
 
-        last_activated = time.time()
-        shutil.copy(playlist[current_song],os.path.join(os.getcwd(),'static/sound.mp3'))
-        song_name = playlist_info[current_song]
-        next_song_time = getTime() + delay * 1000
-        logger.debug('next up: ' + song_name)
+        state['last_activated'] = time.time()
+
+        if skip < 0:
+            state['current_song'] += skip + 2
+        else:
+            state['current_song'] = skip
+        if state['current_song'] >= len(state['ordering']):
+            state['current_song'] = 0
+        if state['current_song'] < 0:
+            state['current_song'] = len(state['orering']) - 1
+        current_song_path = state['ordering'][state['current_song']]
+
+        shutil.copy(current_song_path,os.path.join(os.getcwd(),'static/sound.mp3'))
+        state['currently_playing_songname'] = state['playlist'][current_song_path]['song_name']
+        state['next_song_time'] = getTime() + delay * 1000
+        logger.debug('next up: ' + state['currently_playing_songname'])
         logger.debug('time: ' + str(getTime()) +
-                     ' and next: ' + str(next_song_time))
-        is_initialized = True
+                     ' and next: ' + str(state['next_song_time']))
+        state['is_initialized'] = True
         if songStartTimer is not None:
             songStartTimer.cancel()
             songStopTimer.cancel()
         songStopTimer = Timer(
             float(
-                next_song_time -
+                state['next_song_time'] -
                 getTime()) /
             1000.0,
             songStarts,
@@ -146,7 +135,7 @@ def nextSong(delay, skip):
             float(
                 audio.info.length) +
             float(
-                next_song_time -
+                state['next_song_time'] -
                 getTime()) /
             1000.0,
             songOver,
@@ -157,76 +146,87 @@ def nextSong(delay, skip):
 # WEB ROUTES
 #################
 
+index_page = Template(open('templates/index.html','r').read())
 
-@app.route("/")
-def index_html():
+class IndexPage(tornado.web.RequestHandler):
     """Main sign-in - /
 
     Server loads new song if not initialized, and
     then returns the rendered music control page
     """
 
-    if not is_initialized:
-        nextSong(int(parser.get('server_parameters','time_to_next_song')), 0)
-    data = {}
-    data['random_integer'] = random.randint(1000, 30000)
-    data['playlist_html'] = getPlaylistHtml()
-    data['is_playing'] = is_playing
-    data['message'] = 'Syncing...'
-    data['is_index'] = True
-    data['max_sync_lag'] = parser.get('client_parameters','max_sync_lag')
-    data['check_up_wait_time'] = parser.get('client_parameters','check_up_wait_time')
-    return render_template('index.html', data=data)
+    def get(self):
+        if not state['is_initialized']:
+            nextSong(int(parser.get('server_parameters','time_to_next_song')), state['current_song'])
+        data = {}
+        data['random_integer'] = random.randint(1000, 30000)
+        data['playlist_html'] = getPlaylistHtml()
+        data['is_playing'] = state['is_playing']
+        data['message'] = 'Syncing...'
+        data['is_index'] = True
+        data['max_sync_lag'] = parser.get('client_parameters','max_sync_lag')
+        data['check_up_wait_time'] = parser.get('client_parameters','check_up_wait_time')
+        if state['debug']:
+            index_page = Template(open('templates/index.html','r').read())
+        self.write(index_page.render(data=data))
 
-
-@app.route("/sync", methods=['GET', 'POST'])
-def sync():
+class SyncHandler(tornado.web.RequestHandler):
     """Syncing route - /sync
 
     POST request from main page with the client client_timestamp
     and current_song. Returns JSON containing the server client_timestamp
     and whether or not to load a new song.
     """
-    #searchword = request.args.get('key', '')
-    if request.method == 'POST':
+
+    def post(self):
         data = {}
-        data['client_timestamp'] = int(request.form['client_timestamp'])
+        data['client_timestamp'] = int(self.get_argument('client_timestamp'))
         data['server_timestamp'] = getTime()
-        data['next_song'] = next_song_time
-        if is_playing:
-            data['is_playing'] = (song_name == request.form['current_song'])
+        data['next_song'] = state['next_song_time']
+        if state['is_playing']:
+            data['is_playing'] = (state['currently_playing_songname'] == self.get_argument('current_song'))
         else:
-            data['is_playing'] = is_playing
-        data['current_song'] = song_name
-        data['song_time'] = float(getTime() - next_song_time) / 1000.0
-        return jsonify(data)
+            data['is_playing'] = state['is_playing']
+        data['current_song'] = state['currently_playing_songname']
+        data['song_time'] = float(getTime() - state['next_song_time']) / 1000.0
+        self.write(data)
 
 
-@app.route("/nextsong", methods=['GET', 'POST'])
-def finished():
-    """ Next song route - /nextSong
+class NextSongHandler(tornado.web.RequestHandler):
+    """Syncing route - /sync
 
-    POST request to start a new song
+    POST request from main page with the client client_timestamp
+    and current_song. Returns JSON containing the server client_timestamp
+    and whether or not to load a new song.
     """
-    response = {'message': 'loading!'}
-    if request.method == 'POST':
-        skip = int(request.form['skip'])
+
+    def post(self):
+        response = {'message': 'loading!'}
+        skip = int(self.get_argument('skip'))
         nextSong(int(parser.get('server_parameters','time_to_next_song')), skip)
-    return jsonify(response)
+        self.write(response)
 
+# Depreciated
+# @app.route("/playing", methods=['GET', 'POST'])
+# def playing():
+#     """ Is playing route - /nextSong
 
-@app.route("/playing", methods=['GET', 'POST'])
-def playing():
-    """ Is playing route - /nextSong
+#     POST request to tell server that client has started
+#     playing a song. DEPRECATED.
+#     """
+#     global is_playing
+#     response = {'message': 'loading!'}
+#     if request.method == 'POST':
+#         is_playing = True
+#     return jsonify(response)
 
-    POST request to tell server that client has started
-    playing a song. DEPRECATED.
-    """
-    global is_playing
-    response = {'message': 'loading!'}
-    if request.method == 'POST':
-        is_playing = True
-    return jsonify(response)
+application = tornado.web.Application([
+    (r"/", IndexPage),
+    (r"/sync", SyncHandler),
+    (r"/nextsong", NextSongHandler),
+    (r'/static/(.*)', tornado.web.StaticFileHandler, {'path': './static'}),
+])
+
 
 
 ##########
@@ -239,34 +239,61 @@ if __name__ == "__main__":
     logger = logging.getLogger('syncmusic:nextSong')
     cwd = os.getcwd()
 
+    state['playlist'] = {}
+    state['ordering'] = []
+    state['current_song'] = 0
+    state['currently_playing_songname'] = ""
+    if os.path.isfile('state.json'):
+        state = json.load(open('state.json','r'))
+    state['last_activated'] = 0
+    state['next_song_time'] = 0
+    state['is_playing'] = False
+    state['is_initialized'] = False
+    state['last_activated'] = 0
+    state['debug'] = True
+
     folders_with_music = parser.get('server_parameters','music_folder').split(',')
     for folder_with_music in folders_with_music:
         # Load playlist
         folder_with_music = folder_with_music.strip()
         for root, dirnames, filenames in os.walk(folder_with_music):
             for filename in fnmatch.filter(filenames, '*.mp3'):
-                playlist.append(os.path.join(root, filename))
+                path = os.path.join(root, filename)
+                if path in state['ordering']:
+                    continue
+                state['ordering'].append(path)
+                state['playlist'][path] = {}
+                title = filename
+                artist = 'unknown'
+                album = 'unknown'
                 try:
-                    audiofile = eyed3.load(playlist[-1])
-                    title = audiofile.tag.title
-                    if title is None:
-                        title = 'unknown'
-                    artist = audiofile.tag.artist
-                    if artist is None:
-                        artist = filename
-                    album = audiofile.tag.album
-                    if album is None:
-                        album = ''
-                    song_name = album + ' - ' + title + ' by ' + artist
-                except:
-                    song_name = filename
-                playlist_info.append(song_name)
+                    audiofile = ID3(path)
+                    try:
+                        title = audiofile['TIT2'].text[0]
+                    except:
+                        pass
+                    try:
+                        artist = audiofile['TPE1'].text[0]
+                    except:
+                        pass
+                    try:
+                        album = audiofile['TALB'].text[0]
+                    except:
+                        pass
+                except BaseException as e:
+                    logger.error('Failed to get audio information for ' + path + ': '+ str(e))
+                state['playlist'][path]['title'] = title
+                state['playlist'][path]['artist'] = artist
+                state['playlist'][path]['album'] = album
+                state['playlist'][path]['song_name'] = album + ' - ' + title + ' by ' + artist
                 os.chdir(cwd)
-    if len(playlist) == 0:
+
+    if len(state['ordering']) == 0:
         print(
             "\n\nNo mp3s found.\nDid you specify a music folder in line 40 of config.cfg?\n\n")
         sys.exit(-1)
 
+    print(json.dumps(state,indent=2))
     os.chdir(cwd)
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -277,7 +304,7 @@ if __name__ == "__main__":
         ip_address = "127.0.0.1"
 
     print("\n\n" +"#" * 60)
-    print("# Starting server with " + str(len(playlist)) + " songs")
+    print("# Starting server with " + str(len(state['ordering'])) + " songs")
     print("# To use, open a browser to http://" + ip_address + ":"+ parser.get('server_parameters','port') + "")
     print("# To stop server, use Ctl + C")
     print("#" * 60 +"\n\n")
@@ -293,20 +320,23 @@ if __name__ == "__main__":
             except:
                 print("Problem starting pi!")
 
-    from tornado.wsgi import WSGIContainer
-    from tornado.httpserver import HTTPServer
-    from tornado.ioloop import IOLoop
-    http_server = HTTPServer(WSGIContainer(app))
-    http_server.listen(int(parser.get('server_parameters','port')))
+    application.listen(int(parser.get('server_parameters','port')))
     try:
-        IOLoop.instance().start()
+        tornado.ioloop.IOLoop.instance().start()
     except (KeyboardInterrupt, SystemExit):
         print('\nProgram shutting down...')
+        print('Saving state...')
+        with open('state.json','w') as f:
+            f.write(json.dumps(state,indent=2))
+
         for pi_client in pi_clients:
+            pi_client = pi_client.strip()
+            print('Shutting down ' + pi_client + '...')
             try:
                 os.system("ssh " + pi_client + " 'pkill -9 midori </dev/null > log 2>&1 &'")
             except:
                 pass
+        print('Stopping timers...')
         try:
             songStopTimer.cancel()
         except:
@@ -315,5 +345,6 @@ if __name__ == "__main__":
             songStartTimer.cancel()
         except:
             pass
+        print('Exiting...')
         sys.exit(-1)
         raise
