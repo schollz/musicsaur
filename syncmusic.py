@@ -168,7 +168,6 @@ class SoundMp3(tornado.web.RequestHandler):
         self.write(audio_data)
         self.finish()
 
-
 class IndexPage(tornado.web.RequestHandler):
     """Main sign-in - /
 
