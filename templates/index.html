@@ -31,10 +31,10 @@ return +new Date.getTime();
 }
 
 // CONSTANTS
-var CHECK_UP_WAIT_TIME = 2000;
+var CHECK_UP_WAIT_TIME = {{ data['check_up_wait_time'] }};
 var CHECK_UP_ITERATION = 1;
 var check_up_counter = 0;
-var MAX_SYNC_LAG = 30;
+var MAX_SYNC_LAG = {{ data['max_sync_lag'] }};
 
 // GLOBALS
 var lagTimes = [];
@@ -47,6 +47,7 @@ var true_server_time_delta = 0;
 var sound_activated = false;
 var seconds_left = 0;
 var current_song = "None"
+var current_song_name = "None"
 var secondTimeout3 = setTimeout(function() {
 console.log('3 seconds left')
 }, 100000);
@@ -60,6 +61,7 @@ var secondTimeout0 = setTimeout(function() {
 console.log('0 seconds left')
 }, 100000);
 var mainInterval = 0;
+var runningDiff = 0;
 
 
 var sound = new Howl({
@@ -151,7 +153,7 @@ for (var i = 0; i < 15; i++) {
               console.log('playing song');
               current_song_name = current_song.split(":");
               current_song_name = current_song_name[current_song_name.length-1];
-              $("div.info1").html('Playing <b>' + current_song_name + '</b>');
+              $("div.info1").html('Loading <b>' + current_song_name + '</b>...');
               mainInterval = setInterval(function(){
                 checkIfSkipped();
               }, CHECK_UP_WAIT_TIME);
@@ -170,13 +172,7 @@ for (var i = 0; i < 15; i++) {
           }, next_trigger - (time() - true_time_delta));
 
         }
-
-
-
-
     });
-
-
 
   }, i*150 );
     
@@ -186,7 +182,7 @@ for (var i = 0; i < 15; i++) {
 
 function checkIfSkipped() {
 
-    var start = new Date().getTime();
+    
     // Send the data using post
     var posting = $.post('/sync', {
         'client_timestamp': time(),
@@ -195,52 +191,41 @@ function checkIfSkipped() {
 
     // Put the results in a div
     posting.done(function(data) {
+        var start = new Date().getTime();
       check_up_counter = check_up_counter + 1;
       if (data['is_playing']==false) {
         sound.unload()
         location.reload(true);
       } else if (check_up_counter % CHECK_UP_ITERATION==0) {
         check_up_counter = 0;
-          var mySongTime = sound.seek();
-          if (typeof(mySongTime)=="object") {
-            mySongTime = 0;
-          }
-        var serverSongTime = data['song_time'];
-        current_song = data['current_song']
-        var end = new Date().getTime();
-        var time = end - start;
-        console.log('Execution time1: (ms) ' + time);
-        var diff = serverSongTime*1000+time - mySongTime*1000;
-        var seekTo = data['song_time']+time/1000.0;
-        console.log('Browser: ' + mySongTime.toString() + '\nServer: ' + serverSongTime.toString() + '\nHalf-Latency: ' + true_server_time_delta.toString() + '\nCorrected diff: ' + diff.toString());
-        if (Math.abs(diff) > MAX_SYNC_LAG) {
-          if (lagTimes.length>2) {
-            var meanLag = math.median(lagTimes)/1000.0;
-            var meanCompute = math.median(computeTimes)/1000.0;
-            	console.log('\npreviously seeking to ' + seekTo.toString() + ' now adjusting with ' + meanLag.toString() + ' s lag + Half-Latency + 1/2 * diff'); // + meanCompute.toString() + ' s compute time');
-		seekTo = seekTo + meanLag + true_server_time_delta/1000.0 + 0.5*diff/1000; // + meanCompute;
-          }
-          console.log('now seeking to ' + seekTo.toString());
-          sound.seek(seekTo);
-          var end = new Date().getTime();
-          var time = end - start;
-          console.log('Execution time: (ms) ' + time);
-          if (diff>0) {
-            lagTimes.push(diff);
-          }
-           computeTimes.push(time);
-          // Don't need to save stuff while the song is loading
-          if (mySongTime == 0 || lagTimes.length > 10) {
-            lagTimes = [];
-          }
-          sound.volume(0.0);
-          CHECK_UP_ITERATION = 1;
+        var mySongTime = sound.seek();
+        if (typeof(mySongTime)=="object") {
+          mySongTime = 0;
+          console.log('Still loading...')
+            $("div.info1").html('Loading <b>' + current_song_name + '</b>...');
+        }
+
+        if (mySongTime == 0) {
+          sound.seek(data['song_time']+true_server_time_delta/1000.0);
         } else {
-          lagTimes = [];
-          computeTimes = [];
-          sound.volume(1.0);
-          CHECK_UP_ITERATION = 10;
-        } 
+          var diff = data['song_time']+true_server_time_delta/1000.0 - mySongTime;
+          if (Math.abs(diff) > MAX_SYNC_LAG/1000.0) {
+            CHECK_UP_ITERATION = 1;
+            sound.volume(0.0);
+            runningDiff = runningDiff + diff;
+            var serverSongTime = data['song_time']+true_server_time_delta/1000.0;
+            sound.seek(serverSongTime+runningDiff);
+            console.log('[' + Date.now() + '] ' + ': NOT in sync (>' + MAX_SYNC_LAG.toString() + ' ms)')
+            console.log('Browser:  ' + mySongTime.toString() + '\nServer: ' + serverSongTime.toString() + '\nDiff: ' + (diff*1000).toString() + '\nrunningDiff: ' + (runningDiff*1000).toString());
+            $("div.info1").html('Muted <b>' + current_song_name + '</b> (out of sync)');
+          } else {
+            console.log('[' + Date.now() + '] ' + ': in sync (<' + MAX_SYNC_LAG.toString() + ' ms)')
+            $("div.info1").html('Playing <b>' + current_song_name + '</b>');
+            CHECK_UP_ITERATION = 10;
+            sound.volume(1.0);
+            runningDiff = 0;
+          } 
+        }
       }
     });
 
