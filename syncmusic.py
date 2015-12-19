@@ -277,17 +277,17 @@ if __name__ == "__main__":
 
     print("\n\n" +"#" * 60)
     print("# Starting server with " + str(len(playlist)) + " songs")
-    print("# To use, open a browser to http://" + ip_address + ":5000")
+    print("# To use, open a browser to http://" + ip_address + ":"+ parser.get('server_parameters','port') + "")
     print("# To stop server, use Ctl + C")
     print("#" * 60 +"\n\n")
 
     pi_clients = []
-    if len(parser.get('raspberry_pis','clients')) > 2:
+    if len(parser.get('raspberry_pis','clients')) > 2 and ip_address != '127.0.0.1':
         pi_clients = parser.get('raspberry_pis','clients').split(',')
         for pi_client in pi_clients:
             try:
                 os.system("ssh " + pi_client + " 'pkill -9 midori </dev/null > log 2>&1 &'")
-                os.system("ssh " + pi_client + " 'xinit /usr/bin/midori -a 192.168.1.2:5000/ </dev/null > log 2>&1 &'")
+                os.system("ssh " + pi_client + " 'xinit /usr/bin/midori -a " + ip_address + ":" + parser.get('server_parameters','port') + "/ </dev/null > log 2>&1 &'")
             except:
                 print("Problem starting pi!")
 
