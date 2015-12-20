@@ -80,7 +80,7 @@ var runningDiff = 0;
 
 function makeRequests(callback) {
 
-for (var i = 0; i < 15; i++) {
+for (var i = 0; i < 23; i++) {
 
   setTimeout(function postRequest() {
 
@@ -92,15 +92,16 @@ for (var i = 0; i < 15; i++) {
 
     // Put the results in a div
     posting.done(function(data) {
+        var timeNow = time();
         current_song = data['current_song']
-        latency = time() - data['client_timestamp']
+        latency = timeNow - data['client_timestamp']
         half_latency = latency / 2.0
-        time_delta = time() - data['server_timestamp']
+        time_delta = timeNow - data['server_timestamp']
         next_trigger = data['next_song']
 
         correct_time_delta.push(time_delta + half_latency);
         correct_latency.push(half_latency);
-        if (correct_time_delta.length==15) {
+        if (correct_time_delta.length==23) {
           console.log('correct_time_delta');
           console.log(correct_time_delta);
           var mean = math.mean(correct_time_delta);
@@ -170,7 +171,7 @@ for (var i = 0; i < 15; i++) {
         }
     });
 
-  }, i*200 );
+  }, i*180 );
     
 }
 }
@@ -232,7 +233,7 @@ function checkIfSkipped() {
                 sound.seek(serverSongTime+runningDiff);
             }
           } else {
-            console.log('[' + Date.now() + '] ' + ': in sync (' + (Math.abs(diff)*1000).toString() + '<' + MAX_SYNC_LAG.toString() + ' ms)')
+            console.log('[' + Date.now() + '] ' + ': in sync (|' + (diff*1000).toString() + '|<' + MAX_SYNC_LAG.toString() + ' ms)')
             $("div.info1").html('Playing <b>' + current_song_name + '</b>');
             CHECK_UP_ITERATION = parseInt(30.0/(CHECK_UP_WAIT_TIME/1000.0)); // every 30 seconds
             tryWait = 0;
