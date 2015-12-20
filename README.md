@@ -96,6 +96,13 @@ chrome://flags/#disable-gesture-requirement-for-media-playback
 xinit /usr/bin/midori -a http://W.X.Y.Z:5000
 ```
 
+OR
+
+```bash
+xinit /usr/bin/luakit -u http://W.X.Y.Z:5000
+```
+
+
 ## Screenshot
 
 ![Screenshot](http://rpiai.com/musicsaur/screenshot2.png)
