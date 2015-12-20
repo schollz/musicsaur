@@ -278,6 +278,7 @@ if __name__ == "__main__":
         # Load playlist
         folder_with_music = folder_with_music.strip()
         for root, dirnames, filenames in os.walk(folder_with_music):
+            logger.debug('Collecting music from ' + root)
             for filename in fnmatch.filter(filenames, '*.mp3'):
                 path = os.path.join(root, filename)
                 if path in state['ordering']:
@@ -314,7 +315,6 @@ if __name__ == "__main__":
             "\n\nNo mp3s found.\nDid you specify a music folder in line 40 of config.cfg?\n\n")
         sys.exit(-1)
 
-    print(json.dumps(state,indent=2))
     os.chdir(cwd)
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
