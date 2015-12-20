@@ -187,7 +187,7 @@ function checkIfSkipped() {
     // Put the results in a div
     posting.done(function(data) {
         var start = new Date().getTime();
-          var time_delta = time() - data['server_timestamp']
+        var time_delta = time()-(data['server_timestamp']+true_time_delta);
       check_up_counter = check_up_counter + 1;
       if (data['is_playing']==false) {
         console.log('reloading page');
