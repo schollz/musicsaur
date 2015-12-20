@@ -2,19 +2,16 @@
 
 # MusicSAUR (formerly the un-googleable "μsic")
 ## Music Synchronization And Uniform Relaying
-[![Version 1.2](https://img.shields.io/badge/version-1.2-brightgreen.svg)]()
+[![Version 1.3](https://img.shields.io/badge/version-1.3-brightgreen.svg)]()
 [![Join the chat at https://gitter.im/schollz/musicsaur](https://badges.gitter.im/schollz/music.svg)](https://gitter.im/schollz/musicsaur?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ---
 
-**Update 12/19/2015: Version 1.2 released!**
+**Update X/Y/Z: Version 1.3 released!**
 
 **Major features include:**
 
-- Improved server performance
-- State variables for reloading position in playlist and faster boot-up
-- Bug fixes
-- Fewer dependencies
+- ?
 
 ---
 
