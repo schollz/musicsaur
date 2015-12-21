@@ -3,16 +3,17 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	mp3 "github.com/badgerodon/mp3"
 	id3 "github.com/mikkyang/id3-go"
+	mp3 "github.com/tcolgate/mp3"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 )
 
-var m map[string]Song
+var songMap map[string]Song
 
 type SyncJSON struct {
 	Current_song     string `json:"current_song"`
@@ -26,9 +27,8 @@ type Song struct {
 	Title  string
 	Artist string
 	Album  string
-	Year   string
 	Path   string
-	Length time.Duration
+	Length int64
 }
 
 func timeTrack(start time.Time, name string) {
@@ -59,7 +59,7 @@ func test(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getMp3Info(path string) {
+func getMp3Info(path string) Song {
 	defer timeTrack(time.Now(), "getMp3Info")
 	file, err := os.Open(path)
 	if err != nil {
@@ -67,31 +67,71 @@ func getMp3Info(path string) {
 	}
 	defer file.Close()
 
-	duration, err := mp3.Length(file)
+	// duration, err := mp3.Length(file)
+	// if err != nil {
+	// 	log.Println(err)
+	// 	duration = time.Duration(10000)
+	// }
+
+	mp3File, err := id3.Open(path)
+
+	return Song{
+		Title:  mp3File.Title(),
+		Artist: mp3File.Artist(),
+		Album:  mp3File.Album(),
+		Path:   path,
+		Length: getMp3Length(path),
+	}
+}
+
+func loadMp3s(path string) {
+	defer timeTrack(time.Now(), "loadMp3s")
+	searchDir, _ := filepath.Abs("/home/zack/Music/Damien Rice/")
+
+	fileList := []string{}
+	err := filepath.Walk(searchDir, func(path string, f os.FileInfo, err error) error {
+		fileList = append(fileList, path)
+		return nil
+	})
 	if err != nil {
 		panic(err)
 	}
 
-	mp3File, err := id3.Open(path)
-	fmt.Println(mp3File.Title())
-	fmt.Println(mp3File.Artist())
-	fmt.Println(mp3File.Album())
-	fmt.Println(mp3File.Year())
-
-	fmt.Printf("Expected length to return %v, got %v", time.Duration(5067754912), duration)
-
-	m = make(map[string]Song)
-	m["Something"] = Song{
-		Title:  "hi",
-		Artist: "noone",
-		Length: time.Duration(5067754912),
+	for _, file := range fileList {
+		if filepath.Ext(file) == ".mp3" {
+			fmt.Println(file)
+			s := getMp3Info(file)
+			songMap[s.Artist+" - "+s.Album+" - "+s.Title] = s
+		}
 	}
-	fmt.Printf("Length %v\n", m["Something"].Length)
-	fmt.Printf("%T\n", time.Duration(10000))
+}
+
+func getMp3Length(path string) (totalTime int64) {
+	r, err := os.Open(path)
+	if err != nil {
+		//fmt.Println(err)
+		return
+	}
+
+	d := mp3.NewDecoder(r)
+	var f mp3.Frame
+	totalTime = 0
+	for {
+
+		if err := d.Decode(&f); err != nil {
+			//fmt.Println(err)
+			return
+		}
+
+		totalTime += f.Duration().Nanoseconds() / 1000000
+	}
 }
 
 func main() {
-	getMp3Info("./static/test.mp3")
+
+	songMap = make(map[string]Song)
+	loadMp3s("./static/test.mp3")
+	fmt.Printf("%v\n", songMap)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		defer timeTrack(time.Now(), r.RemoteAddr+" /")
