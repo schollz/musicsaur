@@ -11,7 +11,7 @@ import (
 
 func loadMp3s(path string) {
 	defer timeTrack(time.Now(), "loadMp3s")
-	searchDir, _ := filepath.Abs("/home/zack/Music/Damien Rice/")
+	searchDir, _ := filepath.Abs(path)
 
 	fileList := []string{}
 	err := filepath.Walk(searchDir, func(path string, f os.FileInfo, err error) error {
@@ -26,7 +26,7 @@ func loadMp3s(path string) {
 		if filepath.Ext(file) == ".mp3" {
 			fmt.Println(file)
 			s := getMp3Info(file)
-			songMap[s.Artist+" - "+s.Album+" - "+s.Title] = s
+			songMap[s.Fullname] = s
 		}
 	}
 }
@@ -46,17 +46,26 @@ func getMp3Info(path string) Song {
 	// }
 
 	mp3File, err := id3.Open(path)
-
+	title := mp3File.Title()
+	artist := mp3File.Artist()
+	album := mp3File.Album()
+	fullname := artist + " - " + album + " - " + title
+	if title == "" {
+		title = path
+		fullname = title
+	}
 	return Song{
-		Title:  mp3File.Title(),
-		Artist: mp3File.Artist(),
-		Album:  mp3File.Album(),
-		Path:   path,
-		Length: getMp3Length(path),
+		Fullname: fullname,
+		Title:    title,
+		Artist:   artist,
+		Album:    album,
+		Path:     path,
+		Length:   getMp3Length(path),
 	}
 }
 
 func getMp3Length(path string) (totalTime int64) {
+	// Returns length in milliseconds
 	r, err := os.Open(path)
 	if err != nil {
 		//fmt.Println(err)
