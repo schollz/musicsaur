@@ -1,5 +1,23 @@
 package main
 
+var songMap map[string]Song
+
+type SyncJSON struct {
+	Current_song     string `json:"current_song"`
+	Client_timestamp int    `json:"client_timestamp"`
+	Next_song        int    `json:"next_song"`
+	Is_playing       bool   `json:"is_playing"`
+	Song_time        int    `json:"song_time"`
+}
+
+type Song struct {
+	Title  string
+	Artist string
+	Album  string
+	Path   string
+	Length int64
+}
+
 var index_html = `
 		<html>
 		<head>
