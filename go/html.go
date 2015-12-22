@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flat"
 	"encoding/json"
 	"fmt"
 	"github.com/BurntSushi/toml"
@@ -129,7 +130,15 @@ func cleanup() {
 }
 
 func main() {
-
+	
+	piFlag := flag.String("pis","","\"pi@url1,pi@url2\"")
+	portFlag := flag.Int("port", 5000, "port to host on")
+	libraryFlag := flag.String("folder","./","Folder to find the mp3s")
+	flag.Parse()
+	   fmt.Println("piFlag:", *piFlag)
+    fmt.Println("portFlag:", *portFlag)
+    fmt.Println("libraryFlag:", *libraryFlag)
+	
 	// Load configuration parameters
 	if _, err := toml.DecodeFile("./config.cfg", &conf); err != nil {
 		// handle error
