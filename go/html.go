@@ -165,11 +165,16 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		//defer timeTrack(time.Now(), r.RemoteAddr+" /")
 		html_response := index_html
-		html_response = strings.Replace(html_response, "{{ .RandomInteger }}", strconv.Itoa(rand.Intn(10000)), -1)
-		html_response = strings.Replace(html_response, "{{ .CheckupWaitTime }}", strconv.Itoa(1700), -1)
-		html_response = strings.Replace(html_response, "{{ .MaxSyncLag }}", strconv.Itoa(50), -1)
-		html_response = strings.Replace(html_response, "{{ .PlaylistHTML }}", getPlaylistHTML(), -1)
-		html_response = strings.Replace(html_response, "{{ .Message }}", "Syncing...", -1)
+		html_response = strings.Replace(html_response, "{{ data['random_integer'] }}", strconv.Itoa(rand.Intn(10000)), -1)
+		html_response = strings.Replace(html_response, "{{ data['check_up_wait_time'] }}", strconv.Itoa(1700), -1)
+		html_response = strings.Replace(html_response, "{{ data['max_sync_lag'] }}", strconv.Itoa(50), -1)
+		html_response = strings.Replace(html_response, "{{ data['message'] }}", "Syncing...", -1)
+		html_response = strings.Replace(html_response, "https://cdnjs.cloudflare.com/ajax/libs/mathjs/2.5.0/math.min.js", "/math.js", -1)
+		html_response = strings.Replace(html_response, "https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js", "/jquery.js", -1)
+		html_response = strings.Replace(html_response, "/static/howler.js", "/howler.js", -1)
+		html_response = strings.Replace(html_response, "/static/normalize.css", "/normalize.css", -1)
+		html_response = strings.Replace(html_response, "/static/skeleton.css", "/skeleton.css", -1)
+		html_response = strings.Replace(html_response, "{{ data['playlist_html'] | safe }}", getPlaylistHTML(), -1)
 		fmt.Fprintf(w, html_response)
 	})
 
