@@ -311,22 +311,9 @@ function checkIfSkipped() {
             console.log('[' + Date.now() + '] ' + ': NOT in sync (>' + MAX_SYNC_LAG.toString() + ' ms)')
             console.log('Browser:  ' + mySongTime.toString() + '\nServer: ' + serverSongTime.toString() + '\nDiff: ' + (diff*1000).toString() + '\nMean half-latency: ' + true_server_time_delta.toString() +  '\nMeasured half-latency: ' + time_delta2.toString() + '\nrunningDiff: ' + (runningDiff*1000).toString() + '\nSeeking to: ' + (serverSongTime+runningDiff).toString());
             $("div.info1").html('Muted <b>' + current_song_name + '</b> (out of sync)');
-            if (diff<-1000000) {
-              console.log('pausing')
-              sound.pause()
-              clearTimeout(secondTimeout3);
-              clearTimeout(mainInterval);
-              secondTimeout3 = setTimeout(function() {
-                  console.log('playing');
-                  sound.play();
-                  mainInterval = setInterval(function(){
-                    checkIfSkipped();
-                  }, CHECK_UP_WAIT_TIME);
-              }, Math.abs(runningDiff)*1000);
-            } else {
+            
                 console.log(JSON.stringify(data));
                 sound.seek(serverSongTime+runningDiff);
-            }
           } else {
             console.log('[' + Date.now() + '] ' + ': in sync (|' + (diff*1000).toString() + '|<' + MAX_SYNC_LAG.toString() + ' ms)')
             $("div.info1").html('Playing <b>' + current_song_name + '</b>');

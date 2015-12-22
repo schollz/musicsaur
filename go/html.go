@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/BurntSushi/toml"
+	"gopkg.in/tylerb/graceful.v1"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -20,7 +21,8 @@ func timeTrack(start time.Time, name string) {
 }
 
 func getTime() (curTime int64) {
-	curTime = time.Now().UnixNano() / 1000000
+	//curTime = time.Now().UnixNano() / 1000000
+	curTime = time.Since(time.Date(2015, 6, 1, 12, 0, 0, 0, time.UTC)).Nanoseconds() / 1000000
 	return
 }
 
@@ -120,12 +122,17 @@ func skipTrack(song_index int) {
 	go songControl(statevar.SongStartTime-getTime()+statevar.SongMap[song].Length, false, "Stopping "+song, song, true)
 }
 
+func cleanup() {
+	fmt.Println("cleanup")
+}
+
 func main() {
+
 	// Load configuration parameters
 	if _, err := toml.DecodeFile("./config.cfg", &conf); err != nil {
 		// handle error
 	}
-	fmt.Printf("%v", conf.ServerParameters.MusicFolder)
+	fmt.Printf("%v", conf)
 
 	// Load state
 	if _, err := os.Stat("state.json"); err == nil {
@@ -161,8 +168,9 @@ func main() {
 	statevar.SongList.Sort()
 
 	skipTrack(statevar.CurrentSongIndex)
+	mux := http.NewServeMux()
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		//defer timeTrack(time.Now(), r.RemoteAddr+" /")
 		html_response := index_html
 		html_response = strings.Replace(html_response, "{{ data['random_integer'] }}", strconv.Itoa(rand.Intn(10000)), -1)
@@ -178,38 +186,38 @@ func main() {
 		fmt.Fprintf(w, html_response)
 	})
 
-	http.HandleFunc("/sound.mp3", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/sound.mp3", func(w http.ResponseWriter, r *http.Request) {
 		defer timeTrack(time.Now(), r.RemoteAddr+" /sound.mp3")
 		w.Header().Set("Content-Type", "audio/mpeg")
 		w.Write([]byte(rawSongData))
 	})
-	http.HandleFunc("/howler.js", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/howler.js", func(w http.ResponseWriter, r *http.Request) {
 		//defer timeTrack(time.Now(), r.RemoteAddr+" /howler.js")
 		w.Header().Set("Content-Type", "text/javascript")
 		w.Write([]byte(howler_js))
 	})
-	http.HandleFunc("/math.js", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/math.js", func(w http.ResponseWriter, r *http.Request) {
 		//defer timeTrack(time.Now(), r.RemoteAddr+" /math.js")
 		w.Header().Set("Content-Type", "text/javascript")
 		w.Write([]byte(jquery_js))
 	})
-	http.HandleFunc("/jquery.js", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/jquery.js", func(w http.ResponseWriter, r *http.Request) {
 		//defer timeTrack(time.Now(), r.RemoteAddr+" /jquery.js")
 		w.Header().Set("Content-Type", "text/javascript")
 		w.Write([]byte(math_js))
 	})
-	http.HandleFunc("/skeleton.css", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/skeleton.css", func(w http.ResponseWriter, r *http.Request) {
 		//defer timeTrack(time.Now(), r.RemoteAddr+" /skeleton.css")
 		w.Header().Set("Content-Type", "text/css")
 		w.Write([]byte(skeleton_css))
 	})
-	http.HandleFunc("/normalize.css", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/normalize.css", func(w http.ResponseWriter, r *http.Request) {
 		//defer timeTrack(time.Now(), r.RemoteAddr+" /normalize.css")
 		w.Header().Set("Content-Type", "text/css")
 		w.Write([]byte(normalize_css))
 	})
-	http.HandleFunc("/sync", SyncRequest)
-	http.HandleFunc("/nextsong", NextSongRequest)
-
-	panic(http.ListenAndServe(":5000", nil))
+	mux.HandleFunc("/sync", SyncRequest)
+	mux.HandleFunc("/nextsong", NextSongRequest)
+	//http.ListenAndServe(":5000", nil)
+	graceful.Run(":5000", 10*time.Second, mux)
 }

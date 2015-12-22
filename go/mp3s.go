@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	id3 "github.com/mikkyang/id3-go"
+	id3 "github.com/bobertlo/go-id3/id3"
 	mp3 "github.com/tcolgate/mp3"
 	"os"
 	"path/filepath"
@@ -10,6 +10,7 @@ import (
 )
 
 func loadMp3s(path string) {
+	fmt.Println("Looking in " + path)
 	defer timeTrack(time.Now(), "loadMp3s")
 	searchDir, _ := filepath.Abs(path)
 
@@ -48,10 +49,13 @@ func getMp3Info(path string) Song {
 	// 	duration = time.Duration(10000)
 	// }
 
-	mp3File, err := id3.Open(path)
-	title := mp3File.Title()
-	artist := mp3File.Artist()
-	album := mp3File.Album()
+	tags, err := id3.ReadFile(file)
+	if err != nil {
+		panic(err)
+	}
+	title := tags["title"]
+	artist := tags["artist"]
+	album := tags["album"]
 	fullname := artist + " - " + album + " - " + title
 	if title == "" {
 		title = path
