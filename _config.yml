@@ -1,6 +1,6 @@
 name: musicsaur
-description: The simplest music synchronization for multi-room audio
-meta_description: "Your New Jekyll Site, Blogging about stuffs"
+description: The simplest music synchronization for multi-room audio.
+meta_description: "Musicsaur is a open-source solution for simple music synchronization that provides multi-room audio with Raspberry Pis"
 
 aboutPage: true
 
