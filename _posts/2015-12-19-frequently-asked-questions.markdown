@@ -4,10 +4,17 @@ date:   2015-12-19 18:18:00
 description: What is this program? What are the alternatives?
 ---
 
+# General
 
-**When you start the server and choose a folder, can you add songs to the folder to be played while its running? Or are all the songs only loaded when the server starts?**
+**What is musicsaur?**
 
-> Songs are only loaded when the server starts. That's a good thing to add though. I'd also like to have better organization of the playlist on the webpage (at least sorted by artist...)
+> *musicsaur* is simply the simplest music synchronization program I know. All you do is run a program and open a browser on the computers that you want to synchronize together. Its fast, easy, and surprisingly good at what it does.
+
+> The name, musicsaur, stands for Music Synchronization And Uniform Replay, which is the jargony way I like to describe musicsaur.
+
+**Is it free?**
+
+> Yes! It's free. Not only that, but its also [open-source](https://github.com/schollz/musicsaur), licensed by the MIT license.
 
 **What are some alternatives to multi-room wifi playback?**
 
@@ -16,3 +23,11 @@ description: What is this program? What are the alternatives?
 > - [Volumio](https://volumio.org/)
 > - [Pulseaudio](http://www.danplanet.com/blog/2014/11/26/multi-room-audio-with-multicast-rtp/)
 > - [Shairport-Sync](https://github.com/mikebrady/shairport-sync)
+
+# Technical
+
+**When you start the server and choose a folder, can you add songs to the folder to be played while its running? Or are all the songs only loaded when the server starts?**
+
+> Songs are only loaded when the server starts. That's a good thing to add though. I'd also like to have better organization of the playlist on the webpage (at least sorted by artist...)
+
+
