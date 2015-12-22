@@ -4,8 +4,6 @@ date:   2015-12-19 18:18:00
 description: What is this program? What are the alternatives?
 ---
 
-# General
-
 **What is musicsaur?**
 
 > *musicsaur* is simply the simplest music synchronization program I know. All you do is run a program and open a browser on the computers that you want to synchronize together. Its fast, easy, and surprisingly good at what it does.
