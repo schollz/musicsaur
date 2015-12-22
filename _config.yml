@@ -16,7 +16,7 @@ disqus_shortname: 'your-disqus-shortname'
 
 # Details for the RSS feed generator
 url:            'http://www.musicsaur.com'
-author:         'MusicSAUR'
+author:         '<i>musicsaur</i>'
 authorTwitter:  'zack_118'
 
 permalink:       /:title/
