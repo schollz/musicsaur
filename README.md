@@ -11,7 +11,8 @@
 
 **Major features include:**
 
-- ?
+- Go version with precompiled libraries for folks that want to unzip and run!
+- Mute button
 
 ---
 
