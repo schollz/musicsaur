@@ -1,5 +1,5 @@
-name: MusicSAUR
-description: Music Synchronization And Uniform Relaying
+name: musicsaur
+description: The simplest music synchronization for multi-room audio
 meta_description: "Your New Jekyll Site, Blogging about stuffs"
 
 aboutPage: true
