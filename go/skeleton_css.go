@@ -32,85 +32,85 @@ var skeleton_css = `/*
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 .container {
   position: relative;
-  width: 100%%;
+  width: 100%;
   max-width: 960px;
   margin: 0 auto;
   padding: 0 20px;
   box-sizing: border-box; }
 .column,
 .columns {
-  width: 100%%;
+  width: 100%;
   float: left;
   box-sizing: border-box; }
 
 /* For devices larger than 400px */
 @media (min-width: 400px) {
   .container {
-    width: 85%%;
+    width: 85%;
     padding: 0; }
 }
 
 /* For devices larger than 550px */
 @media (min-width: 550px) {
   .container {
-    width: 80%%; }
+    width: 80%; }
   .column,
   .columns {
-    margin-left: 4%%; }
+    margin-left: 4%; }
   .column:first-child,
   .columns:first-child {
     margin-left: 0; }
 
   .one.column,
-  .one.columns                    { width: 4.66666666667%%; }
-  .two.columns                    { width: 13.3333333333%%; }
-  .three.columns                  { width: 22%%;            }
-  .four.columns                   { width: 30.6666666667%%; }
-  .five.columns                   { width: 39.3333333333%%; }
-  .six.columns                    { width: 48%%;            }
-  .seven.columns                  { width: 56.6666666667%%; }
-  .eight.columns                  { width: 65.3333333333%%; }
-  .nine.columns                   { width: 74.0%%;          }
-  .ten.columns                    { width: 82.6666666667%%; }
-  .eleven.columns                 { width: 91.3333333333%%; }
-  .twelve.columns                 { width: 100%%; margin-left: 0; }
+  .one.columns                    { width: 4.66666666667%; }
+  .two.columns                    { width: 13.3333333333%; }
+  .three.columns                  { width: 22%;            }
+  .four.columns                   { width: 30.6666666667%; }
+  .five.columns                   { width: 39.3333333333%; }
+  .six.columns                    { width: 48%;            }
+  .seven.columns                  { width: 56.6666666667%; }
+  .eight.columns                  { width: 65.3333333333%; }
+  .nine.columns                   { width: 74.0%;          }
+  .ten.columns                    { width: 82.6666666667%; }
+  .eleven.columns                 { width: 91.3333333333%; }
+  .twelve.columns                 { width: 100%; margin-left: 0; }
 
-  .one-third.column               { width: 30.6666666667%%; }
-  .two-thirds.column              { width: 65.3333333333%%; }
+  .one-third.column               { width: 30.6666666667%; }
+  .two-thirds.column              { width: 65.3333333333%; }
 
-  .one-half.column                { width: 48%%; }
+  .one-half.column                { width: 48%; }
 
   /* Offsets */
   .offset-by-one.column,
-  .offset-by-one.columns          { margin-left: 8.66666666667%%; }
+  .offset-by-one.columns          { margin-left: 8.66666666667%; }
   .offset-by-two.column,
-  .offset-by-two.columns          { margin-left: 17.3333333333%%; }
+  .offset-by-two.columns          { margin-left: 17.3333333333%; }
   .offset-by-three.column,
-  .offset-by-three.columns        { margin-left: 26%%;            }
+  .offset-by-three.columns        { margin-left: 26%;            }
   .offset-by-four.column,
-  .offset-by-four.columns         { margin-left: 34.6666666667%%; }
+  .offset-by-four.columns         { margin-left: 34.6666666667%; }
   .offset-by-five.column,
-  .offset-by-five.columns         { margin-left: 43.3333333333%%; }
+  .offset-by-five.columns         { margin-left: 43.3333333333%; }
   .offset-by-six.column,
-  .offset-by-six.columns          { margin-left: 52%%;            }
+  .offset-by-six.columns          { margin-left: 52%;            }
   .offset-by-seven.column,
-  .offset-by-seven.columns        { margin-left: 60.6666666667%%; }
+  .offset-by-seven.columns        { margin-left: 60.6666666667%; }
   .offset-by-eight.column,
-  .offset-by-eight.columns        { margin-left: 69.3333333333%%; }
+  .offset-by-eight.columns        { margin-left: 69.3333333333%; }
   .offset-by-nine.column,
-  .offset-by-nine.columns         { margin-left: 78.0%%;          }
+  .offset-by-nine.columns         { margin-left: 78.0%;          }
   .offset-by-ten.column,
-  .offset-by-ten.columns          { margin-left: 86.6666666667%%; }
+  .offset-by-ten.columns          { margin-left: 86.6666666667%; }
   .offset-by-eleven.column,
-  .offset-by-eleven.columns       { margin-left: 95.3333333333%%; }
+  .offset-by-eleven.columns       { margin-left: 95.3333333333%; }
 
   .offset-by-one-third.column,
-  .offset-by-one-third.columns    { margin-left: 34.6666666667%%; }
+  .offset-by-one-third.columns    { margin-left: 34.6666666667%; }
   .offset-by-two-thirds.column,
-  .offset-by-two-thirds.columns   { margin-left: 69.3333333333%%; }
+  .offset-by-two-thirds.columns   { margin-left: 69.3333333333%; }
 
   .offset-by-one-half.column,
-  .offset-by-one-half.columns     { margin-left: 52%%; }
+  .offset-by-one-half.columns     { margin-left: 52%; }
 
 }
 
@@ -118,10 +118,10 @@ var skeleton_css = `/*
 /* Base Styles
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 /* NOTE
-html is set to 62.5%% so that all the REM measurements throughout Skeleton
+html is set to 62.5% so that all the REM measurements throughout Skeleton
 are based on 10px sizing. So basically 1.5rem = 15px :) */
 html {
-  font-size: 62.5%%; }
+  font-size: 62.5%; }
 body {
   font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
   line-height: 1.6;
@@ -301,7 +301,7 @@ ul ol,
 ol ol,
 ol ul {
   margin: 1.5rem 0 1.5rem 3rem;
-  font-size: 90%%; }
+  font-size: 90%; }
 li {
   margin-bottom: 1rem; }
 
@@ -311,7 +311,7 @@ li {
 code {
   padding: .2rem .5rem;
   margin: 0 .2rem;
-  font-size: 90%%;
+  font-size: 90%;
   white-space: nowrap;
   background: #F1F1F1;
   border: 1px solid #E1E1E1;
@@ -362,10 +362,10 @@ form {
 /* Utilities
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 .u-full-width {
-  width: 100%%;
+  width: 100%;
   box-sizing: border-box; }
 .u-max-full-width {
-  max-width: 100%%;
+  max-width: 100%;
   box-sizing: border-box; }
 .u-pull-right {
   float: right; }

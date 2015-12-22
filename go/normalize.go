@@ -10,8 +10,8 @@ var normalize_css = `/*! normalize.css v3.0.2 | MIT License | git.io/normalize *
 
 html {
   font-family: sans-serif; /* 1 */
-  -ms-text-size-adjust: 100%%; /* 2 */
-  -webkit-text-size-adjust: 100%%; /* 2 */
+  -ms-text-size-adjust: 100%; /* 2 */
+  -webkit-text-size-adjust: 100%; /* 2 */
 }
 
 /**
@@ -153,7 +153,7 @@ mark {
  */
 
 small {
-  font-size: 80%%;
+  font-size: 80%;
 }
 
 /**
@@ -162,7 +162,7 @@ small {
 
 sub,
 sup {
-  font-size: 75%%;
+  font-size: 75%;
   line-height: 0;
   position: relative;
   vertical-align: baseline;
