@@ -62,12 +62,8 @@ func getPlaybackPositionInSeconds() float64 {
 func SyncRequest(rw http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		//current_song := r.FormValue("current_song")
-		client_timestamp_str :=  r.FormValue("client_timestamp")
-		fmt.Print("client_timestamp2: ")
-		fmt.Println(client_timestamp_str)
-		client_timestamp, _ := strconv.ParseUint(client_timestamp_str,10,64)
-		fmt.Print("client_timestamp: ")
-		fmt.Println(client_timestamp)
+		client_timestamp_str := r.FormValue("client_timestamp")
+		client_timestamp, _ := strconv.ParseUint(client_timestamp_str, 10, 64)
 		data := SyncJSON{
 			Current_song:     statevar.CurrentSong,
 			Client_timestamp: int64(client_timestamp),
@@ -87,6 +83,7 @@ func SyncRequest(rw http.ResponseWriter, r *http.Request) {
 }
 
 func NextSongRequest(rw http.ResponseWriter, r *http.Request) {
+	defer timeTrack(time.Now(), r.RemoteAddr+" /sync")
 	if r.Method == "POST" {
 		skip, _ := strconv.Atoi(r.FormValue("skip"))
 		skipTrack(skip)
