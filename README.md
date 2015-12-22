@@ -13,6 +13,8 @@
 
 - Go version with precompiled libraries for folks that want to unzip and run!
 - Mute button
+- All files served locally (no internet connection needed!)
+- Replaying works now
 
 ---
 
