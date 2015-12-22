@@ -21,8 +21,8 @@ func timeTrack(start time.Time, name string) {
 }
 
 func getTime() (curTime int64) {
-	//curTime = time.Now().UnixNano() / 1000000
-	curTime = time.Since(time.Date(2015, 6, 1, 12, 0, 0, 0, time.UTC)).Nanoseconds() / 1000000
+	curTime = time.Now().UnixNano() / 1000000
+	//curTime = time.Since(time.Date(2015, 6, 1, 12, 0, 0, 0, time.UTC)).Nanoseconds() / 1000000
 	return
 }
 
@@ -62,7 +62,12 @@ func getPlaybackPositionInSeconds() float64 {
 func SyncRequest(rw http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		//current_song := r.FormValue("current_song")
-		client_timestamp, _ := strconv.Atoi(r.FormValue("client_timestamp"))
+		client_timestamp_str :=  r.FormValue("client_timestamp")
+		fmt.Print("client_timestamp2: ")
+		fmt.Println(client_timestamp_str)
+		client_timestamp, _ := strconv.ParseUint(client_timestamp_str,10,64)
+		fmt.Print("client_timestamp: ")
+		fmt.Println(client_timestamp)
 		data := SyncJSON{
 			Current_song:     statevar.CurrentSong,
 			Client_timestamp: int64(client_timestamp),
