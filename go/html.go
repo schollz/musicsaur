@@ -65,13 +65,26 @@ func SyncRequest(rw http.ResponseWriter, r *http.Request) {
 		//current_song := r.FormValue("current_song")
 		client_timestamp_str := r.FormValue("client_timestamp")
 		client_timestamp, _ := strconv.ParseUint(client_timestamp_str, 10, 64)
+		is_muted, _ := strconv.ParseBool(r.FormValue("is_muted"))
+		mute_button_clicked, _ := strconv.ParseBool(r.FormValue("mute_button_clicked"))
+		if mute_button_clicked == true {
+			statevar.LastMuted = getTime()
+			statevar.IsMuted = is_muted
+		}
+
+		if getTime()-statevar.LastMuted < 3000 {
+			mute_button_clicked = true
+			is_muted = statevar.IsMuted
+		}
 		data := SyncJSON{
-			Current_song:     statevar.CurrentSong,
-			Client_timestamp: int64(client_timestamp),
-			Server_timestamp: getTime(),
-			Is_playing:       statevar.IsPlaying,
-			Song_time:        getPlaybackPositionInSeconds(),
-			Song_start_time:  statevar.SongStartTime,
+			Current_song:        statevar.CurrentSong,
+			Client_timestamp:    int64(client_timestamp),
+			Server_timestamp:    getTime(),
+			Is_playing:          statevar.IsPlaying,
+			Song_time:           getPlaybackPositionInSeconds(),
+			Song_start_time:     statevar.SongStartTime,
+			Mute_button_clicked: mute_button_clicked,
+			Is_muted:            is_muted,
 		}
 		b, err := json.Marshal(data)
 		if err != nil {
@@ -96,6 +109,7 @@ func NextSongRequest(rw http.ResponseWriter, r *http.Request) {
 			Song_time:        0,
 			Song_start_time:  0,
 		}
+
 		b, err := json.Marshal(data)
 		if err != nil {
 			panic(err)
@@ -157,6 +171,8 @@ func main() {
 		fmt.Println("*******\n")
 		statevar.IsPlaying = false
 		statevar.SongList = []string{}
+		statevar.LastMuted = 0
+		statevar.IsMuted = false
 	} else {
 		statevar = State{
 			SongMap:          make(map[string]Song),
@@ -166,6 +182,8 @@ func main() {
 			IsPlaying:        false,
 			CurrentSong:      "None",
 			CurrentSongIndex: 0,
+			LastMuted:        0,
+			IsMuted:          false,
 		}
 	}
 
@@ -188,11 +206,6 @@ func main() {
 		html_response = strings.Replace(html_response, "{{ data['check_up_wait_time'] }}", strconv.Itoa(1700), -1)
 		html_response = strings.Replace(html_response, "{{ data['max_sync_lag'] }}", strconv.Itoa(50), -1)
 		html_response = strings.Replace(html_response, "{{ data['message'] }}", "Syncing...", -1)
-		html_response = strings.Replace(html_response, "https://cdnjs.cloudflare.com/ajax/libs/mathjs/2.5.0/math.min.js", "/math.js", -1)
-		html_response = strings.Replace(html_response, "https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js", "/jquery.js", -1)
-		html_response = strings.Replace(html_response, "/static/howler.js", "/howler.js", -1)
-		html_response = strings.Replace(html_response, "/static/normalize.css", "/normalize.css", -1)
-		html_response = strings.Replace(html_response, "/static/skeleton.css", "/skeleton.css", -1)
 		html_response = strings.Replace(html_response, "{{ data['playlist_html'] | safe }}", getPlaylistHTML(), -1)
 		fmt.Fprintf(w, html_response)
 	})
@@ -202,27 +215,27 @@ func main() {
 		w.Header().Set("Content-Type", "audio/mpeg")
 		w.Write([]byte(rawSongData))
 	})
-	mux.HandleFunc("/howler.js", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/static/howler.js", func(w http.ResponseWriter, r *http.Request) {
 		//defer timeTrack(time.Now(), r.RemoteAddr+" /howler.js")
 		w.Header().Set("Content-Type", "text/javascript")
 		w.Write([]byte(howler_js))
 	})
-	mux.HandleFunc("/math.js", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/static/jquery.min.js", func(w http.ResponseWriter, r *http.Request) {
 		//defer timeTrack(time.Now(), r.RemoteAddr+" /math.js")
 		w.Header().Set("Content-Type", "text/javascript")
 		w.Write([]byte(jquery_js))
 	})
-	mux.HandleFunc("/jquery.js", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/static/math.min.js", func(w http.ResponseWriter, r *http.Request) {
 		//defer timeTrack(time.Now(), r.RemoteAddr+" /jquery.js")
 		w.Header().Set("Content-Type", "text/javascript")
 		w.Write([]byte(math_js))
 	})
-	mux.HandleFunc("/skeleton.css", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/static/skeleton.css", func(w http.ResponseWriter, r *http.Request) {
 		//defer timeTrack(time.Now(), r.RemoteAddr+" /skeleton.css")
 		w.Header().Set("Content-Type", "text/css")
 		w.Write([]byte(skeleton_css))
 	})
-	mux.HandleFunc("/normalize.css", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/static/normalize.css", func(w http.ResponseWriter, r *http.Request) {
 		//defer timeTrack(time.Now(), r.RemoteAddr+" /normalize.css")
 		w.Header().Set("Content-Type", "text/css")
 		w.Write([]byte(normalize_css))

@@ -40,17 +40,21 @@ type State struct {
 	IsPlaying        bool
 	CurrentSong      string
 	CurrentSongIndex int
+	LastMuted        int64
+	IsMuted          bool
 }
 
 // Data for Song
 
 type SyncJSON struct {
-	Current_song     string  `json:"current_song"`
-	Client_timestamp int64   `json:"client_timestamp"`
-	Server_timestamp int64   `json:"server_timestamp"`
-	Is_playing       bool    `json:"is_playing"`
-	Song_time        float64 `json:"song_time"`
-	Song_start_time  int64   `json:"next_song"`
+	Current_song        string  `json:"current_song"`
+	Client_timestamp    int64   `json:"client_timestamp"`
+	Server_timestamp    int64   `json:"server_timestamp"`
+	Is_playing          bool    `json:"is_playing"`
+	Song_time           float64 `json:"song_time"`
+	Song_start_time     int64   `json:"next_song"`
+	Mute_button_clicked bool    `json:"mute_button_clicked"`
+	Is_muted            bool    `json:"is_muted"`
 }
 
 type Song struct {
@@ -69,30 +73,6 @@ type IndexData struct {
 	MaxSyncLag      int64
 }
 
-var index_html2 = `<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-
-    <title>MusicSAUR</title>
-    <meta content="width=device-width, initial-scale=1" name="viewport">
-    <meta content="no-cache" http-equiv="Cache-control">
-    <meta content="-1" http-equiv="Expires">
-    <script src="/math.js" type="text/javascript">
-    </script>
-    <script src="/jquery.js" type="text/javascript">
-    </script>
-    <script src="/howler.js" type="text/javascript">
-    </script>
-</head>
-<body>
-<audio controls preload="auto" src="./sound.mp3" id="sound" type="audio/mpeg">
-  Your browser does not support the audio tag.
-</audio>
-</body>
-</html>
-`
-
 var index_html = `<!DOCTYPE html>
 <html>
 <head>
@@ -102,9 +82,9 @@ var index_html = `<!DOCTYPE html>
     <meta content="width=device-width, initial-scale=1" name="viewport">
     <meta content="no-cache" http-equiv="Cache-control">
     <meta content="-1" http-equiv="Expires">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/2.5.0/math.min.js" type="text/javascript">
+    <script src="/static/math.min.js" type="text/javascript">
     </script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js">
+    <script src="/static/jquery.min.js">
     </script>
     <script src="/static/howler.js" type="text/javascript">
     </script>
@@ -121,7 +101,7 @@ var index_html = `<!DOCTYPE html>
   float: left; }
     </style>
     <script>
-
+Howler.mobileAutoEnable = true;
 var sound = new Howl({
   src: ['/sound.mp3?{{ data['random_integer'] }}'],
   preload: true
@@ -144,6 +124,7 @@ var check_up_counter = 0;
 var MAX_SYNC_LAG = {{ data['max_sync_lag'] }};
 
 // GLOBALS
+var is_muted = false
 var lagTimes = [];
 var tryWait = 0;
 var computeTimes = [];
@@ -182,7 +163,9 @@ for (var i = 0; i < 23; i++) {
 // Send the data using post
     var posting = $.post('/sync', {
         'client_timestamp': time(),
-        'current_song': current_song
+        'current_song': current_song,
+        'is_muted': false,
+        'mute_button_clicked': false,
     });
 
     // Put the results in a div
@@ -243,11 +226,11 @@ for (var i = 0; i < 23; i++) {
           clearTimeout(secondTimeout0);
           secondTimeout0 = setTimeout(function() {
               console.log('playing song');
-              current_song_name = current_song.split(":");
+              current_song_name = current_song.split("-");
               current_song_name = current_song_name[current_song_name.length-1];
               $("div.info1").html('Loading <b>' + current_song_name + '</b>...');
               mainInterval = setInterval(function(){
-                checkIfSkipped();
+                checkIfSkipped(false);
               }, CHECK_UP_WAIT_TIME);
               sound.play();
               if (data['is_playing']==true) {
@@ -272,13 +255,15 @@ for (var i = 0; i < 23; i++) {
 }
 
 
-function checkIfSkipped() {
+function checkIfSkipped(mute_button_click) {
 
     
     // Send the data using post
     var posting = $.post('/sync', {
         'client_timestamp': time(),
-        'current_song': current_song
+        'current_song': current_song,
+        'is_muted': !is_muted,
+        'mute_button_clicked': mute_button_click,
     });
 
     // Put the results in a div
@@ -309,19 +294,30 @@ function checkIfSkipped() {
             runningDiff = runningDiff + diff;
             var serverSongTime = data['song_time']+time_delta2/1000.0;
             console.log('[' + Date.now() + '] ' + ': NOT in sync (>' + MAX_SYNC_LAG.toString() + ' ms)')
+
+              if (runningDiff<-20000) {
+              runningDiff = 0
+            } 
             console.log('Browser:  ' + mySongTime.toString() + '\nServer: ' + serverSongTime.toString() + '\nDiff: ' + (diff*1000).toString() + '\nMean half-latency: ' + true_server_time_delta.toString() +  '\nMeasured half-latency: ' + time_delta2.toString() + '\nrunningDiff: ' + (runningDiff*1000).toString() + '\nSeeking to: ' + (serverSongTime+runningDiff).toString());
             $("div.info1").html('Muted <b>' + current_song_name + '</b> (out of sync)');
-            
+
                 console.log(JSON.stringify(data));
                 sound.seek(serverSongTime+runningDiff);
+
           } else {
             console.log('[' + Date.now() + '] ' + ': in sync (|' + (diff*1000).toString() + '|<' + MAX_SYNC_LAG.toString() + ' ms)')
             $("div.info1").html('Playing <b>' + current_song_name + '</b>');
             CHECK_UP_ITERATION = parseInt(30.0/(CHECK_UP_WAIT_TIME/1000.0)); // every 30 seconds
             tryWait = 0;
             check_up_counter = 0;
-            sound.volume(1.0);
+            if (data['mute_button_clicked']==true) {
+              setMute(data['is_muted'])   
+            }
           } 
+        }
+      } else {
+        if (data['mute_button_clicked']==true) {
+          setMute(data['is_muted'])   
         }
       }
     });
@@ -329,7 +325,18 @@ function checkIfSkipped() {
 }
 
 
+function setMute(mute_on) {
+  is_muted = mute_on;
+  if (is_muted == true) {
+    $('a[type=mute]').css("background-color","blue");
+    sound.volume(0.0)
+    $("div.info1").html('Muted <b>' + current_song_name + '</b>');
+  } else {
+    $('a[type=mute]').css("background-color","white");
+    sound.volume(1.0)
+  }
 
+}
 
 $(document).ready(function(){
 $('a[type=controls]').click(function() {
@@ -348,6 +355,9 @@ $('a[type=controls]').click(function() {
         console.log('reloading page')
     });
 
+});
+$('a[type=mute]').click(function() {
+    checkIfSkipped(true);
 });
 
 
@@ -500,14 +510,14 @@ makeRequests();
 
 
             <span style="vertical-align: middle; display: table-cell;">
-            <h1  style="position:relative;bottom:0"><i>musicsaur</i><br><small style="font-size: 50%%;">&nbsp;version 1.2</small></h1>
+            <h1  style="position:relative;bottom:0"><i>musicsaur</i><br><small style="font-size: 50%%;">&nbsp;version 1.3</small></h1>
         </span>
     </div>
 
 
         <div class="row">
             <div class="seven columns">
-                <a class="button" data-skip="-3" type="controls">Previous</a> <a class="button" data-skip="-2" type="controls">Replay</a> <a class="button" data-skip="-1" type="controls">Next</a>
+               <a class="button" type="mute">Mute</a>  <a class="button" data-skip="-3" type="controls">Previous</a> <a class="button" data-skip="-2" type="controls">Replay</a> <a class="button" data-skip="-1" type="controls">Next</a>
             </div>
 
 
