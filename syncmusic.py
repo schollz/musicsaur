@@ -101,6 +101,7 @@ def nextSong(delay, skip):
             or not state['is_initialized']): 
         state['is_initialized'] = True
         state['last_activated'] = time.time()
+        state['is_playing'] = False
 
         if skip < 0:
             state['current_song'] += skip + 2
@@ -109,7 +110,7 @@ def nextSong(delay, skip):
         if state['current_song'] >= len(state['ordering']):
             state['current_song'] = 0
         if state['current_song'] < 0:
-            state['current_song'] = len(state['orering']) - 1
+            state['current_song'] = len(state['ordering']) - 1
         current_song_path = state['ordering'][state['current_song']]
 
         shutil.copy(current_song_path,os.path.join(os.getcwd(),'static/sound.mp3'))
@@ -202,6 +203,14 @@ class SyncHandler(tornado.web.RequestHandler):
         data = {}
         data['client_timestamp'] = int(self.get_argument('client_timestamp'))
         data['server_timestamp'] = getTime()
+        data['mute_button_clicked'] = json.loads(self.get_argument('mute_button_clicked'))
+        if data['mute_button_clicked']:
+            print("MUTE BUTTON CLICKED")
+            state['is_muted'] = json.loads(self.get_argument('is_muted'))
+            state['last_muted'] = getTime()
+        if getTime() - state['last_muted'] < 3000:
+            data['mute_button_clicked'] = True
+        data['is_muted'] = state['is_muted']
         data['next_song'] = state['next_song_time']
         if state['is_playing']:
             data['is_playing'] = (state['currently_playing_songname'] == self.get_argument('current_song'))
@@ -272,6 +281,8 @@ if __name__ == "__main__":
     state['is_initialized'] = False
     state['last_activated'] = 0
     state['debug'] = True
+    state['is_muted'] = False
+    state['last_muted'] = 0
 
     folders_with_music = parser.get('server_parameters','music_folder').split(',')
     for folder_with_music in folders_with_music:
