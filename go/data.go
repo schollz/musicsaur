@@ -2,13 +2,47 @@ package main
 
 import "sort"
 
-var songMap map[string]Song
-var songList sort.StringSlice
-var songStartTime int64
-var isPlaying bool
-var currentSong string
-var currentSongIndex int
+var conf tomlConfig
+var statevar State
 var rawSongData []byte
+
+// Data for configuration file
+
+type tomlConfig struct {
+	ClientData       clientInfo  `toml:"raspberry_pis"`
+	ClientParameters clientParms `toml:"client_parameters"`
+	ServerParameters serverParms `toml:"server_parameters"`
+}
+
+type clientInfo struct {
+	Clients string `toml:"clients"`
+}
+
+type clientParms struct {
+	CheckUpWaitTime int `toml:"check_up_wait_time"`
+	MaxSyncLag      int `toml:"max_sync_lag"`
+}
+
+type serverParms struct {
+	MusicFolder         string `toml:"music_folder"`
+	Port                int    `toml:"port"`
+	TimeToNextSong      int    `toml:"time_to_next_song"`
+	TimeToDisallowSkips int    `toml:"time_to_disallow_skips"`
+}
+
+// Data for state
+
+type State struct {
+	SongMap          map[string]Song
+	SongList         sort.StringSlice
+	PathList         map[string]bool
+	SongStartTime    int64
+	IsPlaying        bool
+	CurrentSong      string
+	CurrentSongIndex int
+}
+
+// Data for Song
 
 type SyncJSON struct {
 	Current_song     string  `json:"current_song"`

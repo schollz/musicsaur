@@ -3,10 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/BurntSushi/toml"
 	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -24,19 +26,19 @@ func getTime() (curTime int64) {
 
 func songControl(millisecondWait int64, is_playing bool, text string, song string, start_next bool) {
 	time.Sleep(time.Duration(millisecondWait) * time.Millisecond)
-	if song == currentSong {
+	if song == statevar.CurrentSong {
 		log.Printf(song + " " + text)
-		isPlaying = is_playing
+		statevar.IsPlaying = is_playing
 		if start_next == true {
-			skipTrack(1)
+			skipTrack(-1)
 		}
 	}
 }
 
 func getPlaylistHTML() (playlist_html string) {
 	playlist_html = ""
-	for i, k := range songList {
-		if currentSong != k {
+	for i, k := range statevar.SongList {
+		if statevar.CurrentSong != k {
 			playlist_html += "<a type='controls' data-skip='" + strconv.Itoa(i) + "'>" + k + "</a><br>\n"
 		} else {
 			playlist_html += "<a type='controls' data-skip='" + strconv.Itoa(i) + "'><b>" + k + "</b></a><br>\n"
@@ -47,8 +49,8 @@ func getPlaylistHTML() (playlist_html string) {
 }
 
 func getPlaybackPositionInSeconds() float64 {
-	position := float64(getTime()-songStartTime) / 1000.0
-	if isPlaying == true && position > 0 {
+	position := float64(getTime()-statevar.SongStartTime) / 1000.0
+	if statevar.IsPlaying == true && position > 0 {
 		return position
 	} else {
 		return 0.0
@@ -60,12 +62,12 @@ func SyncRequest(rw http.ResponseWriter, r *http.Request) {
 		//current_song := r.FormValue("current_song")
 		client_timestamp, _ := strconv.Atoi(r.FormValue("client_timestamp"))
 		data := SyncJSON{
-			Current_song:     currentSong,
+			Current_song:     statevar.CurrentSong,
 			Client_timestamp: int64(client_timestamp),
 			Server_timestamp: getTime(),
-			Is_playing:       isPlaying,
+			Is_playing:       statevar.IsPlaying,
 			Song_time:        getPlaybackPositionInSeconds(),
-			Song_start_time:  songStartTime,
+			Song_start_time:  statevar.SongStartTime,
 		}
 		b, err := json.Marshal(data)
 		if err != nil {
@@ -100,89 +102,109 @@ func NextSongRequest(rw http.ResponseWriter, r *http.Request) {
 
 func skipTrack(song_index int) {
 	if song_index < 0 {
-		currentSongIndex += song_index + 2
+		statevar.CurrentSongIndex += song_index + 2
 	} else {
-		currentSongIndex = song_index
+		statevar.CurrentSongIndex = song_index
 	}
-	song := songList[currentSongIndex]
-	rawSongData, _ = ioutil.ReadFile(songMap[song].Path)
-	currentSong = song
-	songStartTime = getTime() + 11000
-	go songControl(songStartTime-getTime()-3000, false, "3", song, false)
-	go songControl(songStartTime-getTime()-2000, false, "2", song, false)
-	go songControl(songStartTime-getTime()-1000, false, "1", song, false)
-	go songControl(songStartTime-getTime(), true, "Playing "+song, song, false)
-	go songControl(songStartTime-getTime()+songMap[song].Length, false, "Stopping "+song, song, true)
+	song := statevar.SongList[statevar.CurrentSongIndex]
+	rawSongData, _ = ioutil.ReadFile(statevar.SongMap[song].Path)
+	statevar.CurrentSong = song
+	statevar.SongStartTime = getTime() + 11000
+	statevar.IsPlaying = false
+	b, _ := json.Marshal(statevar)
+	ioutil.WriteFile("state.json", b, 0644)
+	go songControl(statevar.SongStartTime-getTime()-3000, false, "3", song, false)
+	go songControl(statevar.SongStartTime-getTime()-2000, false, "2", song, false)
+	go songControl(statevar.SongStartTime-getTime()-1000, false, "1", song, false)
+	go songControl(statevar.SongStartTime-getTime(), true, "Playing "+song, song, false)
+	go songControl(statevar.SongStartTime-getTime()+statevar.SongMap[song].Length, false, "Stopping "+song, song, true)
 }
 
 func main() {
-	currentSong = "None"
-	currentSongIndex = 0
-	isPlaying = false
-
-	songMap = make(map[string]Song)
-	loadMp3s("/home/zack/Music/Damien Rice/")
-	fmt.Printf("%v\n", songMap)
-
-	songList = []string{}
-	for k, _ := range songMap {
-		songList = append(songList, k)
+	// Load configuration parameters
+	if _, err := toml.DecodeFile("./config.cfg", &conf); err != nil {
+		// handle error
 	}
-	songList.Sort()
-	fmt.Println(songList)
+	fmt.Printf("%v", conf.ServerParameters.MusicFolder)
 
-	skipTrack(0)
+	// Load state
+	if _, err := os.Stat("state.json"); err == nil {
+		dat, err := ioutil.ReadFile("state.json")
+		if err != nil {
+			panic(err)
+		}
+		json.Unmarshal(dat, &statevar)
+		fmt.Println("\n*******")
+		fmt.Println(statevar.CurrentSong)
+		fmt.Println("*******\n")
+		statevar.IsPlaying = false
+		statevar.SongList = []string{}
+	} else {
+		statevar = State{
+			SongMap:          make(map[string]Song),
+			SongList:         []string{},
+			PathList:         make(map[string]bool),
+			SongStartTime:    0,
+			IsPlaying:        false,
+			CurrentSong:      "None",
+			CurrentSongIndex: 0,
+		}
+	}
+
+	// Load Mp3s
+	loadMp3s(conf.ServerParameters.MusicFolder)
+
+	// Load song list
+	for k, _ := range statevar.SongMap {
+		statevar.SongList = append(statevar.SongList, k)
+	}
+	statevar.SongList.Sort()
+
+	skipTrack(statevar.CurrentSongIndex)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		defer timeTrack(time.Now(), r.RemoteAddr+" /")
+		//defer timeTrack(time.Now(), r.RemoteAddr+" /")
 		html_response := index_html
 		html_response = strings.Replace(html_response, "{{ .RandomInteger }}", strconv.Itoa(rand.Intn(10000)), -1)
 		html_response = strings.Replace(html_response, "{{ .CheckupWaitTime }}", strconv.Itoa(1700), -1)
 		html_response = strings.Replace(html_response, "{{ .MaxSyncLag }}", strconv.Itoa(50), -1)
 		html_response = strings.Replace(html_response, "{{ .PlaylistHTML }}", getPlaylistHTML(), -1)
-		html_response = strings.Replace(html_response, "{{ .Message }}", "hi", -1)
+		html_response = strings.Replace(html_response, "{{ .Message }}", "Syncing...", -1)
 		fmt.Fprintf(w, html_response)
 	})
 
 	http.HandleFunc("/sound.mp3", func(w http.ResponseWriter, r *http.Request) {
 		defer timeTrack(time.Now(), r.RemoteAddr+" /sound.mp3")
-		log.Println("TESTING")
 		w.Header().Set("Content-Type", "audio/mpeg")
 		w.Write([]byte(rawSongData))
-		// file, err := os.Open("./sound.mp3")
-		// if err != nil {
-		// 	panic(err)
-		// }
-		// defer file.Close()
-		// http.ServeContent(w, r, "/static/test.mp3", time.Now(), file)
-
 	})
 	http.HandleFunc("/howler.js", func(w http.ResponseWriter, r *http.Request) {
-		defer timeTrack(time.Now(), r.RemoteAddr+" /howler.js")
+		//defer timeTrack(time.Now(), r.RemoteAddr+" /howler.js")
 		w.Header().Set("Content-Type", "text/javascript")
 		w.Write([]byte(howler_js))
 	})
 	http.HandleFunc("/math.js", func(w http.ResponseWriter, r *http.Request) {
-		defer timeTrack(time.Now(), r.RemoteAddr+" /math.js")
+		//defer timeTrack(time.Now(), r.RemoteAddr+" /math.js")
 		w.Header().Set("Content-Type", "text/javascript")
 		w.Write([]byte(jquery_js))
 	})
 	http.HandleFunc("/jquery.js", func(w http.ResponseWriter, r *http.Request) {
-		defer timeTrack(time.Now(), r.RemoteAddr+" /jquery.js")
+		//defer timeTrack(time.Now(), r.RemoteAddr+" /jquery.js")
 		w.Header().Set("Content-Type", "text/javascript")
 		w.Write([]byte(math_js))
 	})
 	http.HandleFunc("/skeleton.css", func(w http.ResponseWriter, r *http.Request) {
-		defer timeTrack(time.Now(), r.RemoteAddr+" /skeleton.css")
+		//defer timeTrack(time.Now(), r.RemoteAddr+" /skeleton.css")
 		w.Header().Set("Content-Type", "text/css")
 		w.Write([]byte(skeleton_css))
 	})
 	http.HandleFunc("/normalize.css", func(w http.ResponseWriter, r *http.Request) {
-		defer timeTrack(time.Now(), r.RemoteAddr+" /normalize.css")
+		//defer timeTrack(time.Now(), r.RemoteAddr+" /normalize.css")
 		w.Header().Set("Content-Type", "text/css")
 		w.Write([]byte(normalize_css))
 	})
 	http.HandleFunc("/sync", SyncRequest)
+	http.HandleFunc("/nextsong", NextSongRequest)
 
 	panic(http.ListenAndServe(":5000", nil))
 }

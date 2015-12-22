@@ -24,9 +24,12 @@ func loadMp3s(path string) {
 
 	for _, file := range fileList {
 		if filepath.Ext(file) == ".mp3" {
-			fmt.Println(file)
-			s := getMp3Info(file)
-			songMap[s.Fullname] = s
+			if !statevar.PathList[file] {
+				fmt.Println(file)
+				s := getMp3Info(file)
+				statevar.PathList[file] = true
+				statevar.SongMap[s.Fullname] = s
+			}
 		}
 	}
 }
