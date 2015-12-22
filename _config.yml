@@ -1,25 +1,25 @@
-name: Your New Jekyll Site
-description: Blogging about stuffs
+name: MusicSAUR
+description: Music Synchronization And Uniform Relaying
 meta_description: "Your New Jekyll Site, Blogging about stuffs"
 
 aboutPage: true
 
 markdown: redcarpet
 highlighter: pygments
-
+gems: [jekyll-paginate]
 paginate: 20
 baseurl: /
-domain_name: 'http://yourblog-domain.com'
+domain_name: 'http://www.musicsaur.com'
 google_analytics: 'UA-XXXXXXXX-X'
 disqus: false
 disqus_shortname: 'your-disqus-shortname'
 
 # Details for the RSS feed generator
-url:            'http://your-blog-url.example.com'
-author:         'Your Name'
-authorTwitter:  'YourTwitterUsername'
+url:            'http://www.musicsaur.com'
+author:         'MusicSAUR'
+authorTwitter:  'zack_118'
 
-permalink:       /:year/:title/
+permalink:       /:title/
 
 defaults:
     -

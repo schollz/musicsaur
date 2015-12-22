@@ -1,7 +1,7 @@
 ---
-title:  "Welcome to Jekyll!"
+title:  "MusicSAUR website"
 date:   2013-11-10 10:18:00
-description: Thriller Comedy Horror
+description: New website to keep you informed
 ---
 
 You'll find this post in your `_posts` directory - edit this post and re-build (or run with the `-w` switch) to see your changes!
