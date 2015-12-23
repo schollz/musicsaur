@@ -231,6 +231,8 @@ function checkIfSkipped(mute_button_click) {
 
                 console.log(JSON.stringify(data));
                 sound.seek(serverSongTime+runningDiff);
+                sound.seek(serverSongTime+runningDiff);
+                sound.seek(serverSongTime+runningDiff);
 
           } else {
             console.log('[' + Date.now() + '] ' + ': in sync (|' + (diff*1000).toString() + '|<' + MAX_SYNC_LAG.toString() + ' ms)')
@@ -246,17 +248,13 @@ function checkIfSkipped(mute_button_click) {
             } else {
               sound.volume(1.0)
             }
+            sound.volume(1.0)
 
           } 
         }
       } else {
         if (data['mute_button_clicked']==true) {
-          setMute(data['is_muted'])   
-        }
-        if (is_muted==true) {
-          sound.volume(0.0)
-        } else {
-          sound.volume(1.0)
+           setMute(data['is_muted'])   
         }
       }
     });
@@ -269,9 +267,11 @@ function setMute(mute_on) {
   if (is_muted == true) {
     $('a[type=mute]').css("background-color","blue");
     $("div.info1").html('Muted <b>' + current_song_name + '</b>');
+    sound.volume(0.0)
   } else {
     $('a[type=mute]').css("background-color","white");
     $("div.info1").html('Playing <b>' + current_song_name + '</b>...');
+    sound.volume(1.0)
   }
 
 }

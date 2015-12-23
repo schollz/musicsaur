@@ -199,8 +199,8 @@ func main() {
 		//defer timeTrack(time.Now(), r.RemoteAddr+" /")
 		html_response := index_html
 		html_response = strings.Replace(html_response, "{{ data['random_integer'] }}", strconv.Itoa(rand.Intn(10000)), -1)
-		html_response = strings.Replace(html_response, "{{ data['check_up_wait_time'] }}", strconv.Itoa(1700), -1)
-		html_response = strings.Replace(html_response, "{{ data['max_sync_lag'] }}", strconv.Itoa(50), -1)
+		html_response = strings.Replace(html_response, "{{ data['check_up_wait_time'] }}", strconv.Itoa(conf.Client.CheckupWaitTime), -1)
+		html_response = strings.Replace(html_response, "{{ data['max_sync_lag'] }}", strconv.Itoa(conf.Client.MaxSyncLag), -1)
 		html_response = strings.Replace(html_response, "{{ data['message'] }}", "Syncing...", -1)
 		html_response = strings.Replace(html_response, "{{ data['playlist_html'] | safe }}", getPlaylistHTML(), -1)
 		fmt.Fprintf(w, html_response)
@@ -240,10 +240,7 @@ func main() {
 	mux.HandleFunc("/nextsong", NextSongRequest)
 	//http.ListenAndServe(":5000", nil)
 
-	ip, err := externalIP()
-	if err != nil {
-		fmt.Println(err)
-	}
+	ip := GetLocalIP()
 
 	port := strconv.Itoa(conf.Server.Port)
 
@@ -255,7 +252,15 @@ func main() {
 
 	for _, k := range conf.Autostart {
 		fmt.Println(k)
-		response, err := runSSHCommand(k, "ps aux")
+		response, err := runSSHCommand(k, "pkill -9 midori </dev/null > log 2>&1 &")
+		fmt.Println(response)
+		fmt.Println(err)
+	}
+	for _, k := range conf.Autostart {
+		fmt.Println(k)
+		cmd := "xinit /usr/bin/midori -a http://" + ip + ":" + port + "/ </dev/null > log 2>&1 &"
+		fmt.Println(cmd)
+		response, err := runSSHCommand(k, cmd)
 		fmt.Println(response)
 		fmt.Println(err)
 	}

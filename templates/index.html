@@ -250,11 +250,6 @@ function checkIfSkipped(mute_button_click) {
         if (data['mute_button_clicked']==true) {
           setMute(data['is_muted'])   
         }
-        if (is_muted==true) {
-          sound.volume(0.0)
-        } else {
-          sound.volume(1.0)
-        }
       }
     });
 
@@ -266,9 +261,11 @@ function setMute(mute_on) {
   if (is_muted == true) {
     $('a[type=mute]').css("background-color","blue");
     $("div.info1").html('Muted <b>' + current_song_name + '</b>');
+    sound.volume(0.0)
   } else {
     $('a[type=mute]').css("background-color","white");
     $("div.info1").html('Playing <b>' + current_song_name + '</b>...');
+    sound.volume(1.0)
   }
 
 }
