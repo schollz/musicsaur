@@ -27,15 +27,19 @@ func loadMp3s(path string) {
 		if filepath.Ext(file) == ".mp3" {
 			if !statevar.PathList[file] {
 				fmt.Println(file)
-				s := getMp3Info(file)
-				statevar.PathList[file] = true
-				statevar.SongMap[s.Path] = s
+				s, err := getMp3Info(file)
+				if err != nil {
+					fmt.Println("Couldn't get ID3 for " + file + ", skipping...")
+				} else {
+					statevar.PathList[file] = true
+					statevar.SongMap[s.Path] = s
+				}
 			}
 		}
 	}
 }
 
-func getMp3Info(path string) Song {
+func getMp3Info(path string) (Song, error) {
 	defer timeTrack(time.Now(), "getMp3Info")
 	file, err := os.Open(path)
 	if err != nil {
@@ -51,7 +55,14 @@ func getMp3Info(path string) Song {
 
 	tags, err := id3.ReadFile(file)
 	if err != nil {
-		panic(err)
+		return Song{
+			Fullname: "none",
+			Title:    "none",
+			Artist:   "none",
+			Album:    "none",
+			Path:     "none",
+			Length:   0,
+		}, err
 	}
 	title := tags["title"]
 	artist := tags["artist"]
@@ -68,7 +79,7 @@ func getMp3Info(path string) Song {
 		Album:    album,
 		Path:     path,
 		Length:   getMp3Length(path),
-	}
+	}, nil
 }
 
 func getMp3Length(path string) (totalTime int64) {
