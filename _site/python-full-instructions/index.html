@@ -41,11 +41,11 @@
 
 <p>First log into both of your <code>pi1</code> using</p>
 
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash">ssh pi1@pi1.ip.address</code></pre></figure>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">ssh pi1@pi1.ip.address</code></pre></div>
 
 <p>and install the midori webbrowser using</p>
 
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash">sudo apt-get install midori</code></pre></figure>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">sudo apt-get install midori</code></pre></div>
 
 <p>Repeat for <code>pi2</code>.</p>
 
@@ -53,10 +53,10 @@
 
 <p>Now log back into <code>pi1</code> and run the following to install musicsaur:</p>
 
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash">sudo pip install setuptools
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">sudo pip install setuptools
 git clone https://github.com/schollz/musicsaur.git
 <span class="nb">cd </span>musicsaur
-sudo python setup.py install</code></pre></figure>
+sudo python setup.py install</code></pre></div>
 
 <h2>Configure</h2>
 
@@ -65,22 +65,22 @@ sudo python setup.py install</code></pre></figure>
 </code></pre></div>
 <p>and then edit line #16 to</p>
 
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">clients</span> <span class="o">=</span> pi1@127.0.0.1,pi2@pi2.ip.address</code></pre></figure>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">clients</span> <span class="o">=</span> pi1@127.0.0.1,pi2@pi2.ip.address</code></pre></div>
 
 <p>where <code>pi2.ip.address</code> is the local IP addresses of your other pi. Now, still logged in to the pi1, you need to transfer a ssh key so you don&#39;t have to type a password in to start up music on these pis. To do this just type the following:</p>
 
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash">ssh-keygen</code></pre></figure>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">ssh-keygen</code></pre></div>
 
 <p>Press enter at each prompt. Now, from the same pi1 enter the following and type the requested password for each pi when it prompts:</p>
 
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash">ssh-copy-id pi1@127.0.0.1
-ssh-copy-id pi2@pi2.ip.address</code></pre></figure>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">ssh-copy-id pi1@127.0.0.1
+ssh-copy-id pi2@pi2.ip.address</code></pre></div>
 
 <h2>Run it!</h2>
 
 <p>Now that you have uploaded your keys to each of your pi from the server pi you can have automatic SSH access. Now, still logged into to the server pi1, just type the following</p>
 
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash">python syncmusic.py</code></pre></figure>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">python syncmusic.py</code></pre></div>
 
 <p>It will show an address that you can goto on your phone/computer to control and play the music. It will also automatically start up the Raspberry Pis browsers and they should start playing music.</p>
 
@@ -88,15 +88,15 @@ ssh-copy-id pi2@pi2.ip.address</code></pre></figure>
 
 <p>If you want to run it and log off, you can use nohup mode:</p>
 
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash">nohup python syncmusic.py <span class="p">&amp;</span></code></pre></figure>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">nohup python syncmusic.py <span class="p">&amp;</span></code></pre></div>
 
 <p>which can be killed with</p>
 
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash">pkill -9 python</code></pre></figure>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">pkill -9 python</code></pre></div>
 
 <p>To check whether the Raspberry Pis are working, simply ssh back into them and use</p>
 
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash">tail -f ~/log</code></pre></figure>
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">tail -f ~/log</code></pre></div>
 
 <p>to monitor what is going on.</p>
 
@@ -146,6 +146,23 @@ ssh-copy-id pi2@pi2.ip.address</code></pre></figure>
 
 
 <!-- Archive post list -->
+
+    <ul id="post-list" class="archive readmore">
+        <h3>Read more</h3>
+        
+            <li>
+                <a href="/musicsaur-download/">Musicsaur simple setup<aside class="dates">Dec 22</aside></a>
+            </li>
+        
+            <li>
+                <a href="/frequently-asked-questions/">Frequently Asked Questions<aside class="dates">Dec 19</aside></a>
+            </li>
+        
+            <li>
+                <a href="/python-full-instructions/">Musicsaur setup full instructions [Python]<aside class="dates">Dec 18</aside></a>
+            </li>
+        
+    </ul>
 
 
 

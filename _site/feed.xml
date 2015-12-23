@@ -7,6 +7,29 @@
     <atom:link href="http://www.musicsaur.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>Musicsaur simple setup</title>
+        
+        
+          <description>&lt;style&gt;
+a.cta3 {
+    background: #5badf0;
+    color: #fff;
+    margin-left: 12px;
+    padding: 8px 12px;
+    font-size: 13px;
+    /*font-weight: bold;*/
+    line-height: 1.35;
+    border-radius: 3px;
+}
+&lt;/style&gt;
+</description>
+        
+        <pubDate>Tue, 22 Dec 2015 13:18:00 -0500</pubDate>
+        <link>http://www.musicsaur.com/musicsaur-download/</link>
+        <guid isPermaLink="true">http://www.musicsaur.com/musicsaur-download/</guid>
+      </item>
+    
+      <item>
         <title>Frequently Asked Questions</title>
         
         

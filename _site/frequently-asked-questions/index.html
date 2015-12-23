@@ -55,13 +55,25 @@
 </ul>
 </blockquote>
 
-<h1>Technical</h1>
-
 <p><strong>When you start the server and choose a folder, can you add songs to the folder to be played while its running? Or are all the songs only loaded when the server starts?</strong></p>
 
 <blockquote>
 <p>Songs are only loaded when the server starts. That&#39;s a good thing to add though. I&#39;d also like to have better organization of the playlist on the webpage (at least sorted by artist...)</p>
 </blockquote>
+
+<p><strong>How come I don&#39;t hear anything?</strong></p>
+
+<blockquote>
+<p>If you don&#39;t hear anything, the client is probably trying to synchronize. The browser automatically mutes when it goes out of sync to avoid the headache caused by mis-aligned audio. You can see synchronization progress in <a href="https://webmasters.stackexchange.com/questions/8525/how-to-open-the-javascript-console-in-different-browsers">your browser console</a></p>
+</blockquote>
+
+<p><strong>Does this work on a phone?</strong></p>
+
+<blockquote>
+<p>Yes, at least for Chrome on Android. To have it work, <a href="http://android.stackexchange.com/questions/59134/enable-autoplay-html5-video-in-chrome">you need change one of the flags in chrome to allow audio without gestures</a>. To do this, copy and paste this into your Chrome browser:</p>
+</blockquote>
+
+<div class="highlight"><pre><code class="language-bash" data-lang="bash">chrome://flags/#disable-gesture-requirement-for-media-playback</code></pre></div>
 
     </section>
 </article>
@@ -109,6 +121,23 @@
 
 
 <!-- Archive post list -->
+
+    <ul id="post-list" class="archive readmore">
+        <h3>Read more</h3>
+        
+            <li>
+                <a href="/musicsaur-download/">Musicsaur simple setup<aside class="dates">Dec 22</aside></a>
+            </li>
+        
+            <li>
+                <a href="/frequently-asked-questions/">Frequently Asked Questions<aside class="dates">Dec 19</aside></a>
+            </li>
+        
+            <li>
+                <a href="/python-full-instructions/">Musicsaur setup full instructions [Python]<aside class="dates">Dec 18</aside></a>
+            </li>
+        
+    </ul>
 
 
 
