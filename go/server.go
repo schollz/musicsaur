@@ -40,10 +40,10 @@ func songControl(millisecondWait int64, is_playing bool, text string, song strin
 func getPlaylistHTML() (playlist_html string) {
 	playlist_html = ""
 	for i, k := range statevar.SongList {
-		if statevar.CurrentSong != k {
-			playlist_html += "<a type='controls' data-skip='" + strconv.Itoa(i) + "'>" + k + "</a><br>\n"
+		if statevar.CurrentSong != statevar.SongMap[k].Fullname {
+			playlist_html += "<a type='controls' data-skip='" + strconv.Itoa(i) + "'>" + statevar.SongMap[k].Fullname + "</a><br>\n"
 		} else {
-			playlist_html += "<a type='controls' data-skip='" + strconv.Itoa(i) + "'><b>" + k + "</b></a><br>\n"
+			playlist_html += "<a type='controls' data-skip='" + strconv.Itoa(i) + "'><b>" + statevar.SongMap[k].Fullname + "</b></a><br>\n"
 
 		}
 	}
@@ -126,16 +126,16 @@ func skipTrack(song_index int) {
 	}
 	song := statevar.SongList[statevar.CurrentSongIndex]
 	rawSongData, _ = ioutil.ReadFile(statevar.SongMap[song].Path)
-	statevar.CurrentSong = song
+	statevar.CurrentSong = statevar.SongMap[song].Fullname
 	statevar.SongStartTime = getTime() + 11000
 	statevar.IsPlaying = false
 	b, _ := json.Marshal(statevar)
 	ioutil.WriteFile("state.json", b, 0644)
-	go songControl(statevar.SongStartTime-getTime()-3000, false, "3", song, false)
-	go songControl(statevar.SongStartTime-getTime()-2000, false, "2", song, false)
-	go songControl(statevar.SongStartTime-getTime()-1000, false, "1", song, false)
-	go songControl(statevar.SongStartTime-getTime(), true, "Playing "+song, song, false)
-	go songControl(statevar.SongStartTime-getTime()+statevar.SongMap[song].Length, false, "Stopping "+song, song, true)
+	go songControl(statevar.SongStartTime-getTime()-3000, false, "3", statevar.SongMap[song].Fullname, false)
+	go songControl(statevar.SongStartTime-getTime()-2000, false, "2", statevar.SongMap[song].Fullname, false)
+	go songControl(statevar.SongStartTime-getTime()-1000, false, "1", statevar.SongMap[song].Fullname, false)
+	go songControl(statevar.SongStartTime-getTime(), true, "Playing "+statevar.SongMap[song].Fullname, statevar.SongMap[song].Fullname, false)
+	go songControl(statevar.SongStartTime-getTime()+statevar.SongMap[song].Length, false, "Stopping "+statevar.SongMap[song].Fullname, statevar.SongMap[song].Fullname, true)
 }
 
 func cleanup() {
@@ -244,9 +244,14 @@ func main() {
 	mux.HandleFunc("/nextsong", NextSongRequest)
 	//http.ListenAndServe(":5000", nil)
 
+	ip, err := externalIP()
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	fmt.Println("\n\n######################################################################")
 	fmt.Printf("# Starting server with %d songs\n", len(statevar.SongList))
-	fmt.Println("# To use, open a browser to http://" + "a" + ":" + *portFlag)
+	fmt.Println("# To use, open a browser to http://" + ip + ":" + *portFlag)
 	fmt.Println("# To stop server, use Ctl + C")
 	fmt.Println("######################################################################\n\n")
 

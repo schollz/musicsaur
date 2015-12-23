@@ -29,7 +29,7 @@ func loadMp3s(path string) {
 				fmt.Println(file)
 				s := getMp3Info(file)
 				statevar.PathList[file] = true
-				statevar.SongMap[s.Fullname] = s
+				statevar.SongMap[s.Path] = s
 			}
 		}
 	}
