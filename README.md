@@ -14,7 +14,8 @@
 - Go version with precompiled libraries for folks that want to unzip and run!
 - Mute button
 - All files served locally (no internet connection needed!)
-- Replaying works now
+- Replaying works now (it was broken in 1.2)
+- Playlist sorted by Artist/Album/Track (in order)
 
 ---
 
@@ -24,62 +25,11 @@ This program is powered by [the excellent howler.js library from goldfire](https
 
 # Installation
 
-Tested on Python2.7 and Python3.4. Requires ```setuptools```. To install simply use
+If you don't want to install *anything*, just download the [compiled version](link/to/version).
 
-```bash
-pip install setuptools
-git clone https://github.com/schollz/sync-music-player.git
-python setup.py install
-```
+If you're interested in installing the Python version, follow [these instructions](http://www.musicsaur.com/python-full-instructions/).
 
-## Usage
-
-Open up the configuration file, ```config.cfg```, and edit line 42 by inputting your music folder, e.g.:
-
-```bash
-music_folder = /my/music/folder
-```
-
-Now start the server using
-
-```bash
-python syncmusic.py
-```
-
-which should print out something like
-
-```bash
-############################################################
-# Starting server with 346 songs
-# To use, open a browser to http://W.X.Y.Z:5000
-# To stop server, use Ctl + C
-############################################################
-```
-
-Your server is up and running! Now, for each computer that you want to play music from, just go and load up a browser to the url ```http://W.X.Y.Z:5000```. You will see the playlist and the music will automatically synchronize and start playing! 
-
-### Auto-start Raspberry Pis!
-
-If you'd like the server to automatically start up the Raspberry Pis, its easy to do. First, from your server computer (which can also be a Raspberry Pi) copy your ssh-key using the following command:
-
-```bash
-ssh-copy-id pi@YOUR_PIS_IP
-```
-
-Now sign-in to your Pi (you shouldn't have to use a password now) and install ```midori```:
-
-```bash
-ssh pi@YOUR_PIS_IP
-sudo apt-get install midori
-```
-
-Finally, open up the ```config.cfg``` and change line 16 to include the address of the computer:
-
-```bash
-clients = pi@YOUR_PIS_IP
-```
-
-If you have more then one, just seperate them by commas.
+If you're interested in installing the Golang version, follow [these instructions](http://www.musicsaur.com/golang-full-instructions/).
 
 ### Some notes
 
