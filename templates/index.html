@@ -238,11 +238,22 @@ function checkIfSkipped(mute_button_click) {
             if (data['mute_button_clicked']==true) {
               setMute(data['is_muted'])   
             }
+            if (is_muted==true) {
+              sound.volume(0.0)
+            } else {
+              sound.volume(1.0)
+            }
+
           } 
         }
       } else {
         if (data['mute_button_clicked']==true) {
           setMute(data['is_muted'])   
+        }
+        if (is_muted==true) {
+          sound.volume(0.0)
+        } else {
+          sound.volume(1.0)
         }
       }
     });
@@ -254,11 +265,9 @@ function setMute(mute_on) {
   is_muted = mute_on;
   if (is_muted == true) {
     $('a[type=mute]').css("background-color","blue");
-    sound.volume(0.0)
     $("div.info1").html('Muted <b>' + current_song_name + '</b>');
   } else {
     $('a[type=mute]').css("background-color","white");
-    sound.volume(1.0)
   }
 
 }
