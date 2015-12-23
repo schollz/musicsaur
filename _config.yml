@@ -10,9 +10,9 @@ gems: [jekyll-paginate]
 paginate: 20
 baseurl: /
 domain_name: 'http://www.musicsaur.com'
-google_analytics: 'UA-XXXXXXXX-X'
-disqus: false
-disqus_shortname: 'your-disqus-shortname'
+google_analytics: 'UA-2345677-11'
+disqus: true
+disqus_shortname: 'musicsaur'
 
 # Details for the RSS feed generator
 url:            'http://www.musicsaur.com'
