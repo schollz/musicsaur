@@ -2,8 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
-	"flag"
 	"fmt"
 	"gopkg.in/tylerb/graceful.v1"
 	"io/ioutil"
@@ -143,33 +141,9 @@ func cleanup() {
 	fmt.Println("cleanup")
 }
 
-func processRemoteString(s string) ([]MakeConfig, error) {
-	// pi:password@ip
-	remotes := []MakeConfig{}
-	for _, k := range strings.Split(s, ",") {
-		if strings.Contains(k, "@") == true && strings.Contains(k, ":") == true {
-			userpass := strings.Split(k, "@")[0]
-			userpasssplit := strings.Split(userpass, ":")
-			remotes = append(remotes, MakeConfig{
-				User:     userpasssplit[0],
-				Server:   strings.Split(k, "@")[1],
-				Port:     "22",
-				Password: userpasssplit[1],
-			})
-		} else {
-			return nil, errors.New(k + " is not valid format. Instead, use user:password@some.ip.address")
-		}
-
-	}
-	return remotes, nil
-}
-
 func main() {
 
-	piFlag := flag.String("pis", "", "List of the Raspberry Pis you want to run remotely, e.g.\n\t\"pi1:password1@pi1.ip.address,pi2:password2@pi2.ip.address\"")
-	portFlag := flag.String("port", "5000", "port to host on")
-	libraryFlag := flag.String("folder", "", "Folder/list of folders to find the mp3s, e.g.\n\t\"D:\\Music\\Amazon MP3\"")
-	flag.Parse()
+	setupConfiguration()
 
 	// Load state
 	if _, err := os.Stat("state.json"); err == nil {
@@ -186,7 +160,7 @@ func main() {
 		statevar.LastMuted = 0
 		statevar.IsMuted = false
 	} else {
-		if len(*libraryFlag) == 0 {
+		if len(conf.MusicFolders) == 0 {
 			executable := strings.Split(os.Args[0], "\\")
 			executable_name := executable[len(executable)-1]
 			fmt.Println("Run \"" + executable_name + " --help\" to learn how to add a folder of music")
@@ -202,14 +176,12 @@ func main() {
 			CurrentSongIndex: 0,
 			LastMuted:        0,
 			IsMuted:          false,
-			RemoteComputers:  []MakeConfig{},
 		}
 	}
 
 	// Load Mp3s
-	if len(*libraryFlag) > 0 {
-		folders := strings.Split(*libraryFlag, ",")
-		for _, folder := range folders {
+	if len(conf.MusicFolders) > 0 {
+		for _, folder := range conf.MusicFolders {
 			loadMp3s(folder)
 		}
 	}
@@ -273,25 +245,20 @@ func main() {
 		fmt.Println(err)
 	}
 
+	port := strconv.Itoa(conf.Server.Port)
+
 	fmt.Println("\n\n######################################################################")
 	fmt.Printf("# Starting server with %d songs\n", len(statevar.SongList))
-	fmt.Println("# To use, open a browser to http://" + ip + ":" + *portFlag)
+	fmt.Println("# To use, open a browser to http://" + ip + ":" + port)
 	fmt.Println("# To stop server, use Ctl + C")
 	fmt.Println("######################################################################\n\n")
 
-	if len(*piFlag) > 0 {
-		statevar.RemoteComputers, err = processRemoteString(*piFlag)
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	for _, k := range statevar.RemoteComputers {
+	for _, k := range conf.Autostart {
 		fmt.Println(k)
 		response, err := runSSHCommand(k, "ps aux")
 		fmt.Println(response)
 		fmt.Println(err)
 	}
 
-	graceful.Run(":"+*portFlag, 10*time.Second, mux)
+	graceful.Run(":"+port, 10*time.Second, mux)
 }

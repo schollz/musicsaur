@@ -25,13 +25,13 @@ import (
 // Port is SSH server port on remote machine.
 // Note: easyssh looking for private key in user's home directory (ex. /home/john + Key).
 // Then ensure your Key begins from '/' (ex. /.ssh/id_rsa)
-type MakeConfig struct {
-	User     string
-	Server   string
-	Key      string
-	Port     string
-	Password string
-}
+// type ClientSSH struct {
+// 	User     string
+// 	Server   string
+// 	Key      string
+// 	Port     string
+// 	Password string
+// }
 
 // returns ssh.Signer from user you running app home path + cutted key path.
 // (ex. pubkey,err := getKeyFile("/.ssh/id_rsa") )
@@ -55,8 +55,8 @@ func getKeyFile(keypath string) (ssh.Signer, error) {
 	return pubkey, nil
 }
 
-// connects to remote server using MakeConfig struct and returns *ssh.Session
-func (ssh_conf *MakeConfig) connect() (*ssh.Session, error) {
+// connects to remote server using ClientSSH struct and returns *ssh.Session
+func (ssh_conf *ClientSSH) connect() (*ssh.Session, error) {
 	// auths holds the detected ssh auth methods
 	auths := []ssh.AuthMethod{}
 
@@ -95,7 +95,7 @@ func (ssh_conf *MakeConfig) connect() (*ssh.Session, error) {
 // Stream returns one channel that combines the stdout and stderr of the command
 // as it is run on the remote machine, and another that sends true when the
 // command is done. The sessions and channels will then be closed.
-func (ssh_conf *MakeConfig) Stream(command string) (output chan string, done chan bool, err error) {
+func (ssh_conf *ClientSSH) Stream(command string) (output chan string, done chan bool, err error) {
 	// connect to remote host
 	session, err := ssh_conf.connect()
 	if err != nil {
@@ -131,7 +131,7 @@ func (ssh_conf *MakeConfig) Stream(command string) (output chan string, done cha
 }
 
 // Runs command on remote machine and returns its stdout as a string
-func (ssh_conf *MakeConfig) Run(command string) (outStr string, err error) {
+func (ssh_conf *ClientSSH) Run(command string) (outStr string, err error) {
 	outChan, doneChan, err := ssh_conf.Stream(command)
 	if err != nil {
 		return outStr, err
@@ -151,7 +151,7 @@ func (ssh_conf *MakeConfig) Run(command string) (outStr string, err error) {
 }
 
 // Scp uploads sourceFile to remote machine like native scp console app.
-func (ssh_conf *MakeConfig) Scp(sourceFile string) error {
+func (ssh_conf *ClientSSH) Scp(sourceFile string) error {
 	session, err := ssh_conf.connect()
 
 	if err != nil {
@@ -195,8 +195,8 @@ func (ssh_conf *MakeConfig) Scp(sourceFile string) error {
 	return nil
 }
 
-func runSSHCommand(config MakeConfig, command string) (string, error) {
-	// Create MakeConfig instance with remote username, server address and path to private key.
+func runSSHCommand(config ClientSSH, command string) (string, error) {
+	// Create ClientSSH instance with remote username, server address and path to private key.
 	ssh := &config
 
 	// Call Run method with command you want to run on remote server.

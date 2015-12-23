@@ -1,33 +1,49 @@
 package main
 
-import "sort"
+import (
+	"fmt"
+	"github.com/BurntSushi/toml"
+	"sort"
+)
 
 var conf tomlConfig
 var statevar State
 var rawSongData []byte
 
-// Data for configuration file
+// Configuration file stuff
 
 type tomlConfig struct {
-	ClientData       clientInfo  `toml:"raspberry_pis"`
-	ClientParameters clientParms `toml:"client_parameters"`
-	ServerParameters serverParms `toml:"server_parameters"`
+	MusicFolders []string
+	Autostart    map[string]ClientSSH
+	Server       serverParamaters
+	Client       clientParameters
 }
 
-type clientInfo struct {
-	Clients string `toml:"clients"`
+type ClientSSH struct {
+	User          string
+	Server        string
+	Key           string
+	Port          string
+	Password      string
+	RemoteBrowser string
 }
 
-type clientParms struct {
-	CheckUpWaitTime int `toml:"check_up_wait_time"`
-	MaxSyncLag      int `toml:"max_sync_lag"`
+type clientParameters struct {
+	CheckupWaitTime int
+	MaxSyncLag      int
 }
 
-type serverParms struct {
-	MusicFolder         string `toml:"music_folder"`
-	Port                int    `toml:"port"`
-	TimeToNextSong      int    `toml:"time_to_next_song"`
-	TimeToDisallowSkips int    `toml:"time_to_disallow_skips"`
+type serverParamaters struct {
+	Port                int
+	TimeToNextSong      int
+	TimeToDisallowSkips int
+}
+
+func setupConfiguration() {
+	if _, err := toml.DecodeFile("config.cfg", &conf); err != nil {
+		fmt.Println(err)
+		return
+	}
 }
 
 // Data for state
@@ -42,7 +58,6 @@ type State struct {
 	CurrentSongIndex int
 	LastMuted        int64
 	IsMuted          bool
-	RemoteComputers  []MakeConfig
 }
 
 // Data for Song
