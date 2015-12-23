@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>musicsaur - Musicsaur setup full instructions [Python]</title>
+  <link rel="shortcut icon" href="/assets/images/favicon.ico">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="alternate" type="application/rss+xml" title="My Blog" href="/rss.xml">
+  <link rel="stylesheet" href="/assets/css/highlight.css">
+</head>
+<body>
+
+  <nav class="main-nav">
+	<a href="/"> <span class="arrow">←</span> Home </a>
+	<a href="/download"> Download </a>
+	<a class="cta" href="http://github.com/schollz/musicsaur"> Source </a>
+</nav>
+
+
+  
+
+  <section id="wrapper" class="">
+    <article class="post">
+    <header>
+        <h1>Musicsaur setup full instructions [Python]</h1>
+        <h2 class="headline">December 18, 2015</h2>
+    </header>
+    <section id="post-body">
+        <h1>Before you begin</h1>
+
+<p>You can use these instructions to get going on any kind of computer. For the sake of instruction though, I will assume you have two Raspberry Pis, pi1 and pi2, and that you want to have music playing on both of them with pi1 being the server. </p>
+
+<p>Make sure that you have Python2.7+ or Python3.4+ installed on your server computer (pi1 in this instructions).</p>
+
+<h1>Setup</h1>
+
+<h2>Install midori (Required for Raspberry Pis only)</h2>
+
+<p>First log into both of your <code>pi1</code> using</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">ssh pi1@pi1.ip.address</code></pre></figure>
+
+<p>and install the midori webbrowser using</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">sudo apt-get install midori</code></pre></figure>
+
+<p>Repeat for <code>pi2</code>.</p>
+
+<h2>Install musicsaur on server</h2>
+
+<p>Now log back into <code>pi1</code> and run the following to install musicsaur:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">sudo pip install setuptools
+git clone https://github.com/schollz/musicsaur.git
+<span class="nb">cd </span>musicsaur
+sudo python setup.py install</code></pre></figure>
+
+<h2>Configure</h2>
+
+<p>Now edit <code>config.cfg</code> with <code>vim</code> or <code>nano</code> and edit the line #42 to </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">music_folder = /location/of/your/music
+</code></pre></div>
+<p>and then edit line #16 to</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">clients</span> <span class="o">=</span> pi1@127.0.0.1,pi2@pi2.ip.address</code></pre></figure>
+
+<p>where <code>pi2.ip.address</code> is the local IP addresses of your other pi. Now, still logged in to the pi1, you need to transfer a ssh key so you don&#39;t have to type a password in to start up music on these pis. To do this just type the following:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">ssh-keygen</code></pre></figure>
+
+<p>Press enter at each prompt. Now, from the same pi1 enter the following and type the requested password for each pi when it prompts:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">ssh-copy-id pi1@127.0.0.1
+ssh-copy-id pi2@pi2.ip.address</code></pre></figure>
+
+<h2>Run it!</h2>
+
+<p>Now that you have uploaded your keys to each of your pi from the server pi you can have automatic SSH access. Now, still logged into to the server pi1, just type the following</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">python syncmusic.py</code></pre></figure>
+
+<p>It will show an address that you can goto on your phone/computer to control and play the music. It will also automatically start up the Raspberry Pis browsers and they should start playing music.</p>
+
+<h2>Other notes</h2>
+
+<p>If you want to run it and log off, you can use nohup mode:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">nohup python syncmusic.py <span class="p">&amp;</span></code></pre></figure>
+
+<p>which can be killed with</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">pkill -9 python</code></pre></figure>
+
+<p>To check whether the Raspberry Pis are working, simply ssh back into them and use</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">tail -f ~/log</code></pre></figure>
+
+<p>to monitor what is going on.</p>
+
+    </section>
+</article>
+<footer id="post-meta" class="clearfix">
+    <a href="http://twitter.com/zack_118">
+        <img class="avatar" src="/assets/images/avatar.png">
+        <div>
+            <span class="dark"><span style="font-size: 200%;"><i>musicsaur</i></span></span>
+            <span>The simplest music synchronization for multi-room audio.</span>
+        </div>
+    </a>
+
+    <section id="sharing">
+        <a class="twitter" href="https://twitter.com/intent/tweet?text=http://www.musicsaur.com/python-full-instructions/ - Musicsaur setup full instructions [Python] by @zack_118"><span class="icon-twitter"> Tweet</span></a>
+
+<a class="facebook" href="#" onclick="
+    window.open(
+      'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href),
+      'facebook-share-dialog',
+      'width=626,height=436');
+    return false;"><span class="icon-facebook-rect"> Share</span>
+</a>
+    </section>
+</footer>
+
+<!-- Disqus comments -->
+
+    <div class="archive readmore">
+        <h3>Comments</h3>
+        <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'musicsaur';
+        var disqus_developer = 0; // developer mode is on
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+    </div>
+
+
+<!-- Archive post list -->
+
+
+
+
+
+  </section>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="/assets/js/main.js"></script>
+  <script src="/assets/js/highlight.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-2345677-11', 'auto');
+    ga('send', 'pageview');
+  </script>
+</body>
+</html>
+
+
+

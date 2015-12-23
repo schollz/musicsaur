@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>musicsaur</title>
+    <description>The simplest music synchronization for multi-room audio.</description>
+    <link>http://www.musicsaur.com</link>
+    <atom:link href="http://www.musicsaur.com/feed.xml" rel="self" type="application/rss+xml" />
+    
+      <item>
+        <title>Frequently Asked Questions</title>
+        
+        
+          <description>&lt;p&gt;&lt;strong&gt;What is musicsaur?&lt;/strong&gt;&lt;/p&gt;
+</description>
+        
+        <pubDate>Sat, 19 Dec 2015 13:18:00 -0500</pubDate>
+        <link>http://www.musicsaur.com/frequently-asked-questions/</link>
+        <guid isPermaLink="true">http://www.musicsaur.com/frequently-asked-questions/</guid>
+      </item>
+    
+      <item>
+        <title>Musicsaur setup full instructions [Python]</title>
+        
+        
+          <description>&lt;h1&gt;Before you begin&lt;/h1&gt;
+</description>
+        
+        <pubDate>Fri, 18 Dec 2015 13:18:00 -0500</pubDate>
+        <link>http://www.musicsaur.com/python-full-instructions/</link>
+        <guid isPermaLink="true">http://www.musicsaur.com/python-full-instructions/</guid>
+      </item>
+    
+  </channel>
+</rss>
