@@ -42,6 +42,7 @@ type State struct {
 	CurrentSongIndex int
 	LastMuted        int64
 	IsMuted          bool
+	RemoteComputers  []MakeConfig
 }
 
 // Data for Song

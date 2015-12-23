@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"gopkg.in/tylerb/graceful.v1"
@@ -142,6 +143,27 @@ func cleanup() {
 	fmt.Println("cleanup")
 }
 
+func processRemoteString(s string) ([]MakeConfig, error) {
+	// pi:password@ip
+	remotes := []MakeConfig{}
+	for _, k := range strings.Split(s, ",") {
+		if strings.Contains(k, "@") == true && strings.Contains(k, ":") == true {
+			userpass := strings.Split(k, "@")[0]
+			userpasssplit := strings.Split(userpass, ":")
+			remotes = append(remotes, MakeConfig{
+				User:     userpasssplit[0],
+				Server:   strings.Split(k, "@")[1],
+				Port:     "22",
+				Password: userpasssplit[1],
+			})
+		} else {
+			return nil, errors.New(k + " is not valid format. Instead, use user:password@some.ip.address")
+		}
+
+	}
+	return remotes, nil
+}
+
 func main() {
 
 	piFlag := flag.String("pis", "", "\"pi@url1,pi@url2\"")
@@ -184,6 +206,7 @@ func main() {
 			CurrentSongIndex: 0,
 			LastMuted:        0,
 			IsMuted:          false,
+			RemoteComputers:  []MakeConfig{},
 		}
 	}
 
@@ -254,6 +277,20 @@ func main() {
 	fmt.Println("# To use, open a browser to http://" + ip + ":" + *portFlag)
 	fmt.Println("# To stop server, use Ctl + C")
 	fmt.Println("######################################################################\n\n")
+
+	if len(*piFlag) > 0 {
+		statevar.RemoteComputers, err = processRemoteString(*piFlag)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	for _, k := range statevar.RemoteComputers {
+		fmt.Println(k)
+		response, err := runSSHCommand(k, "ps aux")
+		fmt.Println(response)
+		fmt.Println(err)
+	}
 
 	graceful.Run(":"+*portFlag, 10*time.Second, mux)
 }
