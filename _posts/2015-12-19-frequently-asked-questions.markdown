@@ -22,10 +22,23 @@ description: What is this program? What are the alternatives?
 > - [Pulseaudio](http://www.danplanet.com/blog/2014/11/26/multi-room-audio-with-multicast-rtp/)
 > - [Shairport-Sync](https://github.com/mikebrady/shairport-sync)
 
-# Technical
 
 **When you start the server and choose a folder, can you add songs to the folder to be played while its running? Or are all the songs only loaded when the server starts?**
 
 > Songs are only loaded when the server starts. That's a good thing to add though. I'd also like to have better organization of the playlist on the webpage (at least sorted by artist...)
+
+
+**How come I don't hear anything?**
+
+> If you don't hear anything, the client is probably trying to synchronize. The browser automatically mutes when it goes out of sync to avoid the headache caused by mis-aligned audio. You can see synchronization progress in [your browser console](https://webmasters.stackexchange.com/questions/8525/how-to-open-the-javascript-console-in-different-browsers)
+
+**Does this work on a phone?**
+
+> Yes, at least for Chrome on Android. To have it work, [you need change one of the flags in chrome to allow audio without gestures](http://android.stackexchange.com/questions/59134/enable-autoplay-html5-video-in-chrome). To do this, copy and paste this into your Chrome browser:
+
+{% highlight bash %}
+chrome://flags/#disable-gesture-requirement-for-media-playback
+{% endhighlight %}
+
 
 
