@@ -166,20 +166,10 @@ func processRemoteString(s string) ([]MakeConfig, error) {
 
 func main() {
 
-	piFlag := flag.String("pis", "", "\"pi@url1,pi@url2\"")
+	piFlag := flag.String("pis", "", "List of the Raspberry Pis you want to run remotely, e.g.\n\t\"pi1:password1@pi1.ip.address,pi2:password2@pi2.ip.address\"")
 	portFlag := flag.String("port", "5000", "port to host on")
-	libraryFlag := flag.String("folder", "./", "Folder to find the mp3s")
+	libraryFlag := flag.String("folder", "", "Folder/list of folders to find the mp3s, e.g.\n\t\"D:\\Music\\Amazon MP3\"")
 	flag.Parse()
-	fmt.Println("piFlag:", *piFlag)
-	fmt.Println("piFlag:", len(*piFlag))
-	fmt.Println("portFlag:", *portFlag)
-	fmt.Println("libraryFlag:", *libraryFlag)
-
-	// // Load configuration parameters
-	// if _, err := toml.DecodeFile("./config.cfg", &conf); err != nil {
-	// 	// handle error
-	// }
-	// fmt.Printf("%v", conf)
 
 	// Load state
 	if _, err := os.Stat("state.json"); err == nil {
@@ -196,6 +186,12 @@ func main() {
 		statevar.LastMuted = 0
 		statevar.IsMuted = false
 	} else {
+		if len(*libraryFlag) == 0 {
+			executable := strings.Split(os.Args[0], "\\")
+			executable_name := executable[len(executable)-1]
+			fmt.Println("Run \"" + executable_name + " --help\" to learn how to add a folder of music")
+			os.Exit(0)
+		}
 		statevar = State{
 			SongMap:          make(map[string]Song),
 			SongList:         []string{},
@@ -211,7 +207,12 @@ func main() {
 	}
 
 	// Load Mp3s
-	loadMp3s(*libraryFlag)
+	if len(*libraryFlag) > 0 {
+		folders := strings.Split(*libraryFlag, ",")
+		for _, folder := range folders {
+			loadMp3s(folder)
+		}
+	}
 
 	// Load song list
 	for k, _ := range statevar.SongMap {
