@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/mholt/caddy/caddy"
 	"gopkg.in/tylerb/graceful.v1"
 	"io"
 	"io/ioutil"
@@ -14,6 +15,11 @@ import (
 	"strconv"
 	"strings"
 	"time"
+)
+
+const (
+	appName    = "musicsaur"
+	appVersion = "1.3"
 )
 
 func timeTrack(start time.Time, name string) {
@@ -236,6 +242,26 @@ func cleanup() {
 	fmt.Println("cleanup")
 }
 
+func loadCaddyfile() (caddy.Input, error) {
+
+	// Caddyfile in cwd
+	contents := `IPADDRESS:PORT {
+	header  / Access-Control-Allow-Origin "*"
+	tls off
+	root ./data/
+	gzip
+	browse
+	log ./data/caddy.log
+}`
+	contents = strings.Replace(contents, "IPADDRESS", statevar.IPAddress, -1)
+	contents = strings.Replace(contents, "PORT", strconv.Itoa(statevar.Port+1), -1)
+	return caddy.CaddyfileInput{
+		Contents: []byte(contents),
+		Filepath: "Caddyfile",
+		RealFile: true,
+	}, nil
+}
+
 func main() {
 
 	setupConfiguration()
@@ -273,6 +299,8 @@ func main() {
 			IsMuted:          false,
 		}
 	}
+	statevar.IPAddress = GetLocalIP()
+	statevar.Port = conf.Server.Port
 
 	// Load Mp3s
 	if len(conf.MusicFolders) > 0 {
@@ -298,6 +326,8 @@ func main() {
 		html_response = strings.Replace(html_response, "{{ data['max_sync_lag'] }}", strconv.Itoa(conf.Client.MaxSyncLag), -1)
 		html_response = strings.Replace(html_response, "{{ data['message'] }}", "Syncing...", -1)
 		html_response = strings.Replace(html_response, "{{ data['playlist_html'] | safe }}", getPlaylistHTML(), -1)
+		html_response = strings.Replace(html_response, "{{IPADDRESS}}", statevar.IPAddress, -1)
+		html_response = strings.Replace(html_response, "{{PORT}}", strconv.Itoa(conf.Server.Port+1), -1)
 		fmt.Fprintf(w, html_response)
 	})
 
@@ -335,13 +365,9 @@ func main() {
 	mux.HandleFunc("/nextsong", NextSongRequest)
 	//http.ListenAndServe(":5000", nil)
 
-	ip := GetLocalIP()
-
-	port := strconv.Itoa(conf.Server.Port)
-
 	fmt.Println("\n\n######################################################################")
 	fmt.Printf("# Starting server with %d songs\n", len(statevar.SongList))
-	fmt.Println("# To use, open a browser to http://" + ip + ":" + port)
+	fmt.Println("# To use, open a browser to http://" + statevar.IPAddress + ":" + strconv.Itoa(statevar.Port))
 	fmt.Println("# To stop server, use Ctl + C")
 	fmt.Println("######################################################################\n\n")
 
@@ -353,12 +379,32 @@ func main() {
 	}
 	for _, k := range conf.Autostart {
 		fmt.Println(k)
-		cmd := "xinit /usr/bin/midori -a http://" + ip + ":" + port + "/ </dev/null > log 2>&1 &"
+		cmd := "xinit /usr/bin/midori -a http://" + statevar.IPAddress + ":" + strconv.Itoa(statevar.Port) + "/ </dev/null > log 2>&1 &"
 		fmt.Println(cmd)
 		response, err := runSSHCommand(k, cmd)
 		fmt.Println(response)
 		fmt.Println(err)
 	}
 
-	graceful.Run(":"+port, 10*time.Second, mux)
+	go graceful.Run(":"+strconv.Itoa(statevar.Port), 10*time.Second, mux)
+
+	caddy.AppName = appName
+	caddy.AppVersion = appVersion
+
+	// Get Caddyfile input
+	caddyfile, err := caddy.LoadCaddyfile(loadCaddyfile)
+	fmt.Println(caddyfile)
+	if err != nil {
+		panic(err)
+	}
+
+	// Start your engines
+	err = caddy.Start(caddyfile)
+	if err != nil {
+		panic(err)
+	}
+
+	// Twiddle your thumbs
+	caddy.Wait()
+
 }

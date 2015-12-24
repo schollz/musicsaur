@@ -30,7 +30,7 @@ var index_html = `<!DOCTYPE html>
     <script>
 Howler.mobileAutoEnable = true; //http://192.168.1.2:8082
 var sound = new Howl({
-  src: ['http://192.168.1.2:8082/sound.mp3?{{ data['random_integer'] }}'],
+  src: ['http://{{IPADDRESS}}:{{PORT}}/sound.mp3?{{ data['random_integer'] }}'],
   preload: true
 });
 

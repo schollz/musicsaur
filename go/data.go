@@ -58,6 +58,8 @@ type State struct {
 	CurrentSongIndex int
 	LastMuted        int64
 	IsMuted          bool
+	IPAddress        string
+	Port             int
 }
 
 // Data for Song
