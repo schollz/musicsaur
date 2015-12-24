@@ -114,13 +114,13 @@ def nextSong(delay, skip):
         current_song_path = state['ordering'][state['current_song']]
 
         shutil.copy(current_song_path,os.path.join(os.getcwd(),'static/sound.mp3'))
-        shutil.copy(current_song_path,os.path.join(os.getcwd(),'static/start.mp3'))
+        # shutil.copy(current_song_path,os.path.join(os.getcwd(),'static/start.mp3'))
         os.chdir('static')
-        try:
-            os.remove('sound.mp3')
-        except:
-            pass
-        os.system('ffmpeg -i start.mp3 -codec:a libmp3lame -qscale:a 6 sound.mp3')
+        # try:
+        #     os.remove('sound.mp3')
+        # except:
+        #     pass
+        # os.system('ffmpeg -i start.mp3 -codec:a libmp3lame -qscale:a 6 sound.mp3')
         audio_data = open('sound.mp3','rb').read()
         os.chdir('../')
         state['currently_playing_songname'] = state['playlist'][current_song_path]['song_name']
