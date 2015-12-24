@@ -127,21 +127,23 @@ func skipTrack(song_index int) {
 	}
 	song := statevar.SongList[statevar.CurrentSongIndex]
 
-	fmt.Println("Shrinking file...")
-	cmd := "ffmpeg"
-	err := os.Remove("sound.mp3")
-	if err != nil {
-		fmt.Println(err)
-	}
-	args := []string{"-i", statevar.SongMap[song].Path, "-codec:a", "libmp3lame", "-qscale:a", "8", "sound.mp3"}
-	if err := exec.Command(cmd, args...).Run(); err != nil {
-		fmt.Println(err)
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-	fmt.Println("Successfully shrunk file")
+	// fmt.Println("Shrinking file...")
+	// cmd := "ffmpeg"
+	// err := os.Remove("sound.mp3")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// args := []string{"-i", statevar.SongMap[song].Path, "-codec:a", "libmp3lame", "-qscale:a", "8", "sound.mp3"}
+	// if err := exec.Command(cmd, args...).Run(); err != nil {
+	// 	fmt.Println(err)
+	// 	fmt.Fprintln(os.Stderr, err)
+	// 	os.Exit(1)
+	// }
+	// fmt.Println("Successfully shrunk file")
+	// rawSongData, _ = ioutil.ReadFile("sound.mp3")
 
-	rawSongData, _ = ioutil.ReadFile("sound.mp3")
+	rawSongData, _ = ioutil.ReadFile(statevar.SongMap[song].Path)
+
 	statevar.CurrentSong = statevar.SongMap[song].Fullname
 	statevar.SongStartTime = getTime() + 11000
 	statevar.IsPlaying = false
