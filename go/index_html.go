@@ -1,7 +1,6 @@
 package main
 
-var index_html = `
-<!DOCTYPE html>
+var index_html = `<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -53,6 +52,7 @@ var MAX_SYNC_LAG = {{ data['max_sync_lag'] }};
 
 // GLOBALS
 var is_muted = false
+var is_paused = false
 var lagTimes = [];
 var tryWait = 0;
 var computeTimes = [];
@@ -160,10 +160,10 @@ for (var i = 0; i < 23; i++) {
               mainInterval = setInterval(function(){
                 checkIfSkipped(false);
               }, CHECK_UP_WAIT_TIME);
-              sound.play();
               if (data['is_playing']==true) {
                   sound.seek(data['song_time'])
               }
+              sound.play();
               // var posting = $.post('/playing', {
               // 'message': 'im playing a song'
               // });
@@ -218,7 +218,6 @@ function checkIfSkipped(mute_button_click) {
           var diff = data['song_time']+time_delta2/1000.0 - mySongTime;
           if (Math.abs(diff) > MAX_SYNC_LAG/1000.0) {
             CHECK_UP_ITERATION = 1;
-            sound.volume(0.0);
             runningDiff = runningDiff + diff;
             var serverSongTime = data['song_time']+time_delta2/1000.0;
             console.log('[' + Date.now() + '] ' + ': NOT in sync (>' + MAX_SYNC_LAG.toString() + ' ms)')
@@ -230,9 +229,12 @@ function checkIfSkipped(mute_button_click) {
             $("div.info1").html('Muted <b>' + current_song_name + '</b> (out of sync)');
 
                 console.log(JSON.stringify(data));
+                sound.volume(0.0);
+                sound.pause();
                 sound.seek(serverSongTime+runningDiff);
-                sound.seek(serverSongTime+runningDiff);
-                sound.seek(serverSongTime+runningDiff);
+                sound.play();
+                sound.volume(0.0);
+
 
           } else {
             console.log('[' + Date.now() + '] ' + ': in sync (|' + (diff*1000).toString() + '|<' + MAX_SYNC_LAG.toString() + ' ms)')
@@ -248,13 +250,12 @@ function checkIfSkipped(mute_button_click) {
             } else {
               sound.volume(1.0)
             }
-            sound.volume(1.0)
 
           } 
         }
       } else {
         if (data['mute_button_clicked']==true) {
-           setMute(data['is_muted'])   
+          setMute(data['is_muted'])   
         }
       }
     });
@@ -481,4 +482,6 @@ makeRequests();
     </div>
 </body>
 </html>
+
+
 `

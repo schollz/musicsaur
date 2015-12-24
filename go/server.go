@@ -61,6 +61,7 @@ func getPlaybackPositionInSeconds() float64 {
 
 func SyncRequest(rw http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
+		defer timeTrack(time.Now(), r.RemoteAddr+" /sync")
 		//current_song := r.FormValue("current_song")
 		client_timestamp_str := r.FormValue("client_timestamp")
 		client_timestamp, _ := strconv.ParseUint(client_timestamp_str, 10, 64)
@@ -96,8 +97,8 @@ func SyncRequest(rw http.ResponseWriter, r *http.Request) {
 }
 
 func NextSongRequest(rw http.ResponseWriter, r *http.Request) {
-	defer timeTrack(time.Now(), r.RemoteAddr+" /sync")
 	if r.Method == "POST" {
+		defer timeTrack(time.Now(), r.RemoteAddr+" /nextsong")
 		skip, _ := strconv.Atoi(r.FormValue("skip"))
 		skipTrack(skip)
 		data := SyncJSON{
@@ -132,7 +133,7 @@ func skipTrack(song_index int) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	args := []string{"-i", statevar.SongMap[song].Path, "-codec:a", "libmp3lame", "-qscale:a", "6", "sound.mp3"}
+	args := []string{"-i", statevar.SongMap[song].Path, "-codec:a", "libmp3lame", "-qscale:a", "8", "sound.mp3"}
 	if err := exec.Command(cmd, args...).Run(); err != nil {
 		fmt.Println(err)
 		fmt.Fprintln(os.Stderr, err)
