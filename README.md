@@ -12,6 +12,8 @@
 **Major features include:**
 
 - Go version with precompiled libraries for folks that want to unzip and run!
+- Support for ffmpeg
+- Support for [Caddy hosting](https://github.com/mholt/caddy)
 - Mute button
 - All files served locally (no internet connection needed!)
 - Replaying works now (it was broken in 1.2)
