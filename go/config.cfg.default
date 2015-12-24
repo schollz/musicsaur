@@ -2,8 +2,8 @@
 # REQUIRED: ENTER YOUR MUSIC FOLDERS  										  #
 ###############################################################################
 
-MusicFolders = ["/home/zack/Music/Allen Toussaint", 
-				"/home/zack/Music/Pink Floyd"]
+MusicFolders = ['/home/zack/Music/Allen Toussaint', 
+				'/home/zack/Music/Pink Floyd']
 
 ###############################################################################
 # OPTIONAL: SERVER PARAMETERS												  #
@@ -50,13 +50,14 @@ MaxSyncLag = 50
 #	Server = "someserver.org"
 #	Key = "/.ssh/id_rsa"
 #	Port = "22"
-#	RemoteBrowser = "/usr/bin/midori"
+#	RemoteBrowser = '/usr/bin/midori'
 
 #	[Autostart.2]
 #	User = "pi"
 #	Server = "192.168.1.5"
 #	Password = "yourpassword"
 #	Port = "22"
-#	RemoteBrowser = "/usr/bin/luakit"
+#	RemoteBrowser = '/usr/bin/luakit
+
 
 

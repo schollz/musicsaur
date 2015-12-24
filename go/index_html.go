@@ -28,9 +28,9 @@ var index_html = `<!DOCTYPE html>
   float: left; }
     </style>
     <script>
-Howler.mobileAutoEnable = true;
+Howler.mobileAutoEnable = true; //http://192.168.1.2:8082
 var sound = new Howl({
-  src: ['/sound.mp3?{{ data['random_integer'] }}'],
+  src: ['http://192.168.1.2:8082/sound.mp3?{{ data['random_integer'] }}'],
   preload: true
 });
 
@@ -218,24 +218,20 @@ function checkIfSkipped(mute_button_click) {
           var diff = data['song_time']+time_delta2/1000.0 - mySongTime;
           if (Math.abs(diff) > MAX_SYNC_LAG/1000.0) {
             CHECK_UP_ITERATION = 1;
-            runningDiff = runningDiff + diff;
             var serverSongTime = data['song_time']+time_delta2/1000.0;
             console.log('[' + Date.now() + '] ' + ': NOT in sync (>' + MAX_SYNC_LAG.toString() + ' ms)')
-
-              if (runningDiff<-20000) {
-              runningDiff = 0
-            } 
             console.log('Browser:  ' + mySongTime.toString() + '\nServer: ' + serverSongTime.toString() + '\nDiff: ' + (diff*1000).toString() + '\nMean half-latency: ' + true_server_time_delta.toString() +  '\nMeasured half-latency: ' + time_delta2.toString() + '\nrunningDiff: ' + (runningDiff*1000).toString() + '\nSeeking to: ' + (serverSongTime+runningDiff).toString());
             $("div.info1").html('Muted <b>' + current_song_name + '</b> (out of sync)');
-
-                console.log(JSON.stringify(data));
-                sound.volume(0.0);
-                sound.pause();
+            //    console.log(JSON.stringify(data));
+            sound.volume(0.0);
+            if (Math.abs(diff) > 3) {
+                sound.seek(serverSongTime);
+                runningDiff = 0;
+            } else {
+                runningDiff = runningDiff + diff;
                 sound.seek(serverSongTime+runningDiff);
-                sound.play();
-                sound.volume(0.0);
-
-
+            }
+              
           } else {
             console.log('[' + Date.now() + '] ' + ': in sync (|' + (diff*1000).toString() + '|<' + MAX_SYNC_LAG.toString() + ' ms)')
             $("div.info1").html('Playing <b>' + current_song_name + '</b>');
