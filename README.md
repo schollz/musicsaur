@@ -6,7 +6,6 @@
 [![Join the chat at https://gitter.im/schollz/musicsaur](https://badges.gitter.im/schollz/music.svg)](https://gitter.im/schollz/musicsaur?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ---
-
 **Update 12/19/2015: Version 1.2 released!**
 
 **Major features include:**
@@ -15,6 +14,8 @@
 - State variables for reloading position in playlist and faster boot-up
 - Bug fixes
 - Fewer dependencies
+
+**If you'd like to try the dev Version 1.3, click [here](https://github.com/schollz/musicsaur/tree/1.3)**!
 
 ---
 
