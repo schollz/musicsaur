@@ -239,6 +239,7 @@ function checkIfSkipped(mute_button_click) {
             CHECK_UP_ITERATION = parseInt(30.0/(CHECK_UP_WAIT_TIME/1000.0)); // every 30 seconds
             tryWait = 0;
             check_up_counter = 0;
+            runningDiff = 0;
             if (data['mute_button_clicked']==true) {
               setMute(data['is_muted'])   
             }
