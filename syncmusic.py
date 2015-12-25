@@ -183,6 +183,7 @@ class IndexPage(tornado.web.RequestHandler):
         data['is_index'] = True
         data['max_sync_lag'] = parser.get('client_parameters','max_sync_lag')
         data['check_up_wait_time'] = parser.get('client_parameters','check_up_wait_time')
+        data['sound_url'] = ""
         if state['debug']:
             index_page = Template(open('templates/index.html','r').read())
         self.write(index_page.render(data=data))
