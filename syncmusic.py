@@ -113,7 +113,11 @@ def nextSong(delay, skip):
             state['current_song'] = len(state['ordering']) - 1
         current_song_path = state['ordering'][state['current_song']]
 
-        shutil.copy(current_song_path,os.path.join(os.getcwd(),'static/sound.mp3'))
+        try:
+            os.remove(os.path.join(os.getcwd(),'static','sound.mp3'))
+        except:
+            pass
+        shutil.copy(current_song_path,os.path.join(os.getcwd(),'static','sound.mp3'))
         # shutil.copy(current_song_path,os.path.join(os.getcwd(),'static/start.mp3'))
         os.chdir('static')
         # try:
@@ -139,7 +143,7 @@ def nextSong(delay, skip):
             songStarts,
             ())
         songStopTimer.start()
-        audio = MP3('./static/sound.mp3')
+        audio = MP3(os.path.join('static','sound.mp3'))
         logger.debug(audio.info.length)
         songStartTimer = Timer(
             2 +
@@ -157,7 +161,7 @@ def nextSong(delay, skip):
 # WEB ROUTES
 #################
 
-index_page = Template(open('templates/index.html','r').read())
+index_page = Template(open(os.path.join('templates','index.html'),'r').read())
 
 class SoundMp3(tornado.web.RequestHandler):
 
@@ -185,7 +189,7 @@ class IndexPage(tornado.web.RequestHandler):
         data['check_up_wait_time'] = parser.get('client_parameters','check_up_wait_time')
         data['sound_url'] = ""
         if state['debug']:
-            index_page = Template(open('templates/index.html','r').read())
+            index_page = Template(open(os.path.join('templates','index.html'),'r').read())
         self.write(index_page.render(data=data))
 
 class SyncHandler(tornado.web.RequestHandler):
