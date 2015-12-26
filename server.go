@@ -19,7 +19,7 @@ import (
 
 const (
 	appName    = "musicsaur"
-	appVersion = "1.3"
+	appVersion = "1.3.0"
 )
 
 func timeTrack(start time.Time, name string) {

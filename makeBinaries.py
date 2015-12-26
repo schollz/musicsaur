@@ -27,10 +27,12 @@ linux    ppc64
 windows    amd64"""
 
 arches = """linux    amd64
-windows amd64"""
+windows amd64
+linux    arm
+darwin    amd64"""
 
 arches = arches.split("\n")
-version = "1.3"
+version = "1.3.0"
 try:
     os.system("rm -rf builds")
 except:

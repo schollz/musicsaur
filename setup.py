@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='syncmusic',
-      version='1.2',
+      version='1.3.0',
       description='Syncs music from web browser',
       author='Zack',
       author_email='zack@hypercubeplatforms.com',
