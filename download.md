@@ -19,11 +19,11 @@ Then follow these instructions (coming soon) to get the compiled version.
 
 ### Do you want download, install Python libraries, and run?
 
-Then follow [these instructions](/python-full-instructions/) to get going with the Python version.
+Then follow [these instructions](/python/) to get going with the Python version.
 
 ### Do you want download, install Go libraries, and run?
 
-Then follow these instructions (coming soon) to get going with the Python version.
+Then follow [these instructions](/golang/) to get going with the Go version.
 
 
 

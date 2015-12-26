@@ -2,6 +2,7 @@
 title:  "Frequently Asked Questions"
 date:   2015-12-19 18:18:00
 description: What is this program? What are the alternatives?
+permalink: faq/
 ---
 
 **What is musicsaur?**
@@ -23,7 +24,7 @@ description: What is this program? What are the alternatives?
 > - [Shairport-Sync](https://github.com/mikebrady/shairport-sync)
 
 
-**When you start the server and choose a folder, can you add songs to the folder to be played while its running? Or are all the songs only loaded when the server starts?**
+**Can you add songs once the server starts?**
 
 > Songs are only loaded when the server starts. That's a good thing to add though. I'd also like to have better organization of the playlist on the webpage (at least sorted by artist...)
 

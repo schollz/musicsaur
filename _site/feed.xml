@@ -7,26 +7,15 @@
     <atom:link href="http://www.musicsaur.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
-        <title>Musicsaur simple setup</title>
+        <title>Getting started with Raspberry Pis</title>
         
         
-          <description>&lt;style&gt;
-a.cta3 {
-    background: #5badf0;
-    color: #fff;
-    margin-left: 12px;
-    padding: 8px 12px;
-    font-size: 13px;
-    /*font-weight: bold;*/
-    line-height: 1.35;
-    border-radius: 3px;
-}
-&lt;/style&gt;
+          <description>&lt;p&gt;It&amp;#39;s very easy to get going on a Raspberry Pi as a server or a client. I&amp;#39;ll go through the steps to set up a client and then the server. You can use a server computer also as a client computer, of course!&lt;/p&gt;
 </description>
         
-        <pubDate>Tue, 22 Dec 2015 13:18:00 -0500</pubDate>
-        <link>http://www.musicsaur.com/musicsaur-download/</link>
-        <guid isPermaLink="true">http://www.musicsaur.com/musicsaur-download/</guid>
+        <pubDate>Thu, 24 Dec 2015 11:18:00 -0500</pubDate>
+        <link>http://www.musicsaur.com/raspberry-pi/</link>
+        <guid isPermaLink="true">http://www.musicsaur.com/raspberry-pi/</guid>
       </item>
     
       <item>
@@ -37,20 +26,32 @@ a.cta3 {
 </description>
         
         <pubDate>Sat, 19 Dec 2015 13:18:00 -0500</pubDate>
-        <link>http://www.musicsaur.com/frequently-asked-questions/</link>
-        <guid isPermaLink="true">http://www.musicsaur.com/frequently-asked-questions/</guid>
+        <link>http://www.musicsaur.com/faq/</link>
+        <guid isPermaLink="true">http://www.musicsaur.com/faq/</guid>
       </item>
     
       <item>
         <title>Musicsaur setup full instructions [Python]</title>
         
         
-          <description>&lt;h1&gt;Before you begin&lt;/h1&gt;
+          <description>&lt;h2&gt;Before you begin&lt;/h2&gt;
 </description>
         
         <pubDate>Fri, 18 Dec 2015 13:18:00 -0500</pubDate>
-        <link>http://www.musicsaur.com/python-full-instructions/</link>
-        <guid isPermaLink="true">http://www.musicsaur.com/python-full-instructions/</guid>
+        <link>http://www.musicsaur.com/python/</link>
+        <guid isPermaLink="true">http://www.musicsaur.com/python/</guid>
+      </item>
+    
+      <item>
+        <title>Musicsaur setup full instructions [Golang]</title>
+        
+        
+          <description>&lt;h2&gt;Before you begin&lt;/h2&gt;
+</description>
+        
+        <pubDate>Fri, 18 Dec 2015 13:18:00 -0500</pubDate>
+        <link>http://www.musicsaur.com/golang/</link>
+        <guid isPermaLink="true">http://www.musicsaur.com/golang/</guid>
       </item>
     
   </channel>
