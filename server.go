@@ -194,13 +194,13 @@ func skipTrack(song_index int) {
 	}
 	song := statevar.SongList[statevar.CurrentSongIndex]
 
-	err := os.Remove("./data/sound.mp3")
+	err := os.Remove("./static/sound.mp3")
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	// To be served by Caddy
-	CopyFile(statevar.SongMap[song].Path, "./data/sound.mp3")
+	CopyFile(statevar.SongMap[song].Path, "./static/sound.mp3")
 
 	// cmd := "cp"
 	// args := []string{statevar.SongMap[song].Path, "/cygdrive/C/Users/ZNS/Desktop/Caddy/stuff/sound.mp3"}
@@ -248,10 +248,10 @@ func loadCaddyfile() (caddy.Input, error) {
 	contents := `IPADDRESS:PORT {
 	header  / Access-Control-Allow-Origin "*"
 	tls off
-	root ./data/
+	root ./static/
 	gzip
 	browse
-	log ./data/caddy.log
+	log ./static/caddy.log
 }`
 	contents = strings.Replace(contents, "IPADDRESS", statevar.IPAddress, -1)
 	contents = strings.Replace(contents, "PORT", strconv.Itoa(statevar.Port+1), -1)
