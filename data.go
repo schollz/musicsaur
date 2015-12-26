@@ -40,7 +40,7 @@ type serverParamaters struct {
 }
 
 func setupConfiguration() {
-	if _, err := toml.DecodeFile("config-go.cfg", &conf); err != nil {
+	if _, err := toml.DecodeFile("config.cfg", &conf); err != nil {
 		fmt.Println(err)
 		return
 	}

@@ -351,12 +351,6 @@ func main() {
 	mux.HandleFunc("/nextsong", NextSongRequest)
 	//http.ListenAndServe(":5000", nil)
 
-	fmt.Println("\n\n######################################################################")
-	fmt.Printf("# Starting server with %d songs\n", len(statevar.SongList))
-	fmt.Println("# To use, open a browser to http://" + statevar.IPAddress + ":" + strconv.Itoa(statevar.Port))
-	fmt.Println("# To stop server, use Ctl + C")
-	fmt.Println("######################################################################\n\n")
-
 	for _, k := range conf.Autostart {
 		fmt.Println(k)
 		response, err := runSSHCommand(k, "pkill -9 midori </dev/null > log 2>&1 &")
@@ -364,6 +358,7 @@ func main() {
 		fmt.Println(err)
 	}
 	for _, k := range conf.Autostart {
+		fmt.Println("Running autostart...")
 		fmt.Println(k)
 		cmd := "xinit /usr/bin/midori -a http://" + statevar.IPAddress + ":" + strconv.Itoa(statevar.Port) + "/ </dev/null > log 2>&1 &"
 		fmt.Println(cmd)
@@ -388,6 +383,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Println("\n\n######################################################################")
+	fmt.Printf("# musicsaur - version %s\n", appVersion)
+	fmt.Printf("# Starting server with %d songs\n", len(statevar.SongList))
+	fmt.Println("# To use, open a browser to http://" + statevar.IPAddress + ":" + strconv.Itoa(statevar.Port))
+	fmt.Println("# To stop server, use Ctl + C")
+	fmt.Println("######################################################################\n\n")
 
 	// Twiddle your thumbs
 	caddy.Wait()
