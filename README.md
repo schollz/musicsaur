@@ -25,13 +25,55 @@ Want to sync up your music on multiple computers? This accomplishes exactly that
 
 This program is powered by [the excellent howler.js library from goldfire](https://github.com/goldfire/howler.js/). Essentially all the client computers [sync their clocks](http://www.mine-control.com/zack/timesync/timesync.html) and then try to start a song at the same time. Any dissimilarities between playback are also fixed, because the clients will automatically seek to the position of the server.
 
-# Installation
+# Setup
 
 If you don't want to install *anything*, just download the [compiled version](link/to/version).
 
-If you're interested in installing the Python version, follow [these instructions](http://www.musicsaur.com/python-full-instructions/).
+## Python
 
-If you're interested in installing the Golang version, follow [these instructions](http://www.musicsaur.com/golang-full-instructions/).
+If you're interested in installing the Python version, follow these instructions. First install the required packages using
+
+```bash
+sudo python setup.py install
+```
+
+then copy the configuration file for the Python version
+
+```bash
+cp config-python.cfg config.cfg
+```
+
+and edit line #42 with the locations of your music folderse. There are other parameters to edit, if you feel so inclined, but you needn't just to get started. Then simply run with
+
+```bash
+python syncmusic.py
+```
+
+## Golang
+
+If you're interested in installing the Golang version, follow these instructions. First install the required packages
+
+```bash
+go get github.com/mholt/caddy/caddy
+go get github.com/tcolgate/mp3
+go get github.com/bobertlo/go-id3/id3
+go get github.com/BurntSushi/toml
+go get gopkg.in/tylerb/graceful.v1
+```
+
+Then copy the configuration file 
+
+```bash
+cp config-go.cfg config.cfg
+```
+
+and edit line #5 with your music folders. Then simpily use 
+
+```bash
+go run *.go
+```
+
+to start up the server!
 
 ### Some notes
 
@@ -69,10 +111,9 @@ xinit /usr/bin/luakit -u http://W.X.Y.Z:5000
 
 # History
 
-- 12/19/2015 (morning): Version 1.2 Release
+- 12/19/2015: Version 1.2 Release
 - 12/18/2015 (evening): Version 1.1 Release
 - 12/18/2015 (morning): Version 1.0 Release
-
 
 ## Credits
 
@@ -80,5 +121,7 @@ xinit /usr/bin/luakit -u http://W.X.Y.Z:5000
 * Zach Simpson for [his paper on simple clock synchronization](http://www.mine-control.com/zack/timesync/timesync.html)
 * Everyone on the [/r/raspberry_pi](https://www.reddit.com/r/raspberry_pi/comments/3xc8kq/simple_python_script_to_allow_multiple_raspberry/) and [/r/python](https://www.reddit.com/r/Python/comments/3xc8mj/simple_python_script_to_allow_multiple_computers/) threads for great feature requests and bug reports!
 * [ClkerFreeVectorImages](https://pixabay.com/en/users/ClkerFreeVectorImages-3736/) and [OpenClipartVectors](https://pixabay.com/en/users/OpenClipartVectors-30363/) for the Public Domain vectors
-
-
+- [mholt](github.com/mholt) for the invaluable ```Caddy``` 
+- [tcolgate](http://github.com/tcolgate) for the ```mp3``` package
+- [bobertlo](http://github.com/bobertlo) for the ```go-id3``` package
+- [BurntSushi](http://github.com/BurntSushi) for their ```toml``` library

@@ -273,7 +273,7 @@ func main() {
 			panic(err)
 		}
 		json.Unmarshal(dat, &statevar)
-		fmt.Println("\n*******")
+		fmt.Println("\n*******\nLast song:")
 		fmt.Println(statevar.CurrentSong)
 		fmt.Println("*******\n")
 		statevar.IsPlaying = false
@@ -379,7 +379,6 @@ func main() {
 
 	// Get Caddyfile input
 	caddyfile, err := caddy.LoadCaddyfile(loadCaddyfile)
-	fmt.Println(caddyfile)
 	if err != nil {
 		panic(err)
 	}
