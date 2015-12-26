@@ -15,7 +15,7 @@ There are different ways to get started with **MusicSAUR** depending on what you
 
 ### Do you just want to download and run?
 
-Not available yet, but soon! (Updated: 12/25/2015)
+Click [here](/download-binary/) to just downlad the version you need and get started!
 
 ### Do you want download, install Python libraries, and run?
 
