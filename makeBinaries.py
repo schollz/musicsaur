@@ -32,29 +32,29 @@ windows amd64"""
 arches = arches.split("\n")
 version = "1.3"
 try:
-	os.system("rm -rf builds")
+    os.system("rm -rf builds")
 except:
-	pass
+    pass
 os.mkdir("builds")
 
 for arch in arches:
-	goos = arch.split()[0]
-	goarch = arch.split()[1]
+    goos = arch.split()[0]
+    goarch = arch.split()[1]
 
-	exe = ""
-	if "windows" in goos:
-		exe = ".exe"
-	cmd1  = 'env GOOS=%(goos)s GOARCH=%(goarch)s%(exe)s go build -o builds/musicsaur-%(version)s-%(goos)s-%(goarch)s%(exe)s -v *.go' % {'goos':goos,'goarch':goarch,'exe':exe,'version':version}
-        cmd2 = 'tar -cvzf musicsaur-%(version)s-%(goos)s-%(goarch)s%(exe)s.tar.gz ./templates ./static config.cfg musicsaur-%(version)s-%(goos)s-%(goarch)s%(exe)s' % {'goos':goos,'goarch':goarch,'exe':exe,'version':version}
-	print(cmd1)
-        os.system(cmd1)
-        os.chdir("builds")
-        os.system('cp -r ../static ./')
-        os.system('cp -r ../templates ./')
-        os.system('cp ../config-go.cfg ./config.cfg')
-	print(cmd2)
-        os.system(cmd2)
-	cmd3 = 'rm -rf templates && rm -rf static && rm config.cfg && rm musicsaur-%(version)s-%(goos)s-%(goarch)s%(exe)s' % {'goos':goos,'goarch':goarch,'exe':exe,'version':version}
-        print(cmd3)
-        os.system(cmd3)
-        os.chdir("../")
+    exe = ""
+    if "windows" in goos:
+        exe = ".exe"
+    cmd1  = 'env GOOS=%(goos)s GOARCH=%(goarch)s go build -o builds/musicsaur-%(version)s-%(goos)s-%(goarch)s%(exe)s -v *.go' % {'goos':goos,'goarch':goarch,'exe':exe,'version':version}
+    cmd2 = 'tar -cvzf musicsaur-%(version)s-%(goos)s-%(goarch)s%(exe)s.tar.gz ./templates ./static config.cfg musicsaur-%(version)s-%(goos)s-%(goarch)s%(exe)s' % {'goos':goos,'goarch':goarch,'exe':exe,'version':version}
+    print(cmd1)
+    os.system(cmd1)
+    os.chdir("builds")
+    os.system('cp -r ../static ./')
+    os.system('cp -r ../templates ./')
+    os.system('cp ../config-go.cfg ./config.cfg')
+    print(cmd2)
+    os.system(cmd2)
+    cmd3 = 'rm -rf templates && rm -rf static && rm config.cfg && rm musicsaur-%(version)s-%(goos)s-%(goarch)s%(exe)s' % {'goos':goos,'goarch':goarch,'exe':exe,'version':version}
+    print(cmd3)
+    os.system(cmd3)
+    os.chdir("../")
