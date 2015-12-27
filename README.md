@@ -2,20 +2,22 @@
 
 # MusicSAUR (formerly the un-googleable "μsic")
 ## Music Synchronization And Uniform Relaying
-[![Version 1.2](https://img.shields.io/badge/version-1.2-brightgreen.svg)]()
+[![Version 1.3](https://img.shields.io/badge/version-1.3-brightgreen.svg)]()
 [![Join the chat at https://gitter.im/schollz/musicsaur](https://badges.gitter.im/schollz/music.svg)](https://gitter.im/schollz/musicsaur?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ---
 **Update 12/24/2015: [New website](http://www.musicsaur.com/)**
 
-**Update 12/19/2015: Version 1.2 released!**
+**Update 12/26/2015: Version 1.3 released!**
 
 **Major features include:**
 
-- Improved server performance
-- State variables for reloading position in playlist and faster boot-up
-- Bug fixes
-- Fewer dependencies
+- Go version with precompiled libraries for folks that want to unzip and run!
+- Golang has [Caddy hosting](https://github.com/mholt/caddy) which alleviates burden for serving sound files
+- Mute button
+- All files served locally (no internet connection needed!)
+- Replaying works now (it was broken in 1.2)
+- Playlist sorted by Artist/Album/Track (in order)
 
 **If you'd like to try the dev Version 1.3, click [here](https://github.com/schollz/musicsaur/tree/1.3)**!
 
@@ -25,64 +27,55 @@ Want to sync up your music on multiple computers? This accomplishes exactly that
 
 This program is powered by [the excellent howler.js library from goldfire](https://github.com/goldfire/howler.js/). Essentially all the client computers [sync their clocks](http://www.mine-control.com/zack/timesync/timesync.html) and then try to start a song at the same time. Any dissimilarities between playback are also fixed, because the clients will automatically seek to the position of the server.
 
-# Installation
+# Setup
 
-Tested on Python2.7 and Python3.4. Requires ```setuptools```. To install simply use
+If you don't want to install *anything*, just download the [compiled version](http://www.musicsaur.com/download-binary/).
 
-```bash
-pip install setuptools
-git clone https://github.com/schollz/sync-music-player.git
-python setup.py install
-```
+## Python
 
-## Usage
-
-Open up the configuration file, ```config.cfg```, and edit line 42 by inputting your music folder, e.g.:
+If you're interested in installing the Python version, follow these instructions. First install the required packages using
 
 ```bash
-music_folder = /my/music/folder
+sudo python setup.py install
 ```
 
-Now start the server using
+then copy the configuration file for the Python version
+
+```bash
+cp config-python.cfg config.cfg
+```
+
+and edit line #42 with the locations of your music folderse. There are other parameters to edit, if you feel so inclined, but you needn't just to get started. Then simply run with
 
 ```bash
 python syncmusic.py
 ```
 
-which should print out something like
+## Golang
+
+If you're interested in installing the Golang version, follow these instructions. First install the required packages
 
 ```bash
-############################################################
-# Starting server with 346 songs
-# To use, open a browser to http://W.X.Y.Z:5000
-# To stop server, use Ctl + C
-############################################################
+go get github.com/mholt/caddy/caddy
+go get github.com/tcolgate/mp3
+go get github.com/bobertlo/go-id3/id3
+go get github.com/BurntSushi/toml
+go get gopkg.in/tylerb/graceful.v1
 ```
 
-Your server is up and running! Now, for each computer that you want to play music from, just go and load up a browser to the url ```http://W.X.Y.Z:5000```. You will see the playlist and the music will automatically synchronize and start playing! 
-
-### Auto-start Raspberry Pis!
-
-If you'd like the server to automatically start up the Raspberry Pis, its easy to do. First, from your server computer (which can also be a Raspberry Pi) copy your ssh-key using the following command:
+Then copy the configuration file 
 
 ```bash
-ssh-copy-id pi@YOUR_PIS_IP
+cp config-go.cfg config.cfg
 ```
 
-Now sign-in to your Pi (you shouldn't have to use a password now) and install ```midori```:
+and edit line #5 with your music folders. Then simpily use 
 
 ```bash
-ssh pi@YOUR_PIS_IP
-sudo apt-get install midori
+go run *.go
 ```
 
-Finally, open up the ```config.cfg``` and change line 16 to include the address of the computer:
-
-```bash
-clients = pi@YOUR_PIS_IP
-```
-
-If you have more then one, just seperate them by commas.
+to start up the server!
 
 ### Some notes
 
@@ -120,10 +113,9 @@ xinit /usr/bin/luakit -u http://W.X.Y.Z:5000
 
 # History
 
-- 12/19/2015 (morning): Version 1.2 Release
+- 12/19/2015: Version 1.2 Release
 - 12/18/2015 (evening): Version 1.1 Release
 - 12/18/2015 (morning): Version 1.0 Release
-
 
 ## Credits
 
@@ -131,5 +123,7 @@ xinit /usr/bin/luakit -u http://W.X.Y.Z:5000
 * Zach Simpson for [his paper on simple clock synchronization](http://www.mine-control.com/zack/timesync/timesync.html)
 * Everyone on the [/r/raspberry_pi](https://www.reddit.com/r/raspberry_pi/comments/3xc8kq/simple_python_script_to_allow_multiple_raspberry/) and [/r/python](https://www.reddit.com/r/Python/comments/3xc8mj/simple_python_script_to_allow_multiple_computers/) threads for great feature requests and bug reports!
 * [ClkerFreeVectorImages](https://pixabay.com/en/users/ClkerFreeVectorImages-3736/) and [OpenClipartVectors](https://pixabay.com/en/users/OpenClipartVectors-30363/) for the Public Domain vectors
-
-
+- [mholt](github.com/mholt) for the invaluable ```Caddy``` 
+- [tcolgate](http://github.com/tcolgate) for the ```mp3``` package
+- [bobertlo](http://github.com/bobertlo) for the ```go-id3``` package
+- [BurntSushi](http://github.com/BurntSushi) for their ```toml``` library
