@@ -32,6 +32,8 @@ If you don't want to install *anything*, just download the [compiled version](ht
 If you're interested in installing the Python version, follow these instructions. First install the required packages using
 
 ```bash
+git clone https://github.com/schollz/musicsaur.git
+cd musicsaur
 sudo python setup.py install
 ```
 
@@ -52,6 +54,8 @@ python syncmusic.py
 If you're interested in installing the Golang version, follow these instructions. First install the required packages
 
 ```bash
+git clone https://github.com/schollz/musicsaur.git
+cd musicsaur
 go get github.com/mholt/caddy/caddy
 go get github.com/tcolgate/mp3
 go get github.com/bobertlo/go-id3/id3
