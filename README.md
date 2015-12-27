@@ -26,7 +26,7 @@ This program is powered by [the excellent howler.js library from goldfire](https
 
 # Setup
 
-If you don't want to install *anything*, just download the [compiled version](link/to/version).
+If you don't want to install *anything*, just download the [compiled version](http://www.musicsaur.com/download-binary/).
 
 ## Python
 
