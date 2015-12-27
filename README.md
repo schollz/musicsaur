@@ -7,7 +7,7 @@
 
 ---
 
-**Update X/Y/Z: Version 1.3 released!**
+**Update 12/26/2015: Version 1.3 released!**
 
 **Major features include:**
 
