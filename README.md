@@ -6,20 +6,16 @@
 [![Join the chat at https://gitter.im/schollz/musicsaur](https://badges.gitter.im/schollz/music.svg)](https://gitter.im/schollz/musicsaur?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ---
-**Update 12/24/2015: [New website](http://www.musicsaur.com/)**
 
-**Update 12/26/2015: Version 1.3 released!**
+**Update 12/26/2015: Version 1.3 released! Now includes Go and Python versions!**
 
-**Major features include:**
+**Major features include (for all versions):**
 
-- Go version with precompiled libraries for folks that want to unzip and run!
-- Golang has [Caddy hosting](https://github.com/mholt/caddy) which alleviates burden for serving sound files
+- Go version with [precompiled libraries](http://www.musicsaur.com) for folks that want to unzip and run!
 - Mute button
 - All files served locally (no internet connection needed!)
 - Replaying works now (it was broken in 1.2)
 - Playlist sorted by Artist/Album/Track (in order)
-
-**If you'd like to try the dev Version 1.3, click [here](https://github.com/schollz/musicsaur/tree/1.3)**!
 
 ---
 
