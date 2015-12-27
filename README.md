@@ -109,6 +109,7 @@ xinit /usr/bin/luakit -u http://W.X.Y.Z:5000
 
 # History
 
+- 12/26/2015: Version 1.3 Release
 - 12/19/2015: Version 1.2 Release
 - 12/18/2015 (evening): Version 1.1 Release
 - 12/18/2015 (morning): Version 1.0 Release
