@@ -23,6 +23,8 @@ Want to sync up your music on multiple computers? This accomplishes exactly that
 
 This program is powered by [the excellent howler.js library from goldfire](https://github.com/goldfire/howler.js/). Essentially all the client computers [sync their clocks](http://www.mine-control.com/zack/timesync/timesync.html) and then try to start a song at the same time. Any dissimilarities between playback are also fixed, because the clients will automatically seek to the position of the server.
 
+Tested on Android, Windows phone, Windows, Apple, and Linux.
+
 # Setup
 
 If you don't want to install *anything*, just download the [compiled version](http://www.musicsaur.com/download-binary/).
