@@ -21,13 +21,13 @@ a.cta3 {
 # Windows
 
 <center>
-<a class="cta3" href=/"assets/builds/musicsaur-1.3.0-windows-amd64.tar.gz"> Download musicsaur-1.3-windows-amd64.exe.tar.gz </a>
+<a class="cta3" href="/assets/builds/musicsaur-1.3.0-windows-amd64.tar.gz"> Download musicsaur-1.3-windows-amd64.exe.tar.gz </a>
 </center>
 
 # Linux
 
 <center>
-<a class="cta3" href="assets/builds/musicsaur-1.3.0-linux-amd64.tar.gz"> Download musicsaur-1.3-linux-amd64.tar.gz </a>
+<a class="cta3" href="/assets/builds/musicsaur-1.3.0-linux-amd64.tar.gz"> Download musicsaur-1.3-linux-amd64.tar.gz </a>
 </center>
 
 # Mac
