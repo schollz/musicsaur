@@ -13,9 +13,32 @@
           <description>&lt;p&gt;It&amp;#39;s very easy to get going on a Raspberry Pi as a server or a client. I&amp;#39;ll go through the steps to set up a client and then the server. You can use a server computer also as a client computer, of course!&lt;/p&gt;
 </description>
         
-        <pubDate>Thu, 24 Dec 2015 11:18:00 -0500</pubDate>
+        <pubDate>Thu, 24 Dec 2015 08:18:00 -0800</pubDate>
         <link>http://www.musicsaur.com/raspberry-pi/</link>
         <guid isPermaLink="true">http://www.musicsaur.com/raspberry-pi/</guid>
+      </item>
+    
+      <item>
+        <title>Musicsaur binary installation</title>
+        
+        
+          <description>&lt;style&gt;
+a.cta3 {
+    background: #5badf0;
+    color: #fff;
+    margin-left: 12px;
+    padding: 8px 12px;
+    font-size: 13px;
+    /*font-weight: bold;*/
+    line-height: 1.35;
+    border-radius: 3px;
+}
+&lt;/style&gt;
+</description>
+        
+        <pubDate>Tue, 22 Dec 2015 10:18:00 -0800</pubDate>
+        <link>http://www.musicsaur.com/download-binary/</link>
+        <guid isPermaLink="true">http://www.musicsaur.com/download-binary/</guid>
       </item>
     
       <item>
@@ -25,21 +48,9 @@
           <description>&lt;p&gt;&lt;strong&gt;What is musicsaur?&lt;/strong&gt;&lt;/p&gt;
 </description>
         
-        <pubDate>Sat, 19 Dec 2015 13:18:00 -0500</pubDate>
+        <pubDate>Sat, 19 Dec 2015 10:18:00 -0800</pubDate>
         <link>http://www.musicsaur.com/faq/</link>
         <guid isPermaLink="true">http://www.musicsaur.com/faq/</guid>
-      </item>
-    
-      <item>
-        <title>Musicsaur setup full instructions [Python]</title>
-        
-        
-          <description>&lt;h2&gt;Before you begin&lt;/h2&gt;
-</description>
-        
-        <pubDate>Fri, 18 Dec 2015 13:18:00 -0500</pubDate>
-        <link>http://www.musicsaur.com/python/</link>
-        <guid isPermaLink="true">http://www.musicsaur.com/python/</guid>
       </item>
     
       <item>
@@ -49,9 +60,21 @@
           <description>&lt;h2&gt;Before you begin&lt;/h2&gt;
 </description>
         
-        <pubDate>Fri, 18 Dec 2015 13:18:00 -0500</pubDate>
+        <pubDate>Fri, 18 Dec 2015 10:18:00 -0800</pubDate>
         <link>http://www.musicsaur.com/golang/</link>
         <guid isPermaLink="true">http://www.musicsaur.com/golang/</guid>
+      </item>
+    
+      <item>
+        <title>Musicsaur setup full instructions [Python]</title>
+        
+        
+          <description>&lt;h2&gt;Before you begin&lt;/h2&gt;
+</description>
+        
+        <pubDate>Fri, 18 Dec 2015 10:18:00 -0800</pubDate>
+        <link>http://www.musicsaur.com/python/</link>
+        <guid isPermaLink="true">http://www.musicsaur.com/python/</guid>
       </item>
     
   </channel>

@@ -67,17 +67,16 @@ First download the zipped archive corresponding to your operating system (Window
 
 Then, unzip the archive into the folder of your choice. You will see two folders, a configuration file, and an executable. 
 
-Now, you can open the configuration file, ```config.cfg``` using the editor of your choice. In line #5 of this file, you need to edit to include the path of your music. Make sure to include the *full path* and not the relative path. No other parameters need to be edited in this configuration file.
+Now, you can open the configuration file, {% highlight bash %}config.cfg{% endhighlight %} using the editor of your choice. In line #5 of this file, you need to edit to include the path of your music. Make sure to include the *full path* and not the relative path. No other parameters need to be edited in this configuration file.
 
 To run, simply double click on the executable, or run within a Terminal. Upon running, you should see something like this in the terminal window:
 
 {% highlight bash %}
-######################################################################
-# musicsaur - version 1.3.0
+##########################################
 # Starting server with 10 songs
 # To use, open a browser to http://IP:PORT
 # To stop server, use Ctl + C
-######################################################################
+##########################################
 {% endhighlight %}
 
 To see the music player now, simply open any browser and type in the URL {% highlight bash %}http://IP:PORT{% endhighlight %} to see the music controls.

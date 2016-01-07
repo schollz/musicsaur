@@ -6,7 +6,6 @@ aboutPage: true
 
 markdown: redcarpet
 highlighter: pygments
-gems: [jekyll-paginate]
 paginate: 20
 baseurl: /
 domain_name: 'http://www.musicsaur.com'
@@ -43,3 +42,4 @@ defaults:
 
 gems:
   - jekyll-sitemap
+  - jekyll-paginate
