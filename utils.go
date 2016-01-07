@@ -2,6 +2,7 @@ package main
 
 import "net"
 import "errors"
+import "strings"
 
 func externalIP() (string, error) {
 	ifaces, err := net.Interfaces()
@@ -48,7 +49,7 @@ func GetLocalIP() string {
 	for _, address := range addrs {
 		// check the address type and if it is not a loopback the display it
 		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
-			if ipnet.IP.To4() != nil {
+			if ipnet.IP.To4() != nil && (strings.Contains(ipnet.IP.String(), "192.168.1") || strings.Contains(ipnet.IP.String(), "192.168.0")) {
 				return ipnet.IP.String()
 			}
 		}
