@@ -41,3 +41,8 @@ a.cta3 {
 <center>
 <a class="cta3" href="/assets/builds/musicsaur-1.3.0-linux-arm.tar.gz"> Download musicsaur-1.3.0-linx-arm.tar.gz </a>
 </center>
+
+
+# Instructions for use
+
+Simply unzip the archive, and then edit the config.cfg file with the name of your music folder, and then run!
