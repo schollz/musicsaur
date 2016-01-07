@@ -29,7 +29,7 @@ a.cta3 {
   <tr>
     <td class="tg-031e">Windows (64-bit)</td>
     <td class="tg-yw4l"><a href="/assets/builds/musicsaur-1.3.0-windows-amd64.exe.zip">musicsaur-1.3.0-windows-amd64</a></td>
-    <td class="tg-yw4l">be8683dec2a25da1db28c8830413494b2b9cda37</td>
+    <td class="tg-yw4l">0455797d4bc797eaf1c5cda1fd1cf4be1f9dd880</td>
   </tr>
   <tr>
     <td class="tg-yw4l">Mac OS X</td>
