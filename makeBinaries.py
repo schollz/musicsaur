@@ -47,7 +47,7 @@ for arch in arches:
     if "windows" in goos:
         exe = ".exe"
     cmd1  = 'env GOOS=%(goos)s GOARCH=%(goarch)s go build -o builds/musicsaur-%(version)s-%(goos)s-%(goarch)s%(exe)s -v *.go' % {'goos':goos,'goarch':goarch,'exe':exe,'version':version}
-    cmd2 = 'tar -cvzf musicsaur-%(version)s-%(goos)s-%(goarch)s%(exe)s.tar.gz ./templates ./static config.cfg musicsaur-%(version)s-%(goos)s-%(goarch)s%(exe)s' % {'goos':goos,'goarch':goarch,'exe':exe,'version':version}
+    cmd2 = 'zip musicsaur-%(version)s-%(goos)s-%(goarch)s%(exe)s.zip ./templates ./static config.cfg musicsaur-%(version)s-%(goos)s-%(goarch)s%(exe)s' % {'goos':goos,'goarch':goarch,'exe':exe,'version':version}
     print(cmd1)
     os.system(cmd1)
     os.chdir("builds")
