@@ -18,7 +18,7 @@ a.cta3 {
 }
 </style>
 
-# Download
+# Binaries
 
 <table class="tg">
   <tr>
@@ -63,13 +63,19 @@ a.cta3 {
 
 # Instructions
 
+## Download
+
 First download the zipped archive corresponding to your operating system (Windows, Mac, Linux, Raspberry Pi). Optionally, you can check the SHA1 sum of the archive to see if it matches correspondingly.
 
 Then, unzip the archive into the folder of your choice. You will see two folders, a configuration file, and an executable. 
 
+## Configure
+
 Now, you can open the configuration file, {% highlight bash %}config.cfg{% endhighlight %} using the editor of your choice. In line #5 of this file, you need to edit to include the path of your music. Make sure to include the *full path* and not the relative path. No other parameters need to be edited in this configuration file.
 
-To run, simply double click on the executable, or run within a Terminal. Upon running, you should see something like this in the terminal window:
+## Run
+
+To run on Windows, simply double click on the executable. For all other OS's, you will need to open a Terminal, change directory, and type {% highlight bash %}./musicsaur*{% endhighlight %} Upon running, you should see something like this in the terminal window:
 
 {% highlight bash %}
 ##########################################
@@ -79,8 +85,11 @@ To run, simply double click on the executable, or run within a Terminal. Upon ru
 ##########################################
 {% endhighlight %}
 
-To see the music player now, simply open any browser and type in the URL {% highlight bash %}http://IP:PORT{% endhighlight %} to see the music controls.
+To see the music player now, simply open any browser on any computer and type in the URL {% highlight bash %}http://IP:PORT{% endhighlight %} to see the music controls. Enjoy syncing!
 
+## Troubleshoot
+
+Errors? Leave a comment below, or open up an issue on Github.
 
 # License
 
