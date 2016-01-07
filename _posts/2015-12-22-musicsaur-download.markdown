@@ -27,20 +27,14 @@ a.cta3 {
     <th class="tg-yw4l">SHA1SUM</th>
   </tr>
   <tr>
-    <th class="tg-031e">Windows (64-bit)</th>
-    <th class="tg-yw4l">
-    <th class="tg-yw4l"><a href="/assets/builds/musicsaur-1.3.0-windows-amd64.exe.zip">musicsaur-1.3.0-windows-amd64</a></th>
-
-    </th>
-    <th class="tg-yw4l">be8683dec2a25da1db28c8830413494b2b9cda37</th>
+    <td class="tg-031e">Windows (64-bit)</td>
+    <td class="tg-yw4l"><a href="/assets/builds/musicsaur-1.3.0-windows-amd64.exe.zip">musicsaur-1.3.0-windows-amd64</a></td>
+    <td class="tg-yw4l">be8683dec2a25da1db28c8830413494b2b9cda37</td>
   </tr>
   <tr>
     <td class="tg-yw4l">Mac OS X</td>
     <td class="tg-yw4l">
-    <th class="tg-yw4l">
-
-    <a href="/assets/builds/musicsaur-1.3.0-darwin-amd64.zip">musicsaur-1.3.0-darwin-amd64</a></th>
-
+    <a href="/assets/builds/musicsaur-1.3.0-darwin-amd64.zip">musicsaur-1.3.0-darwin-amd64</a>
     </td>
     <td class="tg-yw4l">346177c8fb0329127894ea193626ac4a2fd09aad</td>
   </tr>
