@@ -3,14 +3,16 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/mholt/caddy/caddy"
-	"gopkg.in/tylerb/graceful.v1"
 	"io"
 	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
 	"os"
+	"os/exec"
+
+	"github.com/mholt/caddy/caddy"
+	"gopkg.in/tylerb/graceful.v1"
 	//"os/exec"
 	"strconv"
 	"strings"
@@ -202,6 +204,25 @@ func skipTrack(song_index int) {
 	// To be served by Caddy
 	CopyFile(statevar.SongMap[song].Path, "./static/sound.mp3")
 
+	err = os.Remove("./static/sound.webm")
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = os.Remove("./static/sound.wav")
+	if err != nil {
+		fmt.Println(err)
+	}
+	cmd := "ffmpeg"
+	args := []string{"-i", "./static/sound.mp3", "-acodec", "pcm_u8", "-ar", "44100", "./static/sound.wav"}
+	if err := exec.Command(cmd, args...).Run(); err != nil {
+		fmt.Println(err)
+	}
+	cmd = "ffmpeg"
+	args = []string{"-i", "./static/sound.wav", "-dash", "1", "./static/sound.webm"}
+	if err := exec.Command(cmd, args...).Run(); err != nil {
+		fmt.Println(err)
+	}
+
 	// cmd := "cp"
 	// args := []string{statevar.SongMap[song].Path, "/cygdrive/C/Users/ZNS/Desktop/Caddy/stuff/sound.mp3"}
 	// if err := exec.Command(cmd, args...).Run(); err != nil {
@@ -339,6 +360,11 @@ func main() {
 		fmt.Fprintf(w, html_response)
 	})
 
+	mux.HandleFunc("/sound.webm", func(w http.ResponseWriter, r *http.Request) {
+		defer timeTrack(time.Now(), r.RemoteAddr+" /sound.mp3")
+		w.Header().Set("Content-Type", "audio/mpeg")
+		w.Write([]byte(rawSongData))
+	})
 	mux.HandleFunc("/sound.mp3", func(w http.ResponseWriter, r *http.Request) {
 		defer timeTrack(time.Now(), r.RemoteAddr+" /sound.mp3")
 		w.Header().Set("Content-Type", "audio/mpeg")
