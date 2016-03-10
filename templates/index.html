@@ -29,7 +29,8 @@
 Howler.mobileAutoEnable = true;
 var sound = new Howl({
   src: ['{{ data['sound_url'] }}/sound.webm?{{ data['random_integer'] }}'],
-  preload: true
+  preload: true,
+  html5: true
 });
 
     </script>

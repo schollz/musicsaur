@@ -322,7 +322,7 @@ func main() {
 			IndexPage:        "",
 		}
 	}
-	statevar.IPAddress = GetLocalIP()
+	statevar.IPAddress = "10.190.77.1" //GetLocalIP()
 	statevar.Port = conf.Server.Port
 
 	// Load Mp3s
