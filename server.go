@@ -70,7 +70,7 @@ func getPlaybackPositionInSeconds() float64 {
 
 func SyncRequest(rw http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
-		defer timeTrack(time.Now(), r.RemoteAddr+" /sync")
+		// defer timeTrack(time.Now(), r.RemoteAddr+" /sync")
 		//current_song := r.FormValue("current_song")
 		client_timestamp_str := r.FormValue("client_timestamp")
 		client_timestamp, _ := strconv.ParseUint(client_timestamp_str, 10, 64)
@@ -212,11 +212,13 @@ func skipTrack(song_index int) {
 	if err != nil {
 		fmt.Println(err)
 	}
+	fmt.Println("Converting to wav..")
 	cmd := "ffmpeg"
 	args := []string{"-i", "./static/sound.mp3", "-acodec", "pcm_u8", "-ar", "44100", "./static/sound.wav"}
 	if err := exec.Command(cmd, args...).Run(); err != nil {
 		fmt.Println(err)
 	}
+	fmt.Println("Converting to webm..")
 	cmd = "ffmpeg"
 	args = []string{"-i", "./static/sound.wav", "-dash", "1", "./static/sound.webm"}
 	if err := exec.Command(cmd, args...).Run(); err != nil {
