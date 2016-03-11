@@ -37,12 +37,13 @@ func loadCaddyfile() (caddy.Input, error) {
 	tls off
 	root ./
 	gzip
-	browse
-	log ./static/caddy.log
+	log ./caddy.log
 }`
 	contents = strings.Replace(contents, "IPADDRESS", statevar.IPAddress, -1)
+	contents = strings.Replace(contents, "EXTADDRESS", RuntimeArgs.ExternalIP, -1)
 	contents = strings.Replace(contents, "PORT1", strconv.Itoa(statevar.Port), -1)
 	contents = strings.Replace(contents, "PORT2", strconv.Itoa(statevar.Port+1), -1)
+	fmt.Println(contents)
 	return caddy.CaddyfileInput{
 		Contents: []byte(contents),
 		Filepath: "Caddyfile",

@@ -158,7 +158,7 @@ func skipTrack(song_index int) {
 	rawSongData, _ = ioutil.ReadFile(statevar.SongMap[song].Path)
 
 	statevar.CurrentSong = statevar.SongMap[song].Fullname
-	statevar.SongStartTime = getTime() + 11000
+	statevar.SongStartTime = getTime() + 9000
 	statevar.IsPlaying = false
 	b, _ := json.Marshal(statevar)
 	ioutil.WriteFile("state.json", b, 0644)
