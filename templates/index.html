@@ -166,6 +166,7 @@ for (var i = 0; i < 23; i++) {
               }
               sound.play();
               sound.volume(0.0);
+              checkIfSkipped(false);
               // var posting = $.post('/playing', {
               // 'message': 'im playing a song'
               // });
@@ -214,7 +215,7 @@ function checkIfSkipped(mute_button_click) {
           loadingError  = loadingError + 1;
           $("div.info1").html('Loading <b>' + current_song_name + '</b>...');
           if (loadingError > 10) {
-            location.reload();
+            location.reload(true);
           }
         }
 
