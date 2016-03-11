@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -26,10 +27,13 @@ func songControl(millisecondWait int64, is_playing bool, text string, song strin
 func getPlaylistHTML() (playlist_html string) {
 	playlist_html = ""
 	for i, k := range statevar.SongList {
+		name := statevar.SongMap[k].Title
+		names := strings.Split(name, "/")
+		showName := names[len(names)-1]
 		if statevar.CurrentSong != statevar.SongMap[k].Fullname {
-			playlist_html += "<a type='controls' data-skip='" + strconv.Itoa(i) + "'>" + statevar.SongMap[k].Fullname + "</a><br>\n"
+			playlist_html += "<a type='controls' data-skip='" + strconv.Itoa(i) + "'>" + showName + "</a><br>\n"
 		} else {
-			playlist_html += "<a type='controls' data-skip='" + strconv.Itoa(i) + "'><b>" + statevar.SongMap[k].Fullname + "</b></a><br>\n"
+			playlist_html += "<a type='controls' data-skip='" + strconv.Itoa(i) + "'><b>" + statevar.SongMap[k].Title + "</b></a><br>\n"
 
 		}
 	}
