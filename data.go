@@ -61,6 +61,7 @@ type State struct {
 	IPAddress        string
 	Port             int
 	IndexPage        string
+	MusicExtension   string
 }
 
 // Data for Song
