@@ -155,8 +155,7 @@ for (var i = 0; i < 23; i++) {
           clearTimeout(secondTimeout0);
           secondTimeout0 = setTimeout(function() {
               console.log('playing song');
-              current_song_name = current_song.split("-");
-              current_song_name = current_song_name[current_song_name.length-1];
+              current_song_name = current_song;
               $("div.info1").html('Loading <b>' + current_song_name + '</b>...');
               mainInterval = setInterval(function(){
                 checkIfSkipped(false);
@@ -253,8 +252,13 @@ function checkIfSkipped(mute_button_click) {
 	    runningError = 0;
       outOfSyncCounts = 0;
             console.log('[' + data['song_time'] + '] ' + ': in sync (|' + (diff*1000).toString() + '|<' + MAX_SYNC_LAG.toString() + ' ms)')
-            $("div.info1").html('Playing <b>' + current_song_name + '</b>');
-            CHECK_UP_ITERATION = parseInt(3.0/(CHECK_UP_WAIT_TIME/1000.0)); // every 30 seconds
+           //console.log(data); 
+	   if (data['is_muted']==false) {
+		$("div.info1").html('Playing <b>' + current_song_name + '</b>');
+           } else {
+             setMute(data['is_muted'])
+          }
+	    CHECK_UP_ITERATION = parseInt(3.0/(CHECK_UP_WAIT_TIME/1000.0)); // every 30 seconds
             tryWait = 0;
             check_up_counter = 0;
             runningDiff = 0;

@@ -33,7 +33,7 @@ func getPlaylistHTML() (playlist_html string) {
 		if statevar.CurrentSong != statevar.SongMap[k].Fullname {
 			playlist_html += "<a type='controls' data-skip='" + strconv.Itoa(i) + "'>" + showName + "</a><br>\n"
 		} else {
-			playlist_html += "<a type='controls' data-skip='" + strconv.Itoa(i) + "'><b>" + statevar.SongMap[k].Title + "</b></a><br>\n"
+			playlist_html += "<a type='controls' data-skip='" + strconv.Itoa(i) + "'><b>" + showName + "</b></a><br>\n"
 
 		}
 	}
@@ -66,15 +66,18 @@ func SyncRequest(rw http.ResponseWriter, r *http.Request) {
 			mute_button_clicked = true
 			is_muted = statevar.IsMuted
 		}
+		name := statevar.CurrentSong
+		names := strings.Split(name, "/")
+		showName := names[len(names)-1]
 		data := SyncJSON{
-			Current_song:        statevar.CurrentSong,
+			Current_song:        showName,
 			Client_timestamp:    int64(client_timestamp),
 			Server_timestamp:    getTime(),
 			Is_playing:          statevar.IsPlaying,
 			Song_time:           getPlaybackPositionInSeconds(),
 			Song_start_time:     statevar.SongStartTime,
 			Mute_button_clicked: mute_button_clicked,
-			Is_muted:            is_muted,
+			Is_muted:            statevar.IsMuted,
 		}
 		b, err := json.Marshal(data)
 		if err != nil {
