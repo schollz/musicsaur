@@ -2,20 +2,22 @@
 
 # MusicSAUR (formerly the un-googleable "μsic")
 ## Music Synchronization And Uniform Relaying
-[![Version 1.3](https://img.shields.io/badge/version-1.3-brightgreen.svg)]()
+[![Version 1.4](https://img.shields.io/badge/version-1.4-brightgreen.svg)]()
 [![Join the chat at https://gitter.im/schollz/musicsaur](https://badges.gitter.im/schollz/music.svg)](https://gitter.im/schollz/musicsaur?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ---
 
-**Update 12/26/2015: Version 1.3 released! Now includes Go and Python versions!**
+**Update 12/26/2015: Version 1.4 released!**
 
-**Major features include (for all versions):**
+**Major changes:**
 
-- Go version with [precompiled libraries](http://www.musicsaur.com) for folks that want to unzip and run!
-- Mute button
-- All files served locally (no internet connection needed!)
-- Replaying works now (it was broken in 1.2)
-- Playlist sorted by Artist/Album/Track (in order)
+- Mute button works better
+- [Python version](link to python version) no longer maintained
+- Syncing is better (reloads on mis-syncs, more health checks)
+- Syncing is faster (< 3 seconds)
+- Better file serving (caddy handles things internally)
+- Better deployment (easily deploy with your own server name)
+- ffmpeg support for webm (much better for compressing audio)
 
 ---
 
@@ -29,28 +31,6 @@ Tested on Android, Windows phone, Windows, Apple, and Linux.
 
 If you don't want to install *anything*, just download the [compiled version](http://www.musicsaur.com/download-binary/).
 
-## Python
-
-If you're interested in installing the Python version, follow these instructions. First install the required packages using
-
-```bash
-git clone https://github.com/schollz/musicsaur.git
-cd musicsaur
-sudo python setup.py install
-```
-
-then copy the configuration file for the Python version
-
-```bash
-cp config-python.cfg config.cfg
-```
-
-and edit line #42 with the locations of your music folderse. There are other parameters to edit, if you feel so inclined, but you needn't just to get started. Then simply run with
-
-```bash
-python syncmusic.py
-```
-
 ## Golang
 
 If you're interested in installing the Golang version, follow these instructions. First install the required packages
@@ -58,11 +38,8 @@ If you're interested in installing the Golang version, follow these instructions
 ```bash
 git clone https://github.com/schollz/musicsaur.git
 cd musicsaur
-go get github.com/mholt/caddy/caddy
-go get github.com/tcolgate/mp3
-go get github.com/bobertlo/go-id3/id3
-go get github.com/BurntSushi/toml
-go get gopkg.in/tylerb/graceful.v1
+go get ./...
+go build
 ```
 
 Then copy the configuration file 
@@ -74,7 +51,7 @@ cp config-go.cfg config.cfg
 and edit line #5 with your music folders. Then simpily use 
 
 ```bash
-go run *.go
+./musicsaur
 ```
 
 to start up the server!
@@ -115,6 +92,7 @@ xinit /usr/bin/luakit -u http://W.X.Y.Z:5000
 
 # History
 
+- 03/11/2016: Version 1.4 Release
 - 12/26/2015: Version 1.3 Release
 - 12/19/2015: Version 1.2 Release
 - 12/18/2015 (evening): Version 1.1 Release
