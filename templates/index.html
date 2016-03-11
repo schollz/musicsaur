@@ -28,7 +28,7 @@
     <script>
 Howler.mobileAutoEnable = true;
 var sound = new Howl({
-  src: ['{{ data['sound_url'] }}/sound.{{ data['sound_extension'] }}?{{ data['random_integer'] }}'],
+  src: ['/static/sound.{{ data['sound_extension'] }}?{{ data['random_integer'] }}'],
   preload: true,
   html5: true
 });
@@ -155,8 +155,7 @@ for (var i = 0; i < 23; i++) {
           clearTimeout(secondTimeout0);
           secondTimeout0 = setTimeout(function() {
               console.log('playing song');
-              current_song_name = current_song.split("-");
-              current_song_name = current_song_name[current_song_name.length-1];
+              current_song_name = current_song;
               $("div.info1").html('Loading <b>' + current_song_name + '</b>...');
               mainInterval = setInterval(function(){
                 checkIfSkipped(false);
@@ -227,7 +226,7 @@ function checkIfSkipped(mute_button_click) {
             CHECK_UP_ITERATION = 1;
             outOfSyncCounts = outOfSyncCounts + 1;
             var serverSongTime = data['song_time']+time_delta2/1000.0;
-            console.log('[' + Date.now() + '] ' + ': NOT in sync (|' + (diff*1000).toString() + '|>' + MAX_SYNC_LAG.toString() + ' ms)')
+            console.log('[' + data['song_time'] + '] ' + ': NOT in sync (|' + (diff*1000).toString() + '|>' + MAX_SYNC_LAG.toString() + ' ms)')
             if (outOfSyncCounts > 3)  {
             sound.volume(0.0);
             console.log('Browser:  ' + mySongTime.toString() + '\nServer: ' + serverSongTime.toString() + '\nDiff: ' + (diff*1000).toString() + '\nMean half-latency: ' + true_server_time_delta.toString() +  '\nMeasured half-latency: ' + time_delta2.toString() + '\nrunningDiff: ' + (runningDiff*1000).toString() + '\nSeeking to: ' + (serverSongTime+runningDiff).toString());
@@ -252,9 +251,14 @@ function checkIfSkipped(mute_button_click) {
           } else {
 	    runningError = 0;
       outOfSyncCounts = 0;
-            console.log('[' + Date.now() + '] ' + ': in sync (|' + (diff*1000).toString() + '|<' + MAX_SYNC_LAG.toString() + ' ms)')
-            $("div.info1").html('Playing <b>' + current_song_name + '</b>');
-            CHECK_UP_ITERATION = parseInt(30.0/(CHECK_UP_WAIT_TIME/1000.0)); // every 30 seconds
+            console.log('[' + data['song_time'] + '] ' + ': in sync (|' + (diff*1000).toString() + '|<' + MAX_SYNC_LAG.toString() + ' ms)')
+           //console.log(data); 
+	   if (data['is_muted']==false) {
+		$("div.info1").html('Playing <b>' + current_song_name + '</b>');
+           } else {
+             setMute(data['is_muted'])
+          }
+	    CHECK_UP_ITERATION = parseInt(3.0/(CHECK_UP_WAIT_TIME/1000.0)); // every 30 seconds
             tryWait = 0;
             check_up_counter = 0;
             runningDiff = 0;
@@ -465,7 +469,7 @@ makeRequests();
 
 
             <span style="vertical-align: middle; display: table-cell;">
-            <h1  style="position:relative;bottom:0"><i>musicsaur</i><br><small style="font-size: 50%;">&nbsp;version 1.3</small></h1>
+            <h1  style="position:relative;bottom:0"><i>musicsaur</i><br><small style="font-size: 50%;">&nbsp;version 1.4</small></h1>
         </span>
     </div>
 
