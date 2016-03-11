@@ -203,7 +203,7 @@ func skipTrack(song_index int) {
 
 	// To be served by Caddy
 	CopyFile(statevar.SongMap[song].Path, "./static/sound.mp3")
-
+	statevar.MusicExtension = "mp3"
 	err = os.Remove("./static/sound.webm")
 	if err != nil {
 		fmt.Println(err)
@@ -225,7 +225,8 @@ func skipTrack(song_index int) {
 			// If unsuccessful, will defualt to sound.mp3
 			fmt.Println(err)
 		} else {
-			// If successful get rid of sound.mp3
+			// If successful get rid of sound.mp3 and use sound.webm
+			statevar.MusicExtension = "webm"
 			err := os.Remove("./static/sound.mp3")
 			if err != nil {
 				fmt.Println(err)
@@ -345,6 +346,7 @@ func main() {
 		html_response = strings.Replace(html_response, "{{ data['message'] }}", "Syncing...", -1)
 		html_response = strings.Replace(html_response, "{{ data['playlist_html'] | safe }}", getPlaylistHTML(), -1)
 		html_response = strings.Replace(html_response, "{{ data['sound_url'] }}", "http://"+statevar.IPAddress+":"+strconv.Itoa(conf.Server.Port+1), -1)
+		html_response = strings.Replace(html_response, "{{ data['sound_extension'] }}", statevar.MusicExtension, -1)
 		fmt.Fprintf(w, html_response)
 	})
 
