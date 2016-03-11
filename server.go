@@ -217,16 +217,20 @@ func skipTrack(song_index int) {
 	args := []string{"-i", "./static/sound.mp3", "-acodec", "pcm_u8", "-ar", "44100", "./static/sound.wav"}
 	if err := exec.Command(cmd, args...).Run(); err != nil {
 		fmt.Println(err)
-	}
-	fmt.Println("Converting to webm..")
-	cmd = "ffmpeg"
-	args = []string{"-i", "./static/sound.wav", "-dash", "1", "./static/sound.webm"}
-	if err := exec.Command(cmd, args...).Run(); err != nil {
-		// If unsuccessful, will defualt to sound.mp3
-		fmt.Println(err)
 	} else {
-		// If successful get rid of sound.mp3
-		os.Remove("./static/sound.mp3")
+		fmt.Println("Converting to webm..")
+		cmd = "ffmpeg"
+		args = []string{"-i", "./static/sound.wav", "-dash", "1", "./static/sound.webm"}
+		if err := exec.Command(cmd, args...).Run(); err != nil {
+			// If unsuccessful, will defualt to sound.mp3
+			fmt.Println(err)
+		} else {
+			// If successful get rid of sound.mp3
+			err := os.Remove("./static/sound.mp3")
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
 	}
 
 	rawSongData, _ = ioutil.ReadFile(statevar.SongMap[song].Path)
@@ -306,7 +310,7 @@ func main() {
 			IndexPage:        "",
 		}
 	}
-	statevar.IPAddress = "10.190.77.1" //GetLocalIP()
+	statevar.IPAddress = GetLocalIP()
 	statevar.Port = conf.Server.Port
 
 	// Load Mp3s
