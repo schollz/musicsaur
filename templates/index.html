@@ -80,6 +80,7 @@ console.log('0 seconds left')
 var mainInterval = 0;
 var runningDiff = 0;
 var runningError = 0;
+var loadingError = 0;
 
 
 function makeRequests(callback) {
@@ -210,7 +211,11 @@ function checkIfSkipped(mute_button_click) {
         if (typeof(mySongTime)=="object") {
           mySongTime = 0;
           console.log('Still loading...')
-            $("div.info1").html('Loading <b>' + current_song_name + '</b>...');
+          loadingError  = loadingError + 1;
+          $("div.info1").html('Loading <b>' + current_song_name + '</b>...');
+          if (loadingError > 10) {
+            location.reload();
+          }
         }
 
         if (mySongTime == 0) {
