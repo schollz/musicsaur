@@ -29,16 +29,20 @@ func cleanup() {
 func loadCaddyfile() (caddy.Input, error) {
 
 	// Caddyfile in cwd
-	contents := `IPADDRESS:PORT {
+	contents := `IPADDRESS:PORT1 {
+	proxy / IPADDRESS:PORT2 {
+	except /static
+}
 	header  / Access-Control-Allow-Origin "*"
 	tls off
-	root ./static/
+	root ./
 	gzip
 	browse
 	log ./static/caddy.log
 }`
 	contents = strings.Replace(contents, "IPADDRESS", statevar.IPAddress, -1)
-	contents = strings.Replace(contents, "PORT", strconv.Itoa(statevar.Port+1), -1)
+	contents = strings.Replace(contents, "PORT1", strconv.Itoa(statevar.Port), -1)
+	contents = strings.Replace(contents, "PORT2", strconv.Itoa(statevar.Port+1), -1)
 	return caddy.CaddyfileInput{
 		Contents: []byte(contents),
 		Filepath: "Caddyfile",
@@ -57,16 +61,15 @@ var RuntimeArgs struct {
 
 func main() {
 	flag.StringVar(&RuntimeArgs.Port, "p", "8003", "port to bind")
+	flag.StringVar(&RuntimeArgs.ExternalIP, "b", "none", "external address (e.g. musicsaur.com)")
 	flag.StringVar(&RuntimeArgs.ServerCRT, "crt", "", "location of ssl crt")
 	flag.StringVar(&RuntimeArgs.ServerKey, "key", "", "location of ssl key")
 	flag.CommandLine.Usage = func() {
-		fmt.Println(`AwwKoala (version ` + appVersion + `): A Websocket Wiki and Kind Of A List Application
+		fmt.Println(`musicsaur (version ` + appVersion + `): A Websocket Wiki and Kind Of A List Application
 run this to start the server and then visit localhost at the port you specify
 (see parameters).
-Example: 'awwkoala yourserver.com'
-Example: 'awwkoala -p :8080 localhost:8080'
-Example: 'awwkoala -db /var/lib/awwkoala/db.bolt localhost:8003'
-Example: 'awwkoala -p :8080 -crt ssl/server.crt -key ssl/server.key localhost:8080'
+Example: 'musicsaur -p 5000 127.0.0.1'
+Example: 'musicsaur -p 5000 -b musicsaur.com 127.0.0.1'
 Options:`)
 		flag.CommandLine.PrintDefaults()
 	}
@@ -118,6 +121,11 @@ Options:`)
 	fmt.Println("PORT", RuntimeArgs.Port)
 	port, _ := strconv.Atoi(RuntimeArgs.Port)
 	statevar.Port = port
+	if RuntimeArgs.ExternalIP == "none" {
+		RuntimeArgs.ExternalIP = "http://" + statevar.IPAddress + ":" + strconv.Itoa(statevar.Port)
+	} else {
+		RuntimeArgs.ExternalIP = "http://" + RuntimeArgs.ExternalIP
+	}
 
 	// Load Mp3s
 	if len(conf.MusicFolders) > 0 {
@@ -150,7 +158,7 @@ Options:`)
 		html_response = strings.Replace(html_response, "{{ data['max_sync_lag'] }}", strconv.Itoa(conf.Client.MaxSyncLag), -1)
 		html_response = strings.Replace(html_response, "{{ data['message'] }}", "Syncing...", -1)
 		html_response = strings.Replace(html_response, "{{ data['playlist_html'] | safe }}", getPlaylistHTML(), -1)
-		html_response = strings.Replace(html_response, "{{ data['sound_url'] }}", "http://"+statevar.IPAddress+":"+strconv.Itoa(statevar.Port+1), -1)
+		html_response = strings.Replace(html_response, "{{ data['sound_url'] }}", RuntimeArgs.ExternalIP, -1)
 		html_response = strings.Replace(html_response, "{{ data['sound_extension'] }}", statevar.MusicExtension, -1)
 		fmt.Fprintf(w, html_response)
 	})
@@ -164,9 +172,6 @@ Options:`)
 		defer timeTrack(time.Now(), r.RemoteAddr+" /sound.mp3")
 		w.Header().Set("Content-Type", "audio/mpeg")
 		w.Write([]byte(rawSongData))
-	})
-	mux.HandleFunc("/static/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, r.URL.Path[1:])
 	})
 	mux.HandleFunc("/sync", SyncRequest)
 	mux.HandleFunc("/nextsong", NextSongRequest)
@@ -188,7 +193,7 @@ Options:`)
 		fmt.Println(err)
 	}
 
-	go graceful.Run(":"+strconv.Itoa(statevar.Port), 10*time.Second, mux)
+	go graceful.Run(":"+strconv.Itoa(statevar.Port+1), 10*time.Second, mux)
 
 	caddy.AppName = appName
 	caddy.AppVersion = appVersion
