@@ -1,7 +1,9 @@
 ![Logo](http://rpiai.com/musicsaur/musicsaur1.png)
 
-# MusicSAUR (formerly the un-googleable "μsic")
-## Music Synchronization And Uniform Relaying
+#musicsaur - [Try it](http://radio.musicsaur.com)
+
+##### Music Synchronization And Uniform Relaying
+
 [![Version 1.4](https://img.shields.io/badge/version-1.4-brightgreen.svg)]()
 [![Join the chat at https://gitter.im/schollz/musicsaur](https://badges.gitter.im/schollz/music.svg)](https://gitter.im/schollz/musicsaur?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
