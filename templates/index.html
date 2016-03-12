@@ -198,6 +198,9 @@ function checkIfSkipped(mute_button_click) {
 
     // Put the results in a div
     posting.done(function(data) {
+	if (data['current_song']!=current_song) {
+	location.reload(true);
+	}
         var start = new Date().getTime();
         var time_delta2 = time()-(data['server_timestamp']+true_time_delta);
       check_up_counter = check_up_counter + 1;
@@ -301,6 +304,7 @@ $(document).ready(function(){
 $('a[type=controls]').click(function() {
    var skip = $(this).data('skip');
    console.log(skip);
+	clearInterval(mainInterval);
     $("div.info1").text('Changing song');
     var posting = $.post('/nextsong', {
         'message': 'next song please',
