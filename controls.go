@@ -28,7 +28,7 @@ func songControl(millisecondWait int64, is_playing bool, text string, song strin
 func getPlaylistHTML() (playlist_html string) {
 	playlist_html = ""
 	for i, k := range statevar.SongList {
-		name := statevar.SongMap[k].Title
+		name := statevar.SongMap[k].Fullname
 		names := strings.Split(name, "/")
 		showName := names[len(names)-1]
 		if statevar.CurrentSong != statevar.SongMap[k].Fullname {
