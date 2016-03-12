@@ -180,14 +180,14 @@ for (var i = 0; i < 23; i++) {
     });
 
   }, i*180 );
-    
+
 }
 }
 
 
 function checkIfSkipped(mute_button_click) {
 
-    
+
     // Send the data using post
     var posting = $.post('/sync', {
         'client_timestamp': time(),
@@ -255,7 +255,7 @@ function checkIfSkipped(mute_button_click) {
 	    runningError = 0;
       outOfSyncCounts = 0;
             console.log('[' + data['song_time'] + '] ' + ': in sync (|' + (diff*1000).toString() + '|<' + MAX_SYNC_LAG.toString() + ' ms)')
-           //console.log(data); 
+           //console.log(data);
 	   if (data['is_muted']==false) {
 		$("div.info1").html('Playing <b>' + current_song_name + '</b>');
            } else {
@@ -266,7 +266,7 @@ function checkIfSkipped(mute_button_click) {
             check_up_counter = 0;
             runningDiff = 0;
             if (data['mute_button_clicked']==true) {
-              setMute(data['is_muted'])   
+              setMute(data['is_muted'])
             }
             if (is_muted==true) {
               sound.volume(0.0)
@@ -274,11 +274,11 @@ function checkIfSkipped(mute_button_click) {
               sound.volume(1.0)
             }
 
-          } 
+          }
         }
       } else {
         if (data['mute_button_clicked']==true) {
-          setMute(data['is_muted'])   
+          setMute(data['is_muted'])
         }
       }
     });
@@ -473,14 +473,14 @@ makeRequests();
 
 
             <span style="vertical-align: middle; display: table-cell;">
-            <h1  style="position:relative;bottom:0"><i>musicsaur</i><br><small style="font-size: 50%;">&nbsp;version 1.4</small></h1>
+            <h1  style="position:relative;bottom:0"><i><a href="http://www.musicsaur.com/">musicsaur</a></i><br><small style="font-size: 30%;">&nbsp;version 1.4</small></h1>
         </span>
     </div>
 
 
         <div class="row">
             <div class="seven columns">
-               <a class="button" type="mute">Mute</a>  
+               <a class="button" type="mute">Mute</a>
 <!--                <a class="button" data-skip="-3" type="controls">Previous</a>  -->
                 <a class="button" data-skip="-2" type="controls">Replay</a> <a class="button" data-skip="-1" type="controls">Next</a>
             </div>
