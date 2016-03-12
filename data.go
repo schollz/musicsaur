@@ -37,6 +37,7 @@ type serverParamaters struct {
 	Port                int
 	TimeToNextSong      int
 	TimeToDisallowSkips int
+	Random              bool
 }
 
 func setupConfiguration() {
@@ -61,6 +62,7 @@ type State struct {
 	IPAddress        string
 	Port             int
 	IndexPage        string
+	MusicExtension   string
 }
 
 // Data for Song
