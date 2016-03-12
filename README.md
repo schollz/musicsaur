@@ -12,12 +12,13 @@
 **Major changes:**
 
 - Mute button works better
-- [Python version](link to python version) no longer maintained
-- Syncing is better (reloads on mis-syncs, more health checks)
+- [Python version](https://github.com/schollz/musicsaur/tree/python) available, but no longer maintained
+- Syncing is better (reloads on mis-syncs, more health checks, smarter muting)
 - Syncing is faster (< 3 seconds)
 - Better file serving (caddy handles things internally)
 - Better deployment (easily deploy with your own server name)
 - ffmpeg support for webm (much better for compressing audio)
+- Updated to latest version of [howler.js](https://github.com/goldfire/howler.js/)
 
 ---
 
@@ -29,11 +30,7 @@ Tested on Android, Windows phone, Windows, Apple, and Linux.
 
 # Setup
 
-If you don't want to install *anything*, just download the [compiled version](http://www.musicsaur.com/download-binary/).
-
-## Golang
-
-If you're interested in installing the Golang version, follow these instructions. First install the required packages
+If you don't want to install *anything*, just download the [compiled version](http://www.musicsaur.com/download-binary/). Otherwise, read on ->.
 
 ```bash
 git clone https://github.com/schollz/musicsaur.git
@@ -42,13 +39,13 @@ go get ./...
 go build
 ```
 
-Then copy the configuration file 
+Then copy the configuration file
 
 ```bash
 cp config-go.cfg config.cfg
 ```
 
-and edit line #5 with your music folders. Then simpily use 
+and edit line #5 with your music folders. Then simpily use
 
 ```bash
 ./musicsaur
@@ -56,9 +53,17 @@ and edit line #5 with your music folders. Then simpily use
 
 to start up the server!
 
+I suggest using `ffmpeg` as it will make syncing much faster. [Installation is easy](https://www.ffmpeg.org/download.html):
+
+```
+sudo add-apt-repository ppa:mc3man/trusty-media
+sudo apt-get update
+sudo apt-get install ffmpeg
+```
+
 ### Some notes
 
-- If you don't hear anything, the client is probably trying to synchronize. The browser automatically mutes when it goes out of sync to avoid the headache caused by mis-aligned audio. You can see synchronization progress in [your browser console](https://webmasters.stackexchange.com/questions/8525/how-to-open-the-javascript-console-in-different-browsers). 
+- If you don't hear anything, the client is probably trying to synchronize. The browser automatically mutes when it goes out of sync to avoid the headache caused by mis-aligned audio. You can see synchronization progress in [your browser console](https://webmasters.stackexchange.com/questions/8525/how-to-open-the-javascript-console-in-different-browsers).
 - If you still dont' hear anything, and you're using Chrome browser on Android [you need change one of the flags in chrome to allow audio without gestures](http://android.stackexchange.com/questions/59134/enable-autoplay-html5-video-in-chrome). To do this, copy and paste this into your Chrome browser:
 
 ```bash
@@ -104,7 +109,7 @@ xinit /usr/bin/luakit -u http://W.X.Y.Z:5000
 * Zach Simpson for [his paper on simple clock synchronization](http://www.mine-control.com/zack/timesync/timesync.html)
 * Everyone on the [/r/raspberry_pi](https://www.reddit.com/r/raspberry_pi/comments/3xc8kq/simple_python_script_to_allow_multiple_raspberry/) and [/r/python](https://www.reddit.com/r/Python/comments/3xc8mj/simple_python_script_to_allow_multiple_computers/) threads for great feature requests and bug reports!
 * [ClkerFreeVectorImages](https://pixabay.com/en/users/ClkerFreeVectorImages-3736/) and [OpenClipartVectors](https://pixabay.com/en/users/OpenClipartVectors-30363/) for the Public Domain vectors
-- [mholt](github.com/mholt) for the invaluable ```Caddy``` 
+- [mholt](github.com/mholt) for the invaluable ```Caddy```
 - [tcolgate](http://github.com/tcolgate) for the ```mp3``` package
 - [bobertlo](http://github.com/bobertlo) for the ```go-id3``` package
 - [BurntSushi](http://github.com/BurntSushi) for their ```toml``` library
