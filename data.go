@@ -37,6 +37,7 @@ type serverParamaters struct {
 	Port                int
 	TimeToNextSong      int
 	TimeToDisallowSkips int
+	Random              bool
 }
 
 func setupConfiguration() {

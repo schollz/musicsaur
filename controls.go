@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"os/exec"
@@ -114,7 +115,13 @@ func NextSongRequest(rw http.ResponseWriter, r *http.Request) {
 
 func skipTrack(song_index int) {
 	if song_index < 0 {
-		statevar.CurrentSongIndex += song_index + 2
+		if song_index == -1 && conf.Server.Random {
+			s1 := rand.NewSource(time.Now().UnixNano())
+			r1 := rand.New(s1)
+			statevar.CurrentSongIndex = r1.Intn(len(statevar.SongList))
+		} else {
+			statevar.CurrentSongIndex += song_index + 2
+		}
 	} else {
 		statevar.CurrentSongIndex = song_index
 	}
