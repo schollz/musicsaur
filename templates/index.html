@@ -305,7 +305,7 @@ $('a[type=controls]').click(function() {
    var skip = $(this).data('skip');
    console.log(skip);
 	clearInterval(mainInterval);
-    $("div.info1").text('Changing song');
+    $("div.info1").text('Changing song...');
     var posting = $.post('/nextsong', {
         'message': 'next song please',
         'skip': parseInt(skip)
