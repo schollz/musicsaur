@@ -139,23 +139,26 @@ func skipTrack(song_index int) {
 	// To be served by Caddy
 	CopyFile(statevar.SongMap[song].Path, "./static/sound.mp3")
 	statevar.MusicExtension = "mp3"
-	err = os.Remove("./static/sound.webm")
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("Converting to webm...")
-	cmd := "ffmpeg"
-	args := []string{"-i", "./static/sound.mp3", "-dash", "1", "-c:a", "libopus", "-compression_level", "0", "-frame_duration", "5", "-application", "lowdelay", "-cutoff", "20000", "./static/sound.webm"}
-	if err := exec.Command(cmd, args...).Run(); err != nil {
-		// If unsuccessful, will defualt to sound.mp3
-		fmt.Println(err)
-	} else {
-		// If successful get rid of sound.mp3 and use sound.webm
-		statevar.MusicExtension = "webm"
-		err := os.Remove("./static/sound.mp3")
+	if conf.Server.Ffmpeg {
+		err = os.Remove("./static/sound.webm")
 		if err != nil {
 			fmt.Println(err)
 		}
+		fmt.Println("Converting to webm...")
+		cmd := "ffmpeg"
+		args := []string{"-i", "./static/sound.mp3", "-dash", "1", "-c:a", "libopus", "-compression_level", "0", "-frame_duration", "5", "-application", "lowdelay", "-cutoff", "20000", "./static/sound.webm"}
+		if err := exec.Command(cmd, args...).Run(); err != nil {
+			// If unsuccessful, will defualt to sound.mp3
+			fmt.Println(err)
+		} else {
+			// If successful get rid of sound.mp3 and use sound.webm
+			statevar.MusicExtension = "webm"
+			err := os.Remove("./static/sound.mp3")
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
+
 	}
 
 	rawSongData, _ = ioutil.ReadFile(statevar.SongMap[song].Path)

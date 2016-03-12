@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/BurntSushi/toml"
 	"sort"
+
+	"github.com/BurntSushi/toml"
 )
 
 var conf tomlConfig
@@ -38,6 +39,7 @@ type serverParamaters struct {
 	TimeToNextSong      int
 	TimeToDisallowSkips int
 	Random              bool
+	Ffmpeg              bool
 }
 
 func setupConfiguration() {
