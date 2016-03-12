@@ -19,7 +19,7 @@ import (
 
 const (
 	appName    = "musicsaur"
-	appVersion = "1.4.0"
+	appVersion = "1.4.1"
 )
 
 func cleanup() {
@@ -40,7 +40,6 @@ func loadCaddyfile() (caddy.Input, error) {
 	log ./caddy.log
 }`
 	contents = strings.Replace(contents, "IPADDRESS", statevar.IPAddress, -1)
-	contents = strings.Replace(contents, "EXTADDRESS", RuntimeArgs.ExternalIP, -1)
 	contents = strings.Replace(contents, "PORT1", strconv.Itoa(statevar.Port), -1)
 	contents = strings.Replace(contents, "PORT2", strconv.Itoa(statevar.Port+1), -1)
 	fmt.Println(contents)
@@ -54,15 +53,13 @@ func loadCaddyfile() (caddy.Input, error) {
 // RuntimeArgs contains all runtime
 // arguments available
 var RuntimeArgs struct {
-	ExternalIP string
-	Port       string
-	ServerCRT  string
-	ServerKey  string
+	Port      string
+	ServerCRT string
+	ServerKey string
 }
 
 func main() {
-	flag.StringVar(&RuntimeArgs.Port, "p", "8003", "port to bind")
-	flag.StringVar(&RuntimeArgs.ExternalIP, "b", "none", "external address (e.g. musicsaur.com)")
+	flag.StringVar(&RuntimeArgs.Port, "p", "8033", "port to bind")
 	flag.StringVar(&RuntimeArgs.ServerCRT, "crt", "", "location of ssl crt")
 	flag.StringVar(&RuntimeArgs.ServerKey, "key", "", "location of ssl key")
 	flag.CommandLine.Usage = func() {
@@ -70,7 +67,6 @@ func main() {
 run this to start the server and then visit localhost at the port you specify
 (see parameters).
 Example: 'musicsaur -p 5000 127.0.0.1'
-Example: 'musicsaur -p 5000 -b musicsaur.com 127.0.0.1'
 Options:`)
 		flag.CommandLine.PrintDefaults()
 	}
@@ -122,11 +118,6 @@ Options:`)
 	fmt.Println("PORT", RuntimeArgs.Port)
 	port, _ := strconv.Atoi(RuntimeArgs.Port)
 	statevar.Port = port
-	if RuntimeArgs.ExternalIP == "none" {
-		RuntimeArgs.ExternalIP = "http://" + statevar.IPAddress + ":" + strconv.Itoa(statevar.Port)
-	} else {
-		RuntimeArgs.ExternalIP = "http://" + RuntimeArgs.ExternalIP
-	}
 
 	// Load Mp3s
 	if len(conf.MusicFolders) > 0 {
@@ -141,25 +132,23 @@ Options:`)
 	}
 	statevar.SongList.Sort()
 
-	// Load index page
-	index_contents, err := ioutil.ReadFile("./templates/index.html")
-	if err != nil {
-		panic(err)
-	}
-	statevar.IndexPage = string(index_contents)
-
 	skipTrack(statevar.CurrentSongIndex)
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		//defer timeTrack(time.Now(), r.RemoteAddr+" /")
+		// Load index page
+		index_contents, err := ioutil.ReadFile("./templates/index.html")
+		if err != nil {
+			panic(err)
+		}
+		statevar.IndexPage = string(index_contents)
 		html_response := statevar.IndexPage
 		html_response = strings.Replace(html_response, "{{ data['random_integer'] }}", strconv.Itoa(rand.Intn(10000)), -1)
 		html_response = strings.Replace(html_response, "{{ data['check_up_wait_time'] }}", strconv.Itoa(conf.Client.CheckupWaitTime), -1)
 		html_response = strings.Replace(html_response, "{{ data['max_sync_lag'] }}", strconv.Itoa(conf.Client.MaxSyncLag), -1)
 		html_response = strings.Replace(html_response, "{{ data['message'] }}", "Syncing...", -1)
 		html_response = strings.Replace(html_response, "{{ data['playlist_html'] | safe }}", getPlaylistHTML(), -1)
-		html_response = strings.Replace(html_response, "{{ data['sound_url'] }}", RuntimeArgs.ExternalIP, -1)
 		html_response = strings.Replace(html_response, "{{ data['sound_extension'] }}", statevar.MusicExtension, -1)
 		fmt.Fprintf(w, html_response)
 	})

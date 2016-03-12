@@ -32,7 +32,7 @@ linux    arm
 darwin    amd64"""
 
 arches = arches.split("\n")
-version = "1.4.0"
+version = "1.4.1"
 try:
     os.system("rm -rf builds")
 except:
@@ -47,7 +47,7 @@ try:
     os.mkdir("builds")
 except:
     pass
-    
+
 for arch in arches:
     goos = arch.split()[0]
     goarch = arch.split()[1]

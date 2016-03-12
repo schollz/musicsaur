@@ -31,6 +31,9 @@ func getPlaylistHTML() (playlist_html string) {
 		name := statevar.SongMap[k].Fullname
 		names := strings.Split(name, "/")
 		showName := names[len(names)-1]
+		name = showName
+		names = strings.Split(name, "\\")
+		showName = names[len(names)-1]
 		if statevar.CurrentSong != statevar.SongMap[k].Fullname {
 			playlist_html += "<a type='controls' data-skip='" + strconv.Itoa(i) + "'>" + showName + "</a><br>\n"
 		} else {
@@ -70,6 +73,9 @@ func SyncRequest(rw http.ResponseWriter, r *http.Request) {
 		name := statevar.CurrentSong
 		names := strings.Split(name, "/")
 		showName := names[len(names)-1]
+		name = showName
+		names = strings.Split(name, "\\")
+		showName = names[len(names)-1]
 		data := SyncJSON{
 			Current_song:        showName,
 			Client_timestamp:    int64(client_timestamp),
