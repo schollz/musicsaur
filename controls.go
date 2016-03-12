@@ -118,6 +118,10 @@ func skipTrack(song_index int) {
 	} else {
 		statevar.CurrentSongIndex = song_index
 	}
+	if statevar.CurrentSongIndex >= len(statevar.SongList) {
+		statevar.CurrentSongIndex = 0
+	}
+	fmt.Println(statevar.CurrentSongIndex, len(statevar.SongList))
 	song := statevar.SongList[statevar.CurrentSongIndex]
 
 	err := os.Remove("./static/sound.mp3")
