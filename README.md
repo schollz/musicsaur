@@ -7,7 +7,7 @@
 
 ---
 
-**Update 12/26/2015: Version 1.4 released!**
+**Update 3/11/2016: Version 1.4 released!**
 
 **Major changes:**
 
