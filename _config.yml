@@ -1,8 +1,8 @@
 ---
 
-port: 4000
-host: 0.0.0.0
-safe: false
+#port: 4000
+#host: 0.0.0.0
+#safe: false
 
 
 ### site serving configuration ###
@@ -12,7 +12,8 @@ timezone: null
 lsi: false
 markdown: kramdown
 highlighter: pygments
-
+domain_name: 'http://www.musicsaur.com'
+url:            'http://www.musicsaur.com'
 
 ### content configuration ###
 title:       "musicsaur"
