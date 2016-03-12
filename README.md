@@ -32,7 +32,7 @@ Tested on Android, Windows phone, Windows, Apple, and Linux.
 
 # Setup
 
-If you don't want to install *anything*, just download the [compiled version](http://www.musicsaur.com/download-binary/). Otherwise, read on ->.
+If you don't want to install *anything*, just download the [compiled version](http://www.musicsaur.com/#details). Otherwise, read on ->.
 
 ```bash
 git clone https://github.com/schollz/musicsaur.git
