@@ -1,45 +1,38 @@
-name: musicsaur
-description: The simplest music synchronization for multi-room audio.
-meta_description: "Musicsaur is a open-source solution for simple music synchronization that provides multi-room audio with Raspberry Pis"
+---
 
-aboutPage: true
+port: 4000
+host: 0.0.0.0
+safe: false
 
-markdown: redcarpet
+
+### site serving configuration ###
+exclude: [CNAME, README.md, .gitignore]
+permalink : /:year
+timezone: null
+lsi: false
+markdown: kramdown
 highlighter: pygments
-paginate: 20
-baseurl: /
-domain_name: 'http://www.musicsaur.com'
-google_analytics: 'UA-2345677-11'
-disqus: true
-disqus_shortname: 'musicsaur'
 
-# Details for the RSS feed generator
-url:            'http://www.musicsaur.com'
-author:         '<span style="font-size: 200%;"><i>musicsaur</i></span>'
-authorTwitter:  'zack_118'
 
-permalink:       /:title/
+### content configuration ###
+title:       "musicsaur"
+keywords:    "music, synchronization, playlist, play, audio, wifi"
+description: "musicsaur is simply the simplest music synchronization program I know. All you do is run a program and open a browser."
+source_link: "https://github.com/schollz/musicsaur"
+favicon:     "img/favicon.ico"
+touch_icon:  "img/apple-touch-icon.png"
+google_analytics_key: UA-2345677-11 ## put YOUR key here to enable tracking! (blank to disable)
 
-defaults:
-    -
-        scope:
-            path: "" # empty string for all files
-            type: pages
-        values:
-            layout: default
-    -
-        scope:
-            path: "" # empty string for all files
-            type: posts
-        values:
-            layout: post
-    -
-        scope:
-            path: ""
-            type: drafts
-        values:
-            layout: post
 
-gems:
-  - jekyll-sitemap
-  - jekyll-paginate
+### template colors, used site-wide via css ###
+colors:
+  black:     '#111111'
+  white:     '#f8f8f8'
+  blue:      '#49a7e9'
+  green:     '#9bcf2f'
+  purple:    '#c869bf'
+  orange:    '#fab125'
+  turquoise: '#0fbfcf'
+
+kramdown:
+  auto_ids:  false
