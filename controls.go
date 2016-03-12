@@ -140,25 +140,29 @@ func skipTrack(song_index int) {
 	CopyFile(statevar.SongMap[song].Path, "./static/sound.mp3")
 	statevar.MusicExtension = "mp3"
 	if conf.Server.Ffmpeg {
-		err = os.Remove("./static/sound.webm")
-		if err != nil {
-			fmt.Println(err)
-		}
-		fmt.Println("Converting to webm...")
+
+		start := time.Now()
 		cmd := "ffmpeg"
-		args := []string{"-i", "./static/sound.mp3", "-dash", "1", "-c:a", "libopus", "-compression_level", "0", "-frame_duration", "5", "-application", "lowdelay", "-cutoff", "20000", "./static/sound.webm"}
+		args := []string{"-i", "./static/sound.mp3", "-y", "-acodec", "pcm_u8", "-ar", "44100", "./static/sound.wav"}
 		if err := exec.Command(cmd, args...).Run(); err != nil {
 			// If unsuccessful, will defualt to sound.mp3
-			fmt.Println(err)
+			fmt.Println("Error with mp3 -> wav", err)
 		} else {
-			// If successful get rid of sound.mp3 and use sound.webm
-			statevar.MusicExtension = "webm"
-			err := os.Remove("./static/sound.mp3")
-			if err != nil {
-				fmt.Println(err)
+			elapsed := time.Since(start)
+			fmt.Printf("mp3 -> wav done. (%s)\n", elapsed)
+			start = time.Now()
+			cmd = "ffmpeg"
+			args = []string{"-i", "./static/sound.wav", "-y", "-dash", "1", "-c:a", "libopus", "-compression_level", "0", "-frame_duration", "60", "-application", "lowdelay", "-cutoff", "20000", "./static/sound.webm"}
+			if err := exec.Command(cmd, args...).Run(); err != nil {
+				// If unsuccessful, will defualt to sound.mp3
+				fmt.Println("Error with wav -> webm", err)
+			} else {
+				// If successful use sound.webm
+				elapsed = time.Since(start)
+				fmt.Printf("wav -> webm done. (%s)\n", elapsed)
+				statevar.MusicExtension = "webm"
 			}
 		}
-
 	}
 
 	rawSongData, _ = ioutil.ReadFile(statevar.SongMap[song].Path)
