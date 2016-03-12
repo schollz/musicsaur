@@ -37,8 +37,17 @@ try:
     os.system("rm -rf builds")
 except:
     pass
-os.mkdir("builds")
 
+try:
+    os.system("rm -rf static/sound.*")
+except:
+    pass
+
+try:
+    os.mkdir("builds")
+except:
+    pass
+    
 for arch in arches:
     goos = arch.split()[0]
     goarch = arch.split()[1]
