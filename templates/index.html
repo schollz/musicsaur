@@ -235,7 +235,7 @@ function checkIfSkipped(mute_button_click) {
             console.log('Browser:  ' + mySongTime.toString() + '\nServer: ' + serverSongTime.toString() + '\nDiff: ' + (diff*1000).toString() + '\nMean half-latency: ' + true_server_time_delta.toString() +  '\nMeasured half-latency: ' + time_delta2.toString() + '\nrunningDiff: ' + (runningDiff*1000).toString() + '\nSeeking to: ' + (serverSongTime+runningDiff).toString());
             $("div.info1").html('Muted <b>' + current_song_name + '</b> (out of sync)');
 	    runningError += 1;
-	    if (runningError > 5) {
+	    if (runningError > 30) {
 		location.reload();
 	    }
             if (Math.abs(diff) > 3) {
