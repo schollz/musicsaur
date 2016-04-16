@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -14,12 +15,13 @@ import (
 	"time"
 
 	"github.com/mholt/caddy/caddy"
+	"github.com/toqueteos/webbrowser"
 	"gopkg.in/tylerb/graceful.v1"
 )
 
 const (
 	appName    = "musicsaur"
-	appVersion = "1.4.1"
+	appVersion = "1.4.2"
 )
 
 func cleanup() {
@@ -42,7 +44,6 @@ func loadCaddyfile() (caddy.Input, error) {
 	contents = strings.Replace(contents, "IPADDRESS", statevar.IPAddress, -1)
 	contents = strings.Replace(contents, "PORT1", strconv.Itoa(statevar.Port), -1)
 	contents = strings.Replace(contents, "PORT2", strconv.Itoa(statevar.Port+1), -1)
-	fmt.Println(contents)
 	return caddy.CaddyfileInput{
 		Contents: []byte(contents),
 		Filepath: "Caddyfile",
@@ -70,6 +71,11 @@ Example: 'musicsaur -p 5000 127.0.0.1'
 Options:`)
 		flag.CommandLine.PrintDefaults()
 	}
+
+	dat, _ := ioutil.ReadFile("./static/logo.txt")
+	fmt.Println(string(dat))
+	fmt.Printf("\n\nversion %s\n", appVersion)
+
 	setupConfiguration()
 
 	// Load state
@@ -79,9 +85,6 @@ Options:`)
 			panic(err)
 		}
 		json.Unmarshal(dat, &statevar)
-		fmt.Println("\n*******\nLast song:")
-		fmt.Println(statevar.CurrentSong)
-		fmt.Println("*******\n")
 		statevar.IsPlaying = false
 		statevar.SongList = []string{}
 		statevar.LastMuted = 0
@@ -115,24 +118,10 @@ Options:`)
 	} else {
 		statevar.IPAddress = flag.Arg(0)
 	}
-	fmt.Println("PORT", RuntimeArgs.Port)
+
 	port, _ := strconv.Atoi(RuntimeArgs.Port)
 	statevar.Port = port
 
-	// Load Mp3s
-	if len(conf.MusicFolders) > 0 {
-		for _, folder := range conf.MusicFolders {
-			loadMp3s(folder)
-		}
-	}
-
-	// Load song list
-	for k, _ := range statevar.SongMap {
-		statevar.SongList = append(statevar.SongList, k)
-	}
-	statevar.SongList.Sort()
-
-	skipTrack(statevar.CurrentSongIndex)
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -183,6 +172,25 @@ Options:`)
 		fmt.Println(err)
 	}
 
+	fmt.Println("Open a browser to http://" + statevar.IPAddress + ":" + strconv.Itoa(statevar.Port))
+	fmt.Println("To stop server, use Ctl + C\n\n")
+
+	log.Printf("Starting server with %d songs\n", len(statevar.SongList))
+
+	// Load Mp3s
+	if len(conf.MusicFolders) > 0 {
+		for _, folder := range conf.MusicFolders {
+			loadMp3s(folder)
+		}
+	}
+
+	// Load song list
+	for k, _ := range statevar.SongMap {
+		statevar.SongList = append(statevar.SongList, k)
+	}
+	statevar.SongList.Sort()
+
+	// start server
 	go graceful.Run(":"+strconv.Itoa(statevar.Port+1), 10*time.Second, mux)
 
 	caddy.AppName = appName
@@ -200,13 +208,8 @@ Options:`)
 		panic(err)
 	}
 
-	fmt.Println("\n\n######################################################################")
-	fmt.Printf("# musicsaur - version %s\n", appVersion)
-	fmt.Printf("# Starting server with %d songs\n", len(statevar.SongList))
-	fmt.Println("# To use, open a browser to http://" + statevar.IPAddress + ":" + strconv.Itoa(statevar.Port))
-	fmt.Println("# To stop server, use Ctl + C")
-	fmt.Println("######################################################################\n\n")
-
+	skipTrack(statevar.CurrentSongIndex)
+	webbrowser.Open("http://" + statevar.IPAddress + ":" + strconv.Itoa(statevar.Port))
 	// Twiddle your thumbs
 	caddy.Wait()
 

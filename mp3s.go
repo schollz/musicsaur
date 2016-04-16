@@ -1,16 +1,16 @@
 package main
 
 import (
-	"fmt"
-	id3 "github.com/bobertlo/go-id3/id3"
-	mp3 "github.com/tcolgate/mp3"
+	"log"
 	"os"
 	"path/filepath"
 	"time"
+
+	id3 "github.com/bobertlo/go-id3/id3"
+	mp3 "github.com/tcolgate/mp3"
 )
 
 func loadMp3s(path string) {
-	fmt.Println("Looking in " + path)
 	defer timeTrack(time.Now(), "loadMp3s")
 	searchDir, _ := filepath.Abs(path)
 
@@ -26,10 +26,10 @@ func loadMp3s(path string) {
 	for _, file := range fileList {
 		if filepath.Ext(file) == ".mp3" {
 			if !statevar.PathList[file] {
-				fmt.Println(file)
+				log.Println(file)
 				s, err := getMp3Info(file)
 				if err != nil {
-					fmt.Println("Couldn't get ID3 for " + file + ", skipping...")
+					log.Println("Couldn't get ID3 for " + file + ", skipping...")
 				} else {
 					statevar.PathList[file] = true
 					statevar.SongMap[s.Path] = s

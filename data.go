@@ -1,8 +1,11 @@
 package main
 
 import (
-	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
 	"sort"
+	"strings"
 
 	"github.com/BurntSushi/toml"
 )
@@ -43,10 +46,18 @@ type serverParamaters struct {
 }
 
 func setupConfiguration() {
+	if _, err := os.Stat("config.cfg"); os.IsNotExist(err) {
+		dat, _ := ioutil.ReadFile("config-go.cfg")
+		musicPath := getInput("Enter full path to folder with music (e.g. C:/Users/Bob/My Music/): ")
+		configFile := strings.Replace(string(dat), "['/location/of/music/folder1','/location/of/music/folder2']", "['"+musicPath+"']", -1)
+		d1 := []byte(configFile)
+		ioutil.WriteFile("config.cfg", d1, 0644)
+	}
 	if _, err := toml.DecodeFile("config.cfg", &conf); err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 		return
 	}
+
 }
 
 // Data for state

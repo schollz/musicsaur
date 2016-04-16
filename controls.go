@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -134,12 +133,12 @@ func skipTrack(song_index int) {
 	if statevar.CurrentSongIndex >= len(statevar.SongList) {
 		statevar.CurrentSongIndex = 0
 	}
-	fmt.Println(statevar.CurrentSongIndex, len(statevar.SongList))
+	log.Println(statevar.CurrentSongIndex, len(statevar.SongList))
 	song := statevar.SongList[statevar.CurrentSongIndex]
 
 	err := os.Remove("./static/sound.mp3")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 
 	// To be served by Caddy
@@ -152,20 +151,20 @@ func skipTrack(song_index int) {
 		args := []string{"-i", "./static/sound.mp3", "-y", "-acodec", "pcm_u8", "-ar", "44100", "./static/sound.wav"}
 		if err := exec.Command(cmd, args...).Run(); err != nil {
 			// If unsuccessful, will defualt to sound.mp3
-			fmt.Println("Error with mp3 -> wav", err)
+			log.Println("Error with mp3 -> wav", err)
 		} else {
 			elapsed := time.Since(start)
-			fmt.Printf("mp3 -> wav done. (%s)\n", elapsed)
+			log.Printf("mp3 -> wav done. (%s)\n", elapsed)
 			start = time.Now()
 			cmd = "ffmpeg"
 			args = []string{"-i", "./static/sound.wav", "-y", "-dash", "1", "-c:a", "libopus", "-compression_level", "0", "-frame_duration", "60", "-application", "lowdelay", "-cutoff", "20000", "./static/sound.webm"}
 			if err := exec.Command(cmd, args...).Run(); err != nil {
 				// If unsuccessful, will defualt to sound.mp3
-				fmt.Println("Error with wav -> webm", err)
+				log.Println("Error with wav -> webm", err)
 			} else {
 				// If successful use sound.webm
 				elapsed = time.Since(start)
-				fmt.Printf("wav -> webm done. (%s)\n", elapsed)
+				log.Printf("wav -> webm done. (%s)\n", elapsed)
 				statevar.MusicExtension = "webm"
 			}
 		}

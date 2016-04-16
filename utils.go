@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"io"
@@ -10,6 +11,13 @@ import (
 	"strings"
 	"time"
 )
+
+func getInput(prompt string) string {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print(prompt)
+	text, _ := reader.ReadString('\n')
+	return strings.TrimSpace(text)
+}
 
 func timeTrack(start time.Time, name string) {
 	elapsed := time.Since(start)
