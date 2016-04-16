@@ -26,13 +26,13 @@ linux    arm
 linux    ppc64
 windows    amd64"""
 
-arches = """linux    amd64
-windows amd64
+arches = """windows amd64
+linux    amd64
 linux    arm
 darwin    amd64"""
 
 arches = arches.split("\n")
-version = "1.4.1"
+version = "1.4.2"
 try:
     os.system("rm -rf builds")
 except:
@@ -56,16 +56,16 @@ for arch in arches:
     if "windows" in goos:
         exe = ".exe"
     cmd1  = 'env GOOS=%(goos)s GOARCH=%(goarch)s go build -o builds/musicsaur-%(version)s-%(goos)s-%(goarch)s%(exe)s -v *.go' % {'goos':goos,'goarch':goarch,'exe':exe,'version':version}
-    cmd2 = 'zip musicsaur-%(version)s-%(goos)s-%(goarch)s%(exe)s.zip ./templates/* ./static/* config.cfg musicsaur-%(version)s-%(goos)s-%(goarch)s%(exe)s' % {'goos':goos,'goarch':goarch,'exe':exe,'version':version}
+    cmd2 = 'zip musicsaur-%(version)s-%(goos)s-%(goarch)s%(exe)s.zip ./templates/* ./static/* config-go.cfg musicsaur-%(version)s-%(goos)s-%(goarch)s%(exe)s' % {'goos':goos,'goarch':goarch,'exe':exe,'version':version}
     print(cmd1)
     os.system(cmd1)
     os.chdir("builds")
     os.system('cp -r ../static ./')
     os.system('cp -r ../templates ./')
-    os.system('cp ../config-go.cfg ./config.cfg')
+    os.system('cp ../config-go.cfg ./config-go.cfg')
     print(cmd2)
     os.system(cmd2)
-    cmd3 = 'rm -rf templates && rm -rf static && rm config.cfg && rm musicsaur-%(version)s-%(goos)s-%(goarch)s%(exe)s' % {'goos':goos,'goarch':goarch,'exe':exe,'version':version}
+    cmd3 = 'rm -rf templates && rm -rf static && rm config-go.cfg && rm musicsaur-%(version)s-%(goos)s-%(goarch)s%(exe)s' % {'goos':goos,'goarch':goarch,'exe':exe,'version':version}
     print(cmd3)
     os.system(cmd3)
     os.chdir("../")
