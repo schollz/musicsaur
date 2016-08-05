@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mholt/caddy/caddy"
+	"github.com/mholt/caddy"
 	"github.com/toqueteos/webbrowser"
 	"gopkg.in/tylerb/graceful.v1"
 )
@@ -45,9 +45,9 @@ func loadCaddyfile() (caddy.Input, error) {
 	contents = strings.Replace(contents, "PORT1", strconv.Itoa(statevar.Port), -1)
 	contents = strings.Replace(contents, "PORT2", strconv.Itoa(statevar.Port+1), -1)
 	return caddy.CaddyfileInput{
-		Contents: []byte(contents),
-		Filepath: "Caddyfile",
-		RealFile: true,
+		Contents:       []byte(contents),
+		Filepath:       "Caddyfile",
+		ServerTypeName: "http",
 	}, nil
 }
 
@@ -191,26 +191,59 @@ Options:`)
 	statevar.SongList.Sort()
 
 	// start server
-	go graceful.Run(":"+strconv.Itoa(statevar.Port+1), 10*time.Second, mux)
-
-	caddy.AppName = appName
-	caddy.AppVersion = appVersion
-
-	// Get Caddyfile input
-	caddyfile, err := caddy.LoadCaddyfile(loadCaddyfile)
-	if err != nil {
-		panic(err)
-	}
-
-	// Start your engines
-	err = caddy.Start(caddyfile)
-	if err != nil {
-		panic(err)
-	}
 
 	skipTrack(statevar.CurrentSongIndex)
 	webbrowser.Open("http://" + statevar.IPAddress + ":" + strconv.Itoa(statevar.Port))
-	// Twiddle your thumbs
-	caddy.Wait()
+	go graceful.Run(":"+strconv.Itoa(statevar.Port+1), 10*time.Second, mux)
 
+	caddy.AppName = "Sprocket"
+	caddy.AppVersion = "1.2.3"
+	caddy.RegisterCaddyfileLoader("flag", caddy.LoaderFunc(confLoader))
+	caddy.SetDefaultCaddyfileLoader("default", caddy.LoaderFunc(defaultLoader))
+	// Get Caddyfile input
+	caddyfile, err := caddy.LoadCaddyfile("http")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Start your engines
+	fmt.Printf("%v", caddyfile)
+	instance, err := caddy.Start(caddyfile)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("%v", caddyfile)
+	// Twiddle your thumbs
+	instance.Wait()
+}
+
+// confLoader loads the Caddyfile using the -conf flag.
+func confLoader(serverType string) (caddy.Input, error) {
+
+	contents, err := ioutil.ReadFile("Caddyfile")
+	if err != nil {
+		return nil, err
+	}
+	return caddy.CaddyfileInput{
+		Contents:       contents,
+		Filepath:       "Caddyfile",
+		ServerTypeName: serverType,
+	}, nil
+}
+
+// defaultLoader loads the Caddyfile from the current working directory.
+func defaultLoader(serverType string) (caddy.Input, error) {
+	contents, err := ioutil.ReadFile(caddy.DefaultConfigFile)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return caddy.CaddyfileInput{
+		Contents:       contents,
+		Filepath:       caddy.DefaultConfigFile,
+		ServerTypeName: serverType,
+	}, nil
 }
