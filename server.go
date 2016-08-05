@@ -17,6 +17,9 @@ import (
 	"github.com/mholt/caddy"
 	"github.com/toqueteos/webbrowser"
 	"gopkg.in/tylerb/graceful.v1"
+	// plug in the HTTP server type
+	_ "github.com/mholt/caddy/caddyhttp"
+	"github.com/mholt/caddy/caddytls"
 )
 
 const (
@@ -196,54 +199,22 @@ Options:`)
 	webbrowser.Open("http://" + statevar.IPAddress + ":" + strconv.Itoa(statevar.Port))
 	go graceful.Run(":"+strconv.Itoa(statevar.Port+1), 10*time.Second, mux)
 
-	caddy.AppName = "Sprocket"
-	caddy.AppVersion = "1.2.3"
-	caddy.RegisterCaddyfileLoader("flag", caddy.LoaderFunc(confLoader))
-	caddy.SetDefaultCaddyfileLoader("default", caddy.LoaderFunc(defaultLoader))
-	// Get Caddyfile input
-	caddyfile, err := caddy.LoadCaddyfile("http")
+	caddy.AppName = appName
+	caddy.AppVersion = appVersion
+	caddy.Quiet = true
+	caddy.PidFile = ""
+	caddytls.DefaultCAUrl = "https://acme-v01.api.letsencrypt.org/directory"
+
+	caddyfile, err := loadCaddyfile()
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	// Start your engines
-	fmt.Printf("%v", caddyfile)
 	instance, err := caddy.Start(caddyfile)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("%v", caddyfile)
 	// Twiddle your thumbs
 	instance.Wait()
-}
-
-// confLoader loads the Caddyfile using the -conf flag.
-func confLoader(serverType string) (caddy.Input, error) {
-
-	contents, err := ioutil.ReadFile("Caddyfile")
-	if err != nil {
-		return nil, err
-	}
-	return caddy.CaddyfileInput{
-		Contents:       contents,
-		Filepath:       "Caddyfile",
-		ServerTypeName: serverType,
-	}, nil
-}
-
-// defaultLoader loads the Caddyfile from the current working directory.
-func defaultLoader(serverType string) (caddy.Input, error) {
-	contents, err := ioutil.ReadFile(caddy.DefaultConfigFile)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil, nil
-		}
-		return nil, err
-	}
-	return caddy.CaddyfileInput{
-		Contents:       contents,
-		Filepath:       caddy.DefaultConfigFile,
-		ServerTypeName: serverType,
-	}, nil
 }
