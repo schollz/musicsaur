@@ -16,16 +16,18 @@ import (
 
 	"github.com/mholt/caddy"
 	"github.com/toqueteos/webbrowser"
-	"gopkg.in/tylerb/graceful.v1"
 	// plug in the HTTP server type
 	_ "github.com/mholt/caddy/caddyhttp"
 	"github.com/mholt/caddy/caddytls"
 )
 
 const (
-	appName    = "musicsaur"
-	appVersion = "1.4.2"
+	appName = "musicsaur"
 )
+
+var VersionNum string
+var Build string
+var BuildTime string
 
 func cleanup() {
 	fmt.Println("cleanup")
@@ -63,11 +65,14 @@ var RuntimeArgs struct {
 }
 
 func main() {
+	if len(Build) > 6 {
+		Build = Build[0:6]
+	}
 	flag.StringVar(&RuntimeArgs.Port, "p", "8033", "port to bind")
 	flag.StringVar(&RuntimeArgs.ServerCRT, "crt", "", "location of ssl crt")
 	flag.StringVar(&RuntimeArgs.ServerKey, "key", "", "location of ssl key")
 	flag.CommandLine.Usage = func() {
-		fmt.Println(`musicsaur (version ` + appVersion + `): A Websocket Wiki and Kind Of A List Application
+		fmt.Println(`musicsaur (version ` + VersionNum + `, ` + Build + `): A Websocket Wiki and Kind Of A List Application
 run this to start the server and then visit localhost at the port you specify
 (see parameters).
 Example: 'musicsaur -p 5000 127.0.0.1'
@@ -77,7 +82,7 @@ Options:`)
 
 	dat, _ := ioutil.ReadFile("./static/logo.txt")
 	fmt.Println(string(dat))
-	fmt.Printf("\n\nversion %s\n", appVersion)
+	fmt.Printf("\n\nversion %s (%s)\n", VersionNum, Build)
 
 	setupConfiguration()
 
