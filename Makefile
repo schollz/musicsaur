@@ -3,7 +3,7 @@ SOURCES := $(shell find $(SOURCEDIR) -name '*.go')
 
 BINARY=musicsaur
 
-VERSION=1.4.2
+VERSION=1.5
 BUILD_TIME=`date +%FT%T%z`
 BUILD=`git rev-parse HEAD`
 
