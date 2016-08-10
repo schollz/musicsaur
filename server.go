@@ -16,6 +16,7 @@ import (
 
 	"github.com/mholt/caddy"
 	"github.com/toqueteos/webbrowser"
+	"gopkg.in/tylerb/graceful.v1"
 	// plug in the HTTP server type
 	_ "github.com/mholt/caddy/caddyhttp"
 	"github.com/mholt/caddy/caddytls"
@@ -205,7 +206,7 @@ Options:`)
 	go graceful.Run(":"+strconv.Itoa(statevar.Port+1), 10*time.Second, mux)
 
 	caddy.AppName = appName
-	caddy.AppVersion = appVersion
+	caddy.AppVersion = VersionNum + " (" + Build + ")"
 	caddy.Quiet = true
 	caddy.PidFile = ""
 	caddytls.DefaultCAUrl = "https://acme-v01.api.letsencrypt.org/directory"

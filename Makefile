@@ -19,6 +19,7 @@ $(BINARY): $(SOURCES)
 	go get github.com/toqueteos/webbrowser
 	go get github.com/bobertlo/go-id3/id3
 	go get github.com/tcolgate/mp3
+	go get gopkg.in/tylerb/graceful.v1
 	go build ${LDFLAGS} -o ${BINARY} ${SOURCES}
 
 .PHONY: install
