@@ -12,8 +12,8 @@ timezone: null
 lsi: false
 markdown: kramdown
 highlighter: pygments
-domain_name: 'http://www.musicsaur.com'
-url:            'http://www.musicsaur.com'
+domain_name: 'http://rpiai.com/musicsaur/'
+url:            'http://rpiai.com/musicsaur/'
 
 ### content configuration ###
 title:       "musicsaur"
