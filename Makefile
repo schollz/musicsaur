@@ -12,10 +12,10 @@ LDFLAGS=-ldflags "-X main.VersionNum=${VERSION} -X main.Build=${BUILD} -X main.B
 .DEFAULT_GOAL: $(BINARY)
 
 $(BINARY): $(SOURCES)
-	go get github.com/mholt/caddy/caddyhttp
+	go get github.com/caddyserver/caddy/caddyhttp
 	go get github.com/BurntSushi/toml
-	go get github.com/mholt/caddy
-	go get github.com/mholt/caddy/caddytls
+	go get github.com/caddyserver/caddy
+	go get github.com/caddyserver/caddy/caddytls
 	go get github.com/toqueteos/webbrowser
 	go get github.com/bobertlo/go-id3/id3
 	go get github.com/tcolgate/mp3

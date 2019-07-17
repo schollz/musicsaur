@@ -10,7 +10,7 @@
 
 **Update 08/09/2016: Version 1.5 released!**
 
-- Updated to the latest version of [caddy](https://github.com/mholt/caddy)
+- Updated to the latest version of [caddy](https://github.com/caddyserver/caddy)
 - Updated to latest version of [howler.js](https://github.com/goldfire/howler.js/)
 
 --------------------------------------------------------------------------------
@@ -104,7 +104,7 @@ xinit /usr/bin/luakit -u http://W.X.Y.Z:5000
 - Zach Simpson for [his paper on simple clock synchronization](http://www.mine-control.com/zack/timesync/timesync.html)
 - Everyone on the [/r/raspberry_pi](https://www.reddit.com/r/raspberry_pi/comments/3xc8kq/simple_python_script_to_allow_multiple_raspberry/) and [/r/python](https://www.reddit.com/r/Python/comments/3xc8mj/simple_python_script_to_allow_multiple_computers/) threads for great feature requests and bug reports!
 - [ClkerFreeVectorImages](https://pixabay.com/en/users/ClkerFreeVectorImages-3736/) and [OpenClipartVectors](https://pixabay.com/en/users/OpenClipartVectors-30363/) for the Public Domain vectors
-- [mholt](github.com/mholt) for the invaluable `Caddy`
+- [caddyserver](github.com/caddyserver) for the invaluable `Caddy`
 - [tcolgate](http://github.com/tcolgate) for the `mp3` package
 - [bobertlo](http://github.com/bobertlo) for the `go-id3` package
 - [BurntSushi](http://github.com/BurntSushi) for their `toml` library
