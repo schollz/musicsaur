@@ -31,7 +31,7 @@ If you don't want to install _anything_, just download the [compiled version](ht
 git clone https://github.com/schollz/musicsaur.git
 cd musicsaur
 go get ./...
-go build
+GO111MODULE=on go build
 ```
 
 Then copy the configuration file
