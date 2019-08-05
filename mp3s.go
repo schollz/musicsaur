@@ -95,7 +95,9 @@ func getMp3Length(path string) (totalTime int64) {
 	totalTime = 0
 	for {
 
-		if err := d.Decode(&f); err != nil {
+		skippedBytes := 0
+
+		if err := d.Decode(&f, &skippedBytes); err != nil {
 			//fmt.Println(err)
 			return
 		}
